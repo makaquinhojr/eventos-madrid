@@ -63,6 +63,7 @@ async function loadEvents() {
         updateCounter(allEvents.length);
         displayEvents(allEvents);
         actualizarEstadisticas(allEvents);
+        iniciarBannerHoy();
 
     } catch (error) {
         console.error('Error cargando eventos:', error);
@@ -692,3 +693,40 @@ document.addEventListener('DOMContentLoaded', () => {
         cb.addEventListener('change', applyFilters);
     });
 });
+// ===== BANNER HOY =====
+function iniciarBannerHoy() {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const eventosHoy = allEvents.filter(e => {
+        const fecha = new Date(e.fecha + 'T00:00:00');
+        return fecha.toDateString() === hoy.toDateString();
+    });
+
+    const banner = document.getElementById('banner-hoy');
+    const count = document.getElementById('banner-hoy-count');
+    const btn = document.getElementById('banner-hoy-btn');
+
+    if (eventosHoy.length === 0) {
+        banner.style.display = 'none';
+        return;
+    }
+
+    // Mostrar banner
+    count.textContent = eventosHoy.length;
+    banner.style.display = 'flex';
+    document.body.classList.add('banner-visible');
+
+    // Click en "Ver todos"
+    btn.addEventListener('click', () => {
+        // Marcar filtro de hoy
+        document.getElementById('filtro-fecha').value = 'hoy';
+        applyFilters();
+
+        // Cerrar panel si está abierto
+        document.getElementById('filters-panel').classList.remove('active');
+
+        // Toast informativo
+        mostrarToast(`🔥 ${eventosHoy.length} eventos hoy en Madrid`);
+    });
+}
