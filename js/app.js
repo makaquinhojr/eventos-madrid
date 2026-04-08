@@ -53,15 +53,16 @@ async function loadEvents() {
 }
 
 // Mostrar eventos en mapa
-// Mostrar eventos en mapa (CORREGIDO)
+// Mostrar eventos en mapa (MEJORADO)
 function displayEvents(events) {
     markersLayer.clearLayers();
+    
+    console.log(`📍 Mostrando ${events.length} eventos en el mapa`);
     
     events.forEach(event => {
         const color = colors[event.tipo] || '#6B7280';
         const emoji = icons[event.tipo] || '📍';
         
-        // Icono corregido con centrado perfecto
         const icon = L.divIcon({
             html: `
                 <div class="custom-marker" style="
@@ -82,10 +83,10 @@ function displayEvents(events) {
                     ${emoji}
                 </div>
             `,
-            className: '', // Importante: vacío para evitar estilos de Leaflet
+            className: '',
             iconSize: [40, 40],
-            iconAnchor: [20, 20], // Centro del icono
-            popupAnchor: [0, -20]  // Popup aparece arriba
+            iconAnchor: [20, 20],
+            popupAnchor: [0, -20]
         });
         
         const marker = L.marker([event.lat, event.lng], { 
@@ -93,25 +94,32 @@ function displayEvents(events) {
             riseOnHover: true
         });
         
-        const dateText = event.fecha_fin 
-            ? `${formatDate(event.fecha)} - ${formatDate(event.fecha_fin)}`
-            : formatDate(event.fecha);
+        // SOLUCIÓN PROBLEMA 1: Formatear fechas correctamente
+        const dateText = formatearFechaSafe(event.fecha, event.fecha_fin);
+        
+        // SOLUCIÓN PROBLEMA 3: Limpiar y truncar descripción
+        const descripcionLimpia = limpiarDescripcion(event.descripcion, 150);
+        
+        // SOLUCIÓN PROBLEMA 2: Mostrar link solo si es útil
+        const linkHTML = esLinkUtil(event.url) 
+            ? `<a href="${event.url}" target="_blank" class="popup-link">Ver más información →</a>`
+            : `<p style="color: #6B7280; font-size: 12px; font-style: italic;">ℹ️ Más información en el ayuntamiento local</p>`;
         
         marker.bindPopup(`
             <div class="popup-evento">
                 <h3>${event.nombre}</h3>
-                <p>📅 ${dateText}</p>
-                <p>📍 ${event.lugar}</p>
-                <p>💰 ${event.precio === 'gratis' ? '<strong style="color: #059669;">Gratis</strong>' : event.precio_desde || 'De pago'}</p>
-                <p style="color: #6B7280; font-size: 13px; margin-top: 8px; line-height: 1.4;">
-                    ${event.descripcion}
-                </p>
-                <a href="${event.url}" target="_blank">Ver más información →</a>
+                <p><strong>📅</strong> ${dateText}</p>
+                <p><strong>📍</strong> ${event.lugar}</p>
+                <p><strong>💰</strong> ${event.precio === 'gratis' ? '<strong style="color: #059669;">Gratis</strong>' : event.precio_desde || 'De pago'}</p>
+                ${descripcionLimpia ? `<p style="color: #6B7280; font-size: 13px; margin-top: 8px; line-height: 1.4;">${descripcionLimpia}</p>` : ''}
+                ${linkHTML}
             </div>
         `);
         
         marker.addTo(markersLayer);
     });
+    
+    actualizarEstadisticas(events);
 }
 
 // Formatear fecha
@@ -407,3 +415,235 @@ displayEvents = function(events) {
         renderListView(events);
     }
 };
+
+// ===== FUNCIONES HELPER PARA POPUPS =====
+
+// Formatear fecha de forma segura
+function formatearFechaSafe(fechaInicio, fechaFin) {
+    try {
+        const inicio = new Date(fechaInicio + 'T00:00:00');
+        
+        if (fechaFin) {
+            const fin = new Date(fechaFin + 'T00:00:00');
+            return `${inicio.toLocaleDateString('es-ES')} - ${fin.toLocaleDateString('es-ES')}`;
+        } else {
+            return inicio.toLocaleDateString('es-ES');
+        }
+    } catch (error) {
+        console.warn('Error formateando fecha:', fechaInicio, error);
+        return fechaInicio || 'Fecha no disponible';
+    }
+}
+
+// Limpiar y truncar descripción
+function limpiarDescripcion(descripcion, maxLength = 150) {
+    if (!descripcion) return '';
+    
+    // Limpiar HTML básico y espacios extra
+    let limpia = descripcion
+        .replace(/<[^>]*>/g, '') // Remover HTML
+        .replace(/\s+/g, ' ') // Espacios múltiples a uno
+        .trim();
+    
+    // Truncar si es muy larga
+    if (limpia.length > maxLength) {
+        limpia = limpia.substring(0, maxLength - 3) + '...';
+    }
+    
+    return limpia;
+}
+
+// Verificar si un link es útil
+function esLinkUtil(url) {
+    if (!url) return false;
+    
+    // No mostrar links vacíos, placeholders o genéricos
+    const noUtiles = [
+        '',
+        '#',
+        'http://',
+        'https://',
+        'javascript:void(0)',
+        'mailto:',
+        'tel:'
+    ];
+    
+    return !noUtiles.some(noUtil => url.includes(noUtil));
+}
+
+// Actualizar estadísticas
+function actualizarEstadisticas(eventos) {
+    const stats = {
+        concierto: 0,
+        fiesta: 0,
+        mercado: 0,
+        cultural: 0,
+        gastronomia: 0,
+        gratis: 0
+    };
+    
+    eventos.forEach(evento => {
+        if (stats[evento.tipo] !== undefined) {
+            stats[evento.tipo]++;
+        }
+        if (evento.precio === 'gratis') {
+            stats.gratis++;
+        }
+    });
+    
+    // Animar contadores
+    animarContador('stat-conciertos', stats.concierto);
+    animarContador('stat-fiestas', stats.fiesta);
+    animarContador('stat-mercados', stats.mercado);
+    animarContador('stat-cultural', stats.cultural);
+    animarContador('stat-gastronomia', stats.gastronomia);
+    animarContador('stat-gratis', stats.gratis);
+    
+    console.log('📊 Estadísticas actualizadas:', stats);
+}
+
+// Animar contador
+function animarContador(elementId, valorFinal) {
+    const elemento = document.getElementById(elementId);
+    if (!elemento) return;
+    
+    const duracion = 1000; // 1 segundo
+    const pasos = 60;
+    const incremento = valorFinal / pasos;
+    let valorActual = 0;
+    
+    const intervalo = setInterval(() => {
+        valorActual += incremento;
+        if (valorActual >= valorFinal) {
+            elemento.textContent = valorFinal;
+            clearInterval(intervalo);
+        } else {
+            elemento.textContent = Math.floor(valorActual);
+        }
+    }, duracion / pasos);
+}
+// ===== SOLUCIÓN PROBLEMA 1: Formatear fechas de forma segura =====
+function formatearFechaSafe(fechaInicio, fechaFin) {
+    // Intentar parsear la fecha
+    const fecha1 = parsearFecha(fechaInicio);
+    
+    if (!fecha1) {
+        return 'Fecha a confirmar';
+    }
+    
+    const opciones = { 
+        weekday: 'short', 
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+    };
+    
+    const textoFecha1 = fecha1.toLocaleDateString('es-ES', opciones);
+    
+    // Si hay fecha fin
+    if (fechaFin) {
+        const fecha2 = parsearFecha(fechaFin);
+        if (fecha2) {
+            const textoFecha2 = fecha2.toLocaleDateString('es-ES', opciones);
+            
+            // Si es el mismo mes, mostrar compacto
+            if (fecha1.getMonth() === fecha2.getMonth() && fecha1.getFullYear() === fecha2.getFullYear()) {
+                return `${fecha1.getDate()}-${fecha2.getDate()} ${fecha2.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })}`;
+            }
+            
+            return `${textoFecha1} - ${textoFecha2}`;
+        }
+    }
+    
+    return textoFecha1;
+}
+
+function parsearFecha(fechaStr) {
+    if (!fechaStr) return null;
+    
+    try {
+        // Intentar formato ISO (YYYY-MM-DD)
+        const fecha = new Date(fechaStr + 'T00:00:00');
+        
+        // Verificar que la fecha es válida
+        if (isNaN(fecha.getTime())) {
+            console.warn(`⚠️ Fecha inválida: ${fechaStr}`);
+            return null;
+        }
+        
+        return fecha;
+    } catch (e) {
+        console.warn(`⚠️ Error parseando fecha: ${fechaStr}`, e);
+        return null;
+    }
+}
+
+// ===== SOLUCIÓN PROBLEMA 2: Detectar links útiles =====
+function esLinkUtil(url) {
+    if (!url) return false;
+    
+    // Lista de URLs genéricas inútiles
+    const urlsGenericas = [
+        'madrid.es',
+        'esmadrid.com',
+        'timeout.es/madrid',
+        'datos.madrid.es'
+    ];
+    
+    // Si la URL contiene alguna genérica, verificar que tenga ruta específica
+    const urlLower = url.toLowerCase();
+    
+    for (const generica of urlsGenericas) {
+        if (urlLower.includes(generica)) {
+            // Si es SOLO el dominio raíz o /agenda genérica, no es útil
+            if (
+                url.endsWith(generica) || 
+                url.endsWith(generica + '/') ||
+                url.includes('/agenda-eventos-madrid') ||
+                url.includes('/agenda') && url.split('/').length <= 4
+            ) {
+                return false;
+            }
+        }
+    }
+    
+    // Si tiene una URL específica con ID o slug, probablemente es útil
+    if (url.match(/\/(evento|event|actividad|show)\/[\w-]+/i)) {
+        return true;
+    }
+    
+    // Si llega aquí y no es una URL genérica, probablemente es útil
+    return !urlLower.includes('madrid.es') || url.length > 50;
+}
+
+// ===== SOLUCIÓN PROBLEMA 3: Limpiar y truncar descripciones =====
+function limpiarDescripcion(descripcion, maxLength = 150) {
+    if (!descripcion) return '';
+    
+    // Limpiar HTML si existe
+    let texto = descripcion
+        .replace(/<[^>]*>/g, '') // Quitar tags HTML
+        .replace(/&nbsp;/g, ' ') // Reemplazar &nbsp;
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/\s+/g, ' ') // Múltiples espacios → uno
+        .trim();
+    
+    // Si es muy corta o vacía, retornar vacío
+    if (texto.length < 10) return '';
+    
+    // Truncar si es muy larga
+    if (texto.length > maxLength) {
+        // Buscar el último espacio antes del límite
+        const ultimoEspacio = texto.lastIndexOf(' ', maxLength);
+        
+        if (ultimoEspacio > maxLength * 0.8) {
+            texto = texto.substring(0, ultimoEspacio) + '...';
+        } else {
+            texto = texto.substring(0, maxLength) + '...';
+        }
+    }
+    
+    return texto;
+}
