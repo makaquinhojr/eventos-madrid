@@ -473,6 +473,168 @@ class EventosScraper:
         self.stats['municipios'] = total
         print(f"\n   📊 Total extraídos de municipios: {total}")
 
+    def scrape_eventbrite(self):
+        """
+        API oficial de Eventbrite
+        Cubre Madrid capital y municipios de la Comunidad
+        """
+        print("\n🔍 Scrapeando Eventbrite...")
+
+        if not EVENTBRITE_TOKEN:
+            print("   ⚠️ No hay token de Eventbrite configurado")
+            return
+
+        headers = {
+            'Authorization': f'Bearer {EVENTBRITE_TOKEN}',
+            'Content-Type': 'application/json'
+        }
+
+        total = 0
+        page = 1
+        has_more = True
+
+        while has_more:
+            params = {
+                'location.address': 'Madrid, España',
+                'location.within': '50km',       # Radio de 50km cubre toda la CM
+                'start_date.range_start': datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
+                'expand': 'venue,category',
+                'page_size': 50,
+                'page': page,
+                'sort_by': 'date',
+                'locale': 'es_ES'
+            }
+
+            try:
+                print(f"   🌐 Página {page}...")
+                response = requests.get(
+                    EVENTBRITE_URL,
+                    headers=headers,
+                    params=params,
+                    timeout=15
+                )
+                response.raise_for_status()
+                time.sleep(DELAY_BETWEEN_REQUESTS)
+
+                data = response.json()
+                eventos_raw = data.get('events', [])
+                pagination = data.get('pagination', {})
+
+                print(f"   📄 {len(eventos_raw)} eventos en página {page}")
+
+                for evento_data in eventos_raw:
+                    try:
+                        # Nombre
+                        nombre = self.limpiar_texto(
+                            evento_data.get('name', {}).get('text', '')
+                        )
+                        if not nombre:
+                            continue
+
+                        # Fechas
+                        fecha_inicio = self.parsear_fecha(
+                            evento_data.get('start', {}).get('local', '')
+                        )
+                        fecha_fin = self.parsear_fecha(
+                            evento_data.get('end', {}).get('local', '')
+                        )
+
+                        if not fecha_inicio:
+                            continue
+                        if not self.es_fecha_futura(fecha_inicio):
+                            continue
+
+                        # Venue (lugar)
+                        venue = evento_data.get('venue', {})
+                        lat, lng = 40.4168, -3.7038
+                        lugar = 'Madrid'
+
+                        if venue:
+                            lugar = self.limpiar_texto(
+                                venue.get('name', '') or
+                                venue.get('address', {}).get('localized_address_display', '') or
+                                'Madrid'
+                            )
+
+                            # Coordenadas del venue
+                            address = venue.get('address', {})
+                            lat_raw = address.get('latitude')
+                            lng_raw = address.get('longitude')
+
+                            if lat_raw and lng_raw:
+                                try:
+                                    lat = float(lat_raw)
+                                    lng = float(lng_raw)
+                                except (ValueError, TypeError):
+                                    pass
+
+                            # Ciudad para contexto
+                            ciudad = address.get('city', '')
+                            if ciudad and ciudad.lower() not in lugar.lower():
+                                lugar = f"{lugar} ({ciudad})"
+
+                        # Si coordenadas son 0, geocodificar
+                        if lat == 0 or lng == 0:
+                            lat, lng = self.geocodificar(lugar)
+
+                        # Descripción
+                        descripcion = self.limpiar_texto(
+                            evento_data.get('description', {}).get('text', '') or
+                            evento_data.get('summary', ''),
+                            300
+                        )
+
+                        # URL
+                        url = evento_data.get('url', '')
+
+                        # Precio
+                        is_free = evento_data.get('is_free', False)
+                        precio = 'gratis' if is_free else 'pago'
+
+                        # Categoría de Eventbrite → nuestro tipo
+                        category = evento_data.get('category', {})
+                        category_name = category.get('name', '') if category else ''
+                        tipo = self.categorizar_evento(nombre, f"{descripcion} {category_name}")
+
+                        evento = {
+                            'nombre': nombre,
+                            'fecha': fecha_inicio,
+                            'tipo': tipo,
+                            'lat': lat,
+                            'lng': lng,
+                            'lugar': lugar,
+                            'precio': precio,
+                            'descripcion': descripcion,
+                            'url': url,
+                            'fuente': 'eventbrite'
+                        }
+
+                        if fecha_fin and fecha_fin != fecha_inicio:
+                            evento['fecha_fin'] = fecha_fin
+
+                        self.eventos.append(evento)
+                        total += 1
+
+                    except Exception as e:
+                        self.stats['errores'] += 1
+                        continue
+
+                # Paginación
+                has_more = pagination.get('has_more_items', False)
+                page += 1
+
+                # Límite de seguridad: máximo 10 páginas (500 eventos)
+                if page > 10:
+                    print("   ℹ️ Límite de páginas alcanzado")
+                    has_more = False
+
+            except Exception as e:
+                print(f"   ❌ Error en página {page}: {e}")
+                has_more = False
+
+        self.stats['eventbrite'] = total
+        print(f"   📊 Total extraídos de Eventbrite: {total}")
+
     # ===== ELIMINAR DUPLICADOS =====
 
     def eliminar_duplicados(self):
@@ -507,6 +669,7 @@ class EventosScraper:
 
         self.scrape_esmadrid()
         self.scrape_municipios()
+        self.scrape_eventbrite()
 
         self.eliminar_duplicados()
 

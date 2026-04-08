@@ -146,3 +146,8 @@ KNOWN_VENUES = {
     'mercado de motores': {'lat': 40.3985, 'lng': -3.6904},
     'el rastro': {'lat': 40.4089, 'lng': -3.7077},
 }
+import os
+
+# Eventbrite
+EVENTBRITE_TOKEN = os.environ.get('EVENTBRITE_TOKEN', '')
+EVENTBRITE_URL = 'https://www.eventbriteapi.com/v3/events/search/'
