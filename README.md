@@ -56,29 +56,9 @@
 - **URLs oficiales** de cada evento
 - **Actualización**: Manual semanal
 
----
-
-## 🚀 Instalación local
-
-```bash
-# Clonar repositorio
-git clone https://github.com/makaquinhojr/eventos-madrid.git
-
-# Entrar al directorio
-cd eventos-madrid
-
-# Abrir con servidor local
-python -m http.server 8000
-
-# Abrir en navegador
-http://localhost:8000
-
-
-
 
 📁 Estructura del proyecto
 
-text
 
 eventos-madrid/
 ├── index.html          # Página principal
