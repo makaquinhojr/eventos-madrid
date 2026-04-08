@@ -1,507 +1,200 @@
-// ===== VARIABLES GLOBALES =====
+// Variables globales
 let map;
-let todosLosEventos = [];
+let allEvents = [];
 let markersLayer;
 
-// ===== ICONOS Y COLORES =====
-const iconos = {
-    'concierto': '🎵',
-    'fiesta': '🎪',
-    'mercado': '🛍️',
-    'cultural': '🎭',
-    'gastronomia': '🍽️'
+const icons = {
+    concierto: '🎵',
+    fiesta: '🎪',
+    mercado: '🛍️',
+    cultural: '🎭',
+    gastronomia: '🍽️'
 };
 
-const colores = {
-    'concierto': '#9333EA',
-    'fiesta': '#C60B1E',
-    'mercado': '#059669',
-    'cultural': '#1E40AF',
-    'gastronomia': '#92400E'
+const colors = {
+    concierto: '#7C3AED',
+    fiesta: '#DC2626',
+    mercado: '#059669',
+    cultural: '#2563EB',
+    gastronomia: '#D97706'
 };
 
-// ===== INICIALIZAR MAPA =====
+// Inicializar mapa
 function initMap() {
     map = L.map('map').setView([40.4168, -3.7038], 12);
-    
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 19
+        attribution: '© OpenStreetMap'
     }).addTo(map);
-    
     markersLayer = L.layerGroup().addTo(map);
-    
-    console.log('✅ Mapa inicializado');
 }
 
-// ===== CARGAR EVENTOS =====
-async function cargarEventos() {
+// Cargar eventos
+async function loadEvents() {
     try {
         const response = await fetch('data/eventos.json');
-        const todosEventos = await response.json();
+        const events = await response.json();
         
-        // Filtrar eventos futuros
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
+        // Filtrar futuros
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
         
-        const eventosFuturos = todosEventos.filter(evento => {
-            const fechaComparar = evento.fecha_fin || evento.fecha;
-            const fechaEvento = new Date(fechaComparar);
-            return fechaEvento >= hoy;
-        });
+        allEvents = events.filter(e => {
+            const eventDate = new Date(e.fecha_fin || e.fecha);
+            return eventDate >= today;
+        }).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
         
-        // Ordenar por fecha
-        todosLosEventos = eventosFuturos.sort((a, b) => {
-            return new Date(a.fecha) - new Date(b.fecha);
-        });
-        
-        console.log(`✅ ${todosLosEventos.length} eventos cargados`);
-        console.log(`📅 Hoy es: ${hoy.toLocaleDateString('es-ES')}`);
-        
-        document.getElementById('evento-count').textContent = `${todosLosEventos.length} eventos`;
-        
-        mostrarEventos(todosLosEventos);
+        updateCounter(allEvents.length);
+        displayEvents(allEvents);
+        updateStats(allEvents);
         
     } catch (error) {
-        console.error('❌ Error cargando eventos:', error);
+        console.error('Error:', error);
     }
 }
 
-// ===== MOSTRAR EVENTOS EN MAPA =====
-function mostrarEventos(eventos) {
+// Mostrar eventos en mapa
+function displayEvents(events) {
     markersLayer.clearLayers();
     
-    console.log(`📍 Mostrando ${eventos.length} eventos en el mapa`);
-    
-    eventos.forEach(evento => {
-        const colorFinal = colores[evento.tipo] || '#6C757D';
-        
-        const icono = L.divIcon({
-            html: `<div style="
-                background: ${colorFinal};
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 20px;
-                border: 3px solid white;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-                cursor: pointer;
-            ">${iconos[evento.tipo] || '📍'}</div>`,
-            className: '',
-            iconSize: [40, 40]
+    events.forEach(event => {
+        const icon = L.divIcon({
+            html: `<div style="background: ${colors[event.tipo]}; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">${icons[event.tipo]}</div>`,
+            iconSize: [36, 36]
         });
         
-        const marker = L.marker([evento.lat, evento.lng], { icon: icono });
+        const marker = L.marker([event.lat, event.lng], { icon });
         
-        const textoFecha = evento.fecha_fin 
-            ? `${formatearFecha(evento.fecha)} - ${formatearFecha(evento.fecha_fin)}`
-            : formatearFecha(evento.fecha);
-        
-        const popupContent = `
+        marker.bindPopup(`
             <div class="popup-evento">
-                <h3>${evento.nombre}</h3>
-                <p>📅 ${textoFecha}</p>
-                <p>📍 ${evento.lugar}</p>
-                <p>💰 ${evento.precio === 'gratis' ? '<strong>Gratis</strong>' : evento.precio_desde || 'De pago'}</p>
-                <p style="color: #6C757D; font-size: 13px; margin-top: 8px;">
-                    ${evento.descripcion}
-                </p>
-                <a href="${evento.url}" target="_blank" class="btn-link">
-                    Ver más información →
-                </a>
+                <h3>${event.nombre}</h3>
+                <p>📅 ${formatDate(event.fecha)}</p>
+                <p>📍 ${event.lugar}</p>
+                <p>💰 ${event.precio === 'gratis' ? 'Gratis' : event.precio_desde || 'De pago'}</p>
+                <p style="color: #6B7280; font-size: 13px;">${event.descripcion}</p>
+                <a href="${event.url}" target="_blank">Ver más →</a>
             </div>
-        `;
+        `);
         
-        marker.bindPopup(popupContent);
         marker.addTo(markersLayer);
     });
-    
-    actualizarEstadisticas(eventos);
 }
 
-// ===== FORMATEAR FECHA =====
-function formatearFecha(fechaStr) {
-    const fecha = new Date(fechaStr + 'T00:00:00');
-    const opciones = { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
+// Formatear fecha
+function formatDate(dateStr) {
+    const date = new Date(dateStr + 'T00:00:00');
+    return date.toLocaleDateString('es-ES', { 
+        weekday: 'short', 
+        month: 'short', 
         day: 'numeric' 
-    };
-    return fecha.toLocaleDateString('es-ES', opciones);
+    });
 }
 
-// ===== APLICAR FILTROS =====
-function aplicarFiltros() {
-    console.log('🔍 Aplicando filtros...');
+// Actualizar contador
+function updateCounter(count) {
+    document.getElementById('event-count').textContent = count;
+}
+
+// Actualizar stats
+function updateStats(events) {
+    const stats = {
+        concierto: 0,
+        fiesta: 0,
+        mercado: 0,
+        cultural: 0,
+        gastronomia: 0,
+        gratis: 0
+    };
     
-    const filtroFecha = document.getElementById('filtro-fecha').value;
-    const buscador = document.getElementById('buscador').value.toLowerCase().trim();
-    
-    console.log('Filtro fecha:', filtroFecha);
-    console.log('Buscador:', buscador);
-    
-    // Obtener checkboxes marcados
-    const tiposSeleccionados = [];
-    const preciosSeleccionados = [];
-    
-    document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(cb => {
-        if (cb.checked) {
-            const val = cb.value;
-            if (['concierto', 'fiesta', 'mercado', 'cultural', 'gastronomia'].includes(val)) {
-                tiposSeleccionados.push(val);
-            } else if (['gratis', 'pago'].includes(val)) {
-                preciosSeleccionados.push(val);
-            }
-        }
+    events.forEach(e => {
+        stats[e.tipo]++;
+        if (e.precio === 'gratis') stats.gratis++;
     });
     
-    console.log('Tipos seleccionados:', tiposSeleccionados);
-    console.log('Precios seleccionados:', preciosSeleccionados);
+    Object.keys(stats).forEach(key => {
+        const el = document.getElementById(`stat-${key}s` || `stat-${key}`);
+        if (el) el.textContent = stats[key];
+    });
+}
+
+// Aplicar filtros
+function applyFilters() {
+    const search = document.getElementById('search').value.toLowerCase();
+    const dateFilter = document.getElementById('filter-date').value;
     
-    // Calcular rango de fechas
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
+    const types = Array.from(document.querySelectorAll('.chip input[value="concierto"], .chip input[value="fiesta"], .chip input[value="mercado"], .chip input[value="cultural"], .chip input[value="gastronomia"]'))
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
     
-    let fechaInicio = new Date(hoy);
-    let fechaFin = new Date(hoy);
+    const prices = Array.from(document.querySelectorAll('.chip input[value="gratis"], .chip input[value="pago"]'))
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
     
-    if (filtroFecha === 'hoy') {
-        fechaFin = new Date(hoy);
-    } else if (filtroFecha === 'finde') {
-        const dia = hoy.getDay();
-        if (dia === 6) { // Sábado
-            fechaInicio = new Date(hoy);
-            fechaFin = new Date(hoy);
-            fechaFin.setDate(hoy.getDate() + 1);
-        } else if (dia === 0) { // Domingo
-            fechaInicio = new Date(hoy);
-            fechaFin = new Date(hoy);
-        } else { // Lunes a viernes
-            const diasHastaSabado = 6 - dia;
-            fechaInicio.setDate(hoy.getDate() + diasHastaSabado);
-            fechaFin.setDate(fechaInicio.getDate() + 1);
-        }
-    } else if (filtroFecha === 'semana') {
-        fechaFin.setDate(hoy.getDate() + 7);
-    } else if (filtroFecha === 'mes') {
-        fechaFin.setDate(hoy.getDate() + 30);
-    } else {
-        fechaFin.setFullYear(hoy.getFullYear() + 2);
-    }
-    
-    console.log('Rango fechas:', fechaInicio.toLocaleDateString(), '-', fechaFin.toLocaleDateString());
-    
-    // Filtrar eventos
-    let eventosFiltrados = todosLosEventos.filter(evento => {
-        // Filtro por tipo
-        if (tiposSeleccionados.length > 0 && !tiposSeleccionados.includes(evento.tipo)) {
-            return false;
-        }
-        
-        // Filtro por precio
-        if (preciosSeleccionados.length > 0 && !preciosSeleccionados.includes(evento.precio)) {
-            return false;
-        }
-        
-        // Filtro por búsqueda
-        if (buscador) {
-            const texto = `${evento.nombre} ${evento.descripcion} ${evento.lugar}`.toLowerCase();
-            const palabras = buscador.split(' ');
-            if (!palabras.every(p => texto.includes(p))) {
-                return false;
-            }
-        }
-        
-        // Filtro por fecha
-        if (filtroFecha !== 'todos') {
-            const fechaEvt = new Date(evento.fecha);
-            fechaEvt.setHours(0, 0, 0, 0);
-            const fechaEvtFin = evento.fecha_fin ? new Date(evento.fecha_fin) : fechaEvt;
-            fechaEvtFin.setHours(0, 0, 0, 0);
-            
-            if (fechaEvt > fechaFin || fechaEvtFin < fechaInicio) {
-                return false;
-            }
-        }
-        
+    let filtered = allEvents.filter(e => {
+        if (types.length && !types.includes(e.tipo)) return false;
+        if (prices.length && !prices.includes(e.precio)) return false;
+        if (search && !`${e.nombre} ${e.descripcion} ${e.lugar}`.toLowerCase().includes(search)) return false;
         return true;
     });
     
-    console.log(`✅ Resultado: ${eventosFiltrados.length} eventos`);
-    
-    mostrarEventos(eventosFiltrados);
-    document.getElementById('evento-count').textContent = `${eventosFiltrados.length} eventos`;
+    displayEvents(filtered);
+    updateCounter(filtered.length);
+    updateStats(filtered);
 }
 
-// ===== LIMPIAR FILTROS =====
-function limpiarFiltros() {
-    console.log('🔄 Limpiando filtros...');
-    
-    document.getElementById('filtro-fecha').value = 'todos';
-    document.getElementById('buscador').value = '';
-    
-    document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(cb => {
-        cb.checked = true;
-    });
-    
-    mostrarEventos(todosLosEventos);
-    document.getElementById('evento-count').textContent = `${todosLosEventos.length} eventos`;
+// Limpiar filtros
+function clearFilters() {
+    document.getElementById('search').value = '';
+    document.getElementById('filter-date').value = 'all';
+    document.querySelectorAll('.chip input').forEach(cb => cb.checked = true);
+    applyFilters();
 }
 
-// ===== INICIALIZACIÓN =====
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 INICIO - EventosMadrid cargando...');
+// Modo oscuro
+function toggleTheme() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
     
-    // Inicializar mapa
+    const icon = document.querySelector('.theme-toggle i');
+    icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+}
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', () => {
     initMap();
+    loadEvents();
     
-    // Cargar eventos
-    cargarEventos();
-    
-    // ESPERAR 1 segundo para que carguen los eventos antes de añadir listeners
-    setTimeout(function() {
-        console.log('📡 Configurando event listeners...');
-        
-        // Botón aplicar filtros
-        const btnAplicar = document.getElementById('aplicar-filtros');
-        if (btnAplicar) {
-            btnAplicar.onclick = function(e) {
-                e.preventDefault();
-                console.log('🔘 Click en Aplicar Filtros');
-                aplicarFiltros();
-            };
-            console.log('✅ Listener añadido a botón aplicar');
-        } else {
-            console.error('❌ No se encuentra botón aplicar-filtros');
-        }
-        
-        // Botón limpiar filtros
-        const btnLimpiar = document.getElementById('limpiar-filtros');
-        if (btnLimpiar) {
-            btnLimpiar.onclick = function(e) {
-                e.preventDefault();
-                console.log('🔘 Click en Limpiar Filtros');
-                limpiarFiltros();
-            };
-            console.log('✅ Listener añadido a botón limpiar');
-        } else {
-            console.error('❌ No se encuentra botón limpiar-filtros');
-        }
-        
-        // Select de fecha
-        const selectFecha = document.getElementById('filtro-fecha');
-        if (selectFecha) {
-            selectFecha.onchange = function() {
-                console.log('📅 Fecha cambiada a:', this.value);
-                aplicarFiltros();
-            };
-            console.log('✅ Listener añadido a select fecha');
-        } else {
-            console.error('❌ No se encuentra select filtro-fecha');
-        }
-        
-        // Checkboxes
-        const checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
-        console.log(`📋 Encontrados ${checkboxes.length} checkboxes`);
-        
-        checkboxes.forEach(function(cb) {
-            cb.onchange = function() {
-                console.log('✅ Checkbox cambiado:', this.value, this.checked);
-                aplicarFiltros();
-            };
-        });
-        
-        if (checkboxes.length > 0) {
-            console.log('✅ Listeners añadidos a checkboxes');
-        } else {
-            console.error('❌ No se encontraron checkboxes');
-        }
-        
-        // Buscador
-        const buscador = document.getElementById('buscador');
-        if (buscador) {
-            let timeout;
-            buscador.oninput = function() {
-                clearTimeout(timeout);
-                const valor = this.value;
-                console.log('🔍 Escribiendo en buscador:', valor);
-                timeout = setTimeout(function() {
-                    aplicarFiltros();
-                }, 500);
-            };
-            console.log('✅ Listener añadido a buscador');
-        } else {
-            console.error('❌ No se encuentra input buscador');
-        }
-        
-        console.log('✅ Todos los listeners configurados');
-        
-    }, 1000);
-});
-
-// ===== MODO OSCURO =====
-document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('theme-toggle');
-    const body = document.body;
-    const icon = themeToggle.querySelector('i');
-    
-    // Cargar preferencia guardada
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        body.classList.add('dark-mode');
-        icon.classList.remove('fa-moon');
-        icon.classList.add('fa-sun');
+    // Tema guardado
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        document.querySelector('.theme-toggle i').className = 'fas fa-sun';
     }
     
-    // Toggle al hacer click
-    themeToggle.addEventListener('click', function() {
-        body.classList.toggle('dark-mode');
-        
-        if (body.classList.contains('dark-mode')) {
-            icon.classList.remove('fa-moon');
-            icon.classList.add('fa-sun');
-            localStorage.setItem('theme', 'dark');
-            console.log('🌙 Modo oscuro activado');
-        } else {
-            icon.classList.remove('fa-sun');
-            icon.classList.add('fa-moon');
-            localStorage.setItem('theme', 'light');
-            console.log('☀️ Modo claro activado');
-        }
+    // Event listeners
+    document.getElementById('fab-filters').addEventListener('click', () => {
+        document.getElementById('filters-panel').classList.add('active');
+    });
+    
+    document.getElementById('close-panel').addEventListener('click', () => {
+        document.getElementById('filters-panel').classList.remove('active');
+    });
+    
+    document.getElementById('stats-toggle').addEventListener('click', () => {
+        document.getElementById('stats-panel').classList.add('active');
+    });
+    
+    document.getElementById('close-stats').addEventListener('click', () => {
+        document.getElementById('stats-panel').classList.remove('active');
+    });
+    
+    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+    
+    document.getElementById('btn-clear').addEventListener('click', clearFilters);
+    
+    // Filtros automáticos
+    document.getElementById('search').addEventListener('input', applyFilters);
+    document.getElementById('filter-date').addEventListener('change', applyFilters);
+    document.querySelectorAll('.chip input').forEach(cb => {
+        cb.addEventListener('change', applyFilters);
     });
 });
-
-// ===== ACTUALIZAR ESTADÍSTICAS =====
-function actualizarEstadisticas(eventos) {
-    const stats = {
-        concierto: 0,
-        fiesta: 0,
-        mercado: 0,
-        cultural: 0,
-        gastronomia: 0,
-        gratis: 0
-    };
-    
-    eventos.forEach(evento => {
-        stats[evento.tipo]++;
-        if (evento.precio === 'gratis') {
-            stats.gratis++;
-        }
-    });
-    
-    // Animar contadores
-    animarContador('stat-conciertos', stats.concierto);
-    animarContador('stat-fiestas', stats.fiesta);
-    animarContador('stat-mercados', stats.mercado);
-    animarContador('stat-cultural', stats.cultural);
-    animarContador('stat-gastronomia', stats.gastronomia);
-    animarContador('stat-gratis', stats.gratis);
-}
-
-function animarContador(elementId, valorFinal) {
-    const elemento = document.getElementById(elementId);
-    if (!elemento) return;
-    
-    const duracion = 1000; // 1 segundo
-    const pasos = 60;
-    const incremento = valorFinal / pasos;
-    let valorActual = 0;
-    
-    const intervalo = setInterval(() => {
-        valorActual += incremento;
-        if (valorActual >= valorFinal) {
-            elemento.textContent = valorFinal;
-            clearInterval(intervalo);
-        } else {
-            elemento.textContent = Math.floor(valorActual);
-        }
-    }, duracion / pasos);
-}
-// ===== MODO OSCURO =====
-(function() {
-    const themeToggle = document.getElementById('theme-toggle');
-    if (!themeToggle) return;
-    
-    const body = document.body;
-    const icon = themeToggle.querySelector('i');
-    
-    // Cargar preferencia guardada
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        body.classList.add('dark-mode');
-        icon.classList.remove('fa-moon');
-        icon.classList.add('fa-sun');
-    }
-    
-    // Toggle al hacer click
-    themeToggle.addEventListener('click', function() {
-        body.classList.toggle('dark-mode');
-        
-        if (body.classList.contains('dark-mode')) {
-            icon.classList.remove('fa-moon');
-            icon.classList.add('fa-sun');
-            localStorage.setItem('theme', 'dark');
-            console.log('🌙 Modo oscuro activado');
-        } else {
-            icon.classList.remove('fa-sun');
-            icon.classList.add('fa-moon');
-            localStorage.setItem('theme', 'light');
-            console.log('☀️ Modo claro activado');
-        }
-    });
-})();
-
-// ===== ACTUALIZAR ESTADÍSTICAS =====
-function actualizarEstadisticas(eventos) {
-    const stats = {
-        concierto: 0,
-        fiesta: 0,
-        mercado: 0,
-        cultural: 0,
-        gastronomia: 0,
-        gratis: 0
-    };
-    
-    eventos.forEach(evento => {
-        if (stats[evento.tipo] !== undefined) {
-            stats[evento.tipo]++;
-        }
-        if (evento.precio === 'gratis') {
-            stats.gratis++;
-        }
-    });
-    
-    // Animar contadores
-    animarContador('stat-conciertos', stats.concierto);
-    animarContador('stat-fiestas', stats.fiesta);
-    animarContador('stat-mercados', stats.mercado);
-    animarContador('stat-cultural', stats.cultural);
-    animarContador('stat-gastronomia', stats.gastronomia);
-    animarContador('stat-gratis', stats.gratis);
-    
-    console.log('📊 Estadísticas actualizadas:', stats);
-}
-
-function animarContador(elementId, valorFinal) {
-    const elemento = document.getElementById(elementId);
-    if (!elemento) return;
-    
-    const duracion = 1000;
-    const pasos = 60;
-    const incremento = valorFinal / pasos;
-    let valorActual = 0;
-    
-    const intervalo = setInterval(() => {
-        valorActual += incremento;
-        if (valorActual >= valorFinal) {
-            elemento.textContent = valorFinal;
-            clearInterval(intervalo);
-        } else {
-            elemento.textContent = Math.floor(valorActual);
-        }
-    }, duracion / pasos);
-}
