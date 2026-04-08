@@ -111,6 +111,7 @@ function displayEvents(events) {
                 <p><strong>📅</strong> ${dateText}</p>
                 <p><strong>📍</strong> ${event.lugar}</p>
                 <p><strong>💰</strong> ${event.precio === 'gratis' ? '<strong style="color: #059669;">Gratis</strong>' : event.precio_desde || 'De pago'}</p>
+                ${userLocation ? `<p><strong>🚶</strong> ${getDistanciaHTML(event)}</p>` : ''}
                 ${descripcionLimpia ? `<p style="color: #6B7280; font-size: 13px; margin-top: 8px; line-height: 1.4;">${descripcionLimpia}</p>` : ''}
                 ${linkHTML}
             </div>
@@ -388,6 +389,11 @@ function renderListView(events) {
                             <i class="fas fa-map-marker-alt"></i>
                             ${evento.lugar}
                         </div>
+                        ${userLocation ? `
+                        <div class="event-meta-item distancia">
+                            ${getDistanciaHTML(evento)}
+                        </div>
+                    ` : ''}
                     </div>
                     
                     <div class="event-description">
@@ -575,6 +581,54 @@ function limpiarDescripcion(descripcion, maxLength = 150) {
     return texto;
 }
 
+// ===== DISTANCIAS =====
+
+// Fórmula Haversine: calcula distancia entre dos coordenadas en km
+function calcularDistancia(lat1, lng1, lat2, lng2) {
+    const R = 6371; // Radio de la Tierra en km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+// Formatea la distancia para mostrar
+function formatearDistancia(km) {
+    if (km < 1) {
+        return `${Math.round(km * 1000)} m`;
+    }
+    return `${km.toFixed(1)} km`;
+}
+
+// Obtiene el HTML de distancia para un evento
+function getDistanciaHTML(evento) {
+    if (!userLocation) return '';
+    
+    const distancia = calcularDistancia(
+        userLocation.lat, 
+        userLocation.lng,
+        evento.lat, 
+        evento.lng
+    );
+    
+    const texto = formatearDistancia(distancia);
+    
+    // Color según distancia
+    let color = '#059669'; // verde - cerca
+    if (distancia > 5) color = '#D97706';  // naranja - medio
+    if (distancia > 15) color = '#DC2626'; // rojo - lejos
+    
+    return `
+        <span class="distancia-badge" style="color: ${color}">
+            <i class="fas fa-walking"></i> ${texto}
+        </span>
+    `;
+}
+
 // ===== GEOLOCALIZACIÓN =====
 let userMarker = null;
 let userLocation = null;
@@ -630,6 +684,9 @@ function onGeoSuccess(position) {
 
     // Poner marker del usuario
     colocarMarkerUsuario(latitude, longitude);
+
+    // ← AÑADIR ESTO: refrescar eventos con distancias
+    displayEvents(allEvents);
 
     // Toast de éxito
     const precisionTexto = accuracy < 100 
@@ -695,6 +752,9 @@ function desactivarGeolocalizacion() {
 
     // Volver a vista general de Madrid
     map.setView([40.4168, -3.7038], 12);
+
+    // ← AÑADIR ESTO: refrescar sin distancias
+    displayEvents(allEvents);
 
     mostrarToast('📍 Geolocalización desactivada');
 }
