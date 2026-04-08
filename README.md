@@ -73,6 +73,9 @@ python -m http.server 8000
 # Abrir en navegador
 http://localhost:8000
 
+
+
+
 📁 Estructura del proyecto
 
 text
