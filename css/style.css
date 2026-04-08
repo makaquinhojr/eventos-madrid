@@ -473,3 +473,65 @@ body.dark-mode .stat-box.highlight .stat-value {
 * {
     transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
+
+/* ===== CUSTOM MARKERS ===== */
+.custom-marker {
+    transition: all 0.3s ease !important;
+}
+
+.leaflet-marker-icon {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Hover effect en markers */
+.leaflet-marker-icon:hover .custom-marker {
+    transform: translate(-50%, -50%) scale(1.15) !important;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4) !important;
+    z-index: 1000 !important;
+}
+
+/* Animación de entrada de markers */
+@keyframes markerPop {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+.custom-marker {
+    animation: markerPop 0.4s ease-out;
+}
+
+/* Mejorar popup */
+body.dark-mode .leaflet-popup-content-wrapper {
+    background: var(--bg-alt);
+    color: var(--text);
+}
+
+body.dark-mode .popup-evento h3 {
+    color: #FF6B6B;
+}
+
+body.dark-mode .popup-evento p {
+    color: var(--text);
+}
+
+body.dark-mode .popup-evento a {
+    background: var(--primary);
+}
+
+.leaflet-popup-content {
+    margin: 0 !important;
+}
+
+.popup-evento {
+    padding: 16px;
+}

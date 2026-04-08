@@ -53,25 +53,60 @@ async function loadEvents() {
 }
 
 // Mostrar eventos en mapa
+// Mostrar eventos en mapa (CORREGIDO)
 function displayEvents(events) {
     markersLayer.clearLayers();
     
     events.forEach(event => {
+        const color = colors[event.tipo] || '#6B7280';
+        const emoji = icons[event.tipo] || '📍';
+        
+        // Icono corregido con centrado perfecto
         const icon = L.divIcon({
-            html: `<div style="background: ${colors[event.tipo]}; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">${icons[event.tipo]}</div>`,
-            iconSize: [36, 36]
+            html: `
+                <div class="custom-marker" style="
+                    background: ${color};
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 20px;
+                    border: 3px solid white;
+                    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+                    cursor: pointer;
+                    position: relative;
+                    transform: translate(-50%, -50%);
+                ">
+                    ${emoji}
+                </div>
+            `,
+            className: '', // Importante: vacío para evitar estilos de Leaflet
+            iconSize: [40, 40],
+            iconAnchor: [20, 20], // Centro del icono
+            popupAnchor: [0, -20]  // Popup aparece arriba
         });
         
-        const marker = L.marker([event.lat, event.lng], { icon });
+        const marker = L.marker([event.lat, event.lng], { 
+            icon: icon,
+            riseOnHover: true
+        });
+        
+        const dateText = event.fecha_fin 
+            ? `${formatDate(event.fecha)} - ${formatDate(event.fecha_fin)}`
+            : formatDate(event.fecha);
         
         marker.bindPopup(`
             <div class="popup-evento">
                 <h3>${event.nombre}</h3>
-                <p>📅 ${formatDate(event.fecha)}</p>
+                <p>📅 ${dateText}</p>
                 <p>📍 ${event.lugar}</p>
-                <p>💰 ${event.precio === 'gratis' ? 'Gratis' : event.precio_desde || 'De pago'}</p>
-                <p style="color: #6B7280; font-size: 13px;">${event.descripcion}</p>
-                <a href="${event.url}" target="_blank">Ver más →</a>
+                <p>💰 ${event.precio === 'gratis' ? '<strong style="color: #059669;">Gratis</strong>' : event.precio_desde || 'De pago'}</p>
+                <p style="color: #6B7280; font-size: 13px; margin-top: 8px; line-height: 1.4;">
+                    ${event.descripcion}
+                </p>
+                <a href="${event.url}" target="_blank">Ver más información →</a>
             </div>
         `);
         
