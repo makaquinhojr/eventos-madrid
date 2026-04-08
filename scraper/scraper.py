@@ -333,7 +333,6 @@ class EventosScraper:
                 'start_date.range_start': datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'expand': 'venue,category',
                 'page_size': 50,
-                'page': page,
                 'sort_by': 'date',
                 'status': 'live'
             }
@@ -341,7 +340,7 @@ class EventosScraper:
             try:
                 print(f"   🌐 Página {page}...")
                 response = requests.get(
-                    'https://www.eventbriteapi.com/v3/events/search/',
+                    'https://www.eventbriteapi.com/v3/events/',
                     headers=headers,
                     params=params,
                     timeout=15
