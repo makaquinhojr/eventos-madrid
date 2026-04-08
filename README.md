@@ -174,10 +174,4 @@ Diego SB · github.com/makaquinhojr
 🌍 Comunidad de Madrid	API de eventos regionales
 🗺️ OpenStreetMap	Datos cartográficos libres
 📦 Leaflet.js	Librería de mapas open source
-<div align="center">
 
-🌐 Ver demo · ⭐ Dar una estrella · 🐛 Reportar un bug
-<br>
-
-Hecho con ❤️ en el Falla · Proyecto educativo · 2026
-</div> ```
