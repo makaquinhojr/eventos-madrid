@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventosMadrid - Mapa de Eventos</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Nuestro CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">🎉 EventosMadrid</div>
+        <div class="stats">
+            <span id="evento-count">0 eventos</span>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>Filtros</h2>
+        
+        <div class="filter-group">
+            <label>📅 Fecha</label>
+            <select id="filtro-fecha">
+                <option value="todos">Todos</option>
+                <option value="hoy">Hoy</option>
+                <option value="semana">Esta semana</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>🎭 Tipo</label>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" value="concierto" checked> Conciertos
+                </label>
+                <label>
+                    <input type="checkbox" value="fiesta" checked> Fiestas
+                </label>
+                <label>
+                    <input type="checkbox" value="mercado" checked> Mercados
+                </label>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <label>🔍 Buscar</label>
+            <input type="text" id="buscador" placeholder="Nombre del evento...">
+        </div>
+
+        <button id="aplicar-filtros">Aplicar filtros</button>
+        <button id="limpiar-filtros">Limpiar</button>
+    </aside>
+
+    <!-- Mapa -->
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Nuestro JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>

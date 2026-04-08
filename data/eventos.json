@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "nombre": "Mad Cool Festival 2026",
+    "fecha": "2026-07-10",
+    "tipo": "concierto",
+    "lat": 40.4637,
+    "lng": -3.6748,
+    "lugar": "Espacio Mad Cool",
+    "precio": "pago",
+    "descripcion": "Festival de música indie y rock",
+    "url": "https://madcoolfestival.es"
+  },
+  {
+    "id": 2,
+    "nombre": "Fiestas de San Isidro",
+    "fecha": "2026-05-15",
+    "tipo": "fiesta",
+    "lat": 40.4086,
+    "lng": -3.6922,
+    "lugar": "Pradera de San Isidro",
+    "precio": "gratis",
+    "descripcion": "Fiestas patronales de Madrid",
+    "url": "https://esmadrid.com"
+  },
+  {
+    "id": 3,
+    "nombre": "Rastro de Madrid",
+    "fecha": "2026-04-27",
+    "tipo": "mercado",
+    "lat": 40.4089,
+    "lng": -3.7077,
+    "lugar": "La Latina",
+    "precio": "gratis",
+    "descripcion": "Mercadillo tradicional",
+    "url": "https://esmadrid.com"
+  }
+]
