@@ -1,7 +1,7 @@
 [
   {
     "nombre": "Actividades mensuales de los centros de mayores del distrito Centro",
-    "fecha": "2025-11-01 00:00:00.0",
+    "fecha": "2025-11-01",
     "tipo": "cultural",
     "lat": 40.4168,
     "lng": -3.7038,
@@ -14,7 +14,7 @@
   },
   {
     "nombre": "Actividades mensuales de los centros de mayores del distrito Vicálvaro",
-    "fecha": "2026-01-01 00:00:00.0",
+    "fecha": "2026-01-01",
     "tipo": "cultural",
     "lat": 40.4168,
     "lng": -3.7038,
@@ -27,7 +27,7 @@
   },
   {
     "nombre": "Ana Juan",
-    "fecha": "2026-01-29 00:00:00.0",
+    "fecha": "2026-01-29",
     "tipo": "cultural",
     "lat": 40.41902261618159,
     "lng": -3.692188193693138,
@@ -40,7 +40,7 @@
   },
   {
     "nombre": "4 ESCULTORES 4",
-    "fecha": "2026-03-02 00:00:00.0",
+    "fecha": "2026-03-02",
     "tipo": "cultural",
     "lat": 40.420280457570335,
     "lng": -3.621730741880216,
@@ -53,7 +53,7 @@
   },
   {
     "nombre": "Ángel De Andrés",
-    "fecha": "2026-04-09 19:00:00.0",
+    "fecha": "2026-04-09",
     "tipo": "concierto",
     "lat": 40.44071019620189,
     "lng": -3.652412289521502,
@@ -66,7 +66,7 @@
   },
   {
     "nombre": "África en Resonancia. Viaje cultural y estreno mundial de Kora para arpa sola",
-    "fecha": "2026-04-10 19:00:00.0",
+    "fecha": "2026-04-10",
     "tipo": "concierto",
     "lat": 40.40741060830642,
     "lng": -3.7119168856897677,
@@ -79,7 +79,7 @@
   },
   {
     "nombre": "Alfredo García",
-    "fecha": "2026-04-10 19:00:00.0",
+    "fecha": "2026-04-10",
     "tipo": "concierto",
     "lat": 40.43200001609297,
     "lng": -3.670904677285496,
@@ -92,7 +92,7 @@
   },
   {
     "nombre": "4º Festival Pies Inquietos. Talleres infantiles: jugando a mares",
-    "fecha": "2026-04-12 00:00:00.0",
+    "fecha": "2026-04-12",
     "tipo": "concierto",
     "lat": 40.49042200599307,
     "lng": -3.6553467891079854,
@@ -105,7 +105,7 @@
   },
   {
     "nombre": "Achús. 100 % Recomendable",
-    "fecha": "2026-04-12 12:00:00.0",
+    "fecha": "2026-04-12",
     "tipo": "cultural",
     "lat": 40.44071019620189,
     "lng": -3.652412289521502,
@@ -118,7 +118,7 @@
   },
   {
     "nombre": "A por la Plata",
-    "fecha": "2026-04-12 18:00:00.0",
+    "fecha": "2026-04-12",
     "tipo": "cultural",
     "lat": 40.44834125150792,
     "lng": -3.6761992414203526,
@@ -131,7 +131,7 @@
   },
   {
     "nombre": "Algo le pasa a mi yerno",
-    "fecha": "2026-04-15 19:00:00.0",
+    "fecha": "2026-04-15",
     "tipo": "cultural",
     "lat": 40.46678417843686,
     "lng": -3.7195598670929315,
@@ -144,7 +144,7 @@
   },
   {
     "nombre": "Algunos Quijotes fueron nuestros, con Félix Martín Franco",
-    "fecha": "2026-04-16 18:00:00.0",
+    "fecha": "2026-04-16",
     "tipo": "cultural",
     "lat": 40.47860087334554,
     "lng": -3.7094408342979954,
@@ -157,7 +157,7 @@
   },
   {
     "nombre": "All Lele 众乐乐 - Retiro",
-    "fecha": "2026-04-17 17:00:00.0",
+    "fecha": "2026-04-17",
     "tipo": "cultural",
     "lat": 40.4168,
     "lng": -3.7038,
@@ -170,7 +170,7 @@
   },
   {
     "nombre": "A Camarón y Paco de Lucía en Moratalaz",
-    "fecha": "2026-04-18 19:00:00.0",
+    "fecha": "2026-04-18",
     "tipo": "cultural",
     "lat": 40.40610655994401,
     "lng": -3.646521482592748,
@@ -183,7 +183,7 @@
   },
   {
     "nombre": "4º Festival Pies Inquietos. Seres siderales",
-    "fecha": "2026-04-19 12:00:00.0",
+    "fecha": "2026-04-19",
     "tipo": "concierto",
     "lat": 40.49042200599307,
     "lng": -3.6553467891079854,
@@ -196,7 +196,7 @@
   },
   {
     "nombre": "Agustina",
-    "fecha": "2026-04-19 12:00:00.0",
+    "fecha": "2026-04-19",
     "tipo": "cultural",
     "lat": 40.40218085880392,
     "lng": -3.60141148450391,
@@ -209,7 +209,7 @@
   },
   {
     "nombre": "Alicia en el país de las maravillas",
-    "fecha": "2026-04-19 12:00:00.0",
+    "fecha": "2026-04-19",
     "tipo": "concierto",
     "lat": 40.36969488211539,
     "lng": -3.7081179166391824,
@@ -222,7 +222,7 @@
   },
   {
     "nombre": "Anatomía de la novela negra. Dinamiza Lucía Seijas",
-    "fecha": "2026-04-21 00:00:00.0",
+    "fecha": "2026-04-21",
     "tipo": "cultural",
     "lat": 40.45224710166,
     "lng": -3.658029027767765,
@@ -235,7 +235,7 @@
   },
   {
     "nombre": "Animación, magia e ilusionismo",
-    "fecha": "2026-04-24 18:00:00.0",
+    "fecha": "2026-04-24",
     "tipo": "concierto",
     "lat": 40.41906571939961,
     "lng": -3.684053112760816,
@@ -248,7 +248,7 @@
   },
   {
     "nombre": "Adiós Moskis, adiós",
-    "fecha": "2026-04-24 19:00:00.0",
+    "fecha": "2026-04-24",
     "tipo": "cultural",
     "lat": 40.44477474902185,
     "lng": -3.6129105844633775,
@@ -261,7 +261,7 @@
   },
   {
     "nombre": "All you need is love",
-    "fecha": "2026-04-24 19:00:00.0",
+    "fecha": "2026-04-24",
     "tipo": "cultural",
     "lat": 40.393619022093546,
     "lng": -3.6556016835101834,
@@ -274,7 +274,7 @@
   },
   {
     "nombre": "46 Juegos Deportivos Municipales",
-    "fecha": "2026-04-25 15:30:00.0",
+    "fecha": "2026-04-25",
     "tipo": "cultural",
     "lat": 40.41433123768487,
     "lng": -3.6559498758522833,
@@ -287,7 +287,7 @@
   },
   {
     "nombre": "Actividad infantil: Detectives de la ciudad. Taller familiar exposición Naturaleza de asfalto.",
-    "fecha": "2026-04-25 17:30:00.0",
+    "fecha": "2026-04-25",
     "tipo": "cultural",
     "lat": 40.42577054821346,
     "lng": -3.700845660719608,
@@ -336,7 +336,7 @@
   },
   {
     "nombre": "Andrés Zorn: Recorrer el mundo, recordar la tierra.",
-    "fecha": "2026-04-29 18:00:00.0",
+    "fecha": "2026-04-29",
     "tipo": "cultural",
     "lat": 40.4293927571053,
     "lng": -3.664846244443566,
@@ -349,7 +349,7 @@
   },
   {
     "nombre": "A salto de mata",
-    "fecha": "2026-04-29 19:00:00.0",
+    "fecha": "2026-04-29",
     "tipo": "cultural",
     "lat": 40.39130985242181,
     "lng": -3.6958028442054074,
@@ -694,19 +694,6 @@
     "url": "https://www.villarosatablao.com/"
   },
   {
-    "nombre": "",
-    "fecha": "2026-06-01",
-    "tipo": "cultural",
-    "lat": 40.4237,
-    "lng": -3.6899,
-    "lugar": "Madrid",
-    "precio": "pago",
-    "descripcion": "",
-    "url": "https://www.timeout.es/madrid/es/viaje/rutas-senderismo-cerca-madrid",
-    "fuente": "timeout",
-    "id": 51
-  },
-  {
     "id": 15,
     "nombre": "PhotoEspaña 2026",
     "fecha": "2026-06-03",
@@ -772,7 +759,7 @@
   },
   {
     "nombre": "4 escenas, 4 estilos",
-    "fecha": "2026-06-12 19:00:00.0",
+    "fecha": "2026-06-12",
     "tipo": "cultural",
     "lat": 40.41906571939961,
     "lng": -3.684053112760816,
@@ -825,7 +812,7 @@
   },
   {
     "nombre": "Andrea Peña «Bogotá»",
-    "fecha": "2026-06-26 19:30:00.0",
+    "fecha": "2026-06-26",
     "tipo": "cultural",
     "lat": 40.42739911262292,
     "lng": -3.710589286287491,

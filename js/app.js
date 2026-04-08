@@ -122,16 +122,6 @@ function displayEvents(events) {
     actualizarEstadisticas(events);
 }
 
-// Formatear fecha
-function formatDate(dateStr) {
-    const date = new Date(dateStr + 'T00:00:00');
-    return date.toLocaleDateString('es-ES', { 
-        weekday: 'short', 
-        month: 'short', 
-        day: 'numeric' 
-    });
-}
-
 // Actualizar contador
 function updateCounter(count) {
     document.getElementById('event-count').textContent = count;
@@ -154,7 +144,7 @@ function updateStats(events) {
     });
     
     Object.keys(stats).forEach(key => {
-        const el = document.getElementById(`stat-${key}s` || `stat-${key}`);
+        const el = document.getElementById(`stat-${key}`) || document.getElementById(`stat-${key}s`);
         if (el) el.textContent = stats[key];
     });
 }
@@ -162,7 +152,7 @@ function updateStats(events) {
 // Aplicar filtros
 function applyFilters() {
     const search = document.getElementById('search').value.toLowerCase();
-    const dateFilter = document.getElementById('filter-date').value;
+    const dateFilter = document.getElementById('filtro-fecha').value;
     
     const types = Array.from(document.querySelectorAll('.chip input[value="concierto"], .chip input[value="fiesta"], .chip input[value="mercado"], .chip input[value="cultural"], .chip input[value="gastronomia"]'))
         .filter(cb => cb.checked)
@@ -179,6 +169,48 @@ function applyFilters() {
         return true;
     });
     
+    // Filtro de fecha
+    if (dateFilter !== 'todos') {
+        filtered = filtered.filter(e => {
+            const fecha = new Date(e.fecha);
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            
+            switch(dateFilter) {
+                case 'hoy':
+                    return fecha.toDateString() === hoy.toDateString();
+                case 'finde':
+                    const dia = hoy.getDay();
+                    let fechaInicio, fechaFin;
+                    if (dia === 6) { // Sábado
+                        fechaInicio = new Date(hoy);
+                        fechaFin = new Date(hoy);
+                        fechaFin.setDate(hoy.getDate() + 1);
+                    } else if (dia === 0) { // Domingo
+                        fechaInicio = new Date(hoy);
+                        fechaFin = new Date(hoy);
+                    } else { // Lunes a viernes
+                        const diasHastaSabado = 6 - dia;
+                        fechaInicio = new Date(hoy);
+                        fechaInicio.setDate(hoy.getDate() + diasHastaSabado);
+                        fechaFin = new Date(fechaInicio);
+                        fechaFin.setDate(fechaInicio.getDate() + 1);
+                    }
+                    return fecha >= fechaInicio && fecha <= fechaFin;
+                case 'semana':
+                    const semanaFin = new Date(hoy);
+                    semanaFin.setDate(hoy.getDate() + 7);
+                    return fecha >= hoy && fecha <= semanaFin;
+                case 'mes':
+                    const mesFin = new Date(hoy);
+                    mesFin.setDate(hoy.getDate() + 30);
+                    return fecha >= hoy && fecha <= mesFin;
+                default:
+                    return true;
+            }
+        });
+    }
+    
     displayEvents(filtered);
     updateCounter(filtered.length);
     updateStats(filtered);
@@ -187,7 +219,7 @@ function applyFilters() {
 // Limpiar filtros
 function clearFilters() {
     document.getElementById('search').value = '';
-    document.getElementById('filter-date').value = 'all';
+    document.getElementById('filtro-fecha').value = 'todos';
     document.querySelectorAll('.chip input').forEach(cb => cb.checked = true);
     applyFilters();
 }
@@ -236,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Filtros automáticos
     document.getElementById('search').addEventListener('input', applyFilters);
-    document.getElementById('filter-date').addEventListener('change', applyFilters);
+    document.getElementById('filtro-fecha').addEventListener('change', applyFilters);
     document.querySelectorAll('.chip input').forEach(cb => {
         cb.addEventListener('change', applyFilters);
     });
@@ -358,7 +390,7 @@ function renderListView(events) {
                     </div>
                     
                     <div class="event-description">
-                        ${evento.descripcion}
+                        ${limpiarDescripcion(evento.descripcion, 200)}
                     </div>
                 </div>
                 
@@ -416,112 +448,6 @@ displayEvents = function(events) {
     }
 };
 
-// ===== FUNCIONES HELPER PARA POPUPS =====
-
-// Formatear fecha de forma segura
-function formatearFechaSafe(fechaInicio, fechaFin) {
-    try {
-        const inicio = new Date(fechaInicio + 'T00:00:00');
-        
-        if (fechaFin) {
-            const fin = new Date(fechaFin + 'T00:00:00');
-            return `${inicio.toLocaleDateString('es-ES')} - ${fin.toLocaleDateString('es-ES')}`;
-        } else {
-            return inicio.toLocaleDateString('es-ES');
-        }
-    } catch (error) {
-        console.warn('Error formateando fecha:', fechaInicio, error);
-        return fechaInicio || 'Fecha no disponible';
-    }
-}
-
-// Limpiar y truncar descripción
-function limpiarDescripcion(descripcion, maxLength = 150) {
-    if (!descripcion) return '';
-    
-    // Limpiar HTML básico y espacios extra
-    let limpia = descripcion
-        .replace(/<[^>]*>/g, '') // Remover HTML
-        .replace(/\s+/g, ' ') // Espacios múltiples a uno
-        .trim();
-    
-    // Truncar si es muy larga
-    if (limpia.length > maxLength) {
-        limpia = limpia.substring(0, maxLength - 3) + '...';
-    }
-    
-    return limpia;
-}
-
-// Verificar si un link es útil
-function esLinkUtil(url) {
-    if (!url) return false;
-    
-    // No mostrar links vacíos, placeholders o genéricos
-    const noUtiles = [
-        '',
-        '#',
-        'http://',
-        'https://',
-        'javascript:void(0)',
-        'mailto:',
-        'tel:'
-    ];
-    
-    return !noUtiles.some(noUtil => url.includes(noUtil));
-}
-
-// Actualizar estadísticas
-function actualizarEstadisticas(eventos) {
-    const stats = {
-        concierto: 0,
-        fiesta: 0,
-        mercado: 0,
-        cultural: 0,
-        gastronomia: 0,
-        gratis: 0
-    };
-    
-    eventos.forEach(evento => {
-        if (stats[evento.tipo] !== undefined) {
-            stats[evento.tipo]++;
-        }
-        if (evento.precio === 'gratis') {
-            stats.gratis++;
-        }
-    });
-    
-    // Animar contadores
-    animarContador('stat-conciertos', stats.concierto);
-    animarContador('stat-fiestas', stats.fiesta);
-    animarContador('stat-mercados', stats.mercado);
-    animarContador('stat-cultural', stats.cultural);
-    animarContador('stat-gastronomia', stats.gastronomia);
-    animarContador('stat-gratis', stats.gratis);
-    
-    console.log('📊 Estadísticas actualizadas:', stats);
-}
-
-// Animar contador
-function animarContador(elementId, valorFinal) {
-    const elemento = document.getElementById(elementId);
-    if (!elemento) return;
-    
-    const duracion = 1000; // 1 segundo
-    const pasos = 60;
-    const incremento = valorFinal / pasos;
-    let valorActual = 0;
-    
-    const intervalo = setInterval(() => {
-        valorActual += incremento;
-        if (valorActual >= valorFinal) {
-            elemento.textContent = valorFinal;
-            clearInterval(intervalo);
-        } else {
-            elemento.textContent = Math.floor(valorActual);
-        }
-    }, duracion / pasos);
-}
 // ===== SOLUCIÓN PROBLEMA 1: Formatear fechas de forma segura =====
 function formatearFechaSafe(fechaInicio, fechaFin) {
     // Intentar parsear la fecha
