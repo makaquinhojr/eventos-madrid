@@ -137,24 +137,6 @@ eventos-madrid/
 └── scraper.yml # GitHub Actions — ejecución automática
 
     
----
-
-## 🚀 Ejecutar en local
-
-```bash
-# 1. Clonar el repo
-git clone https://github.com/makaquinhojr/eventos-madrid.git
-cd eventos-madrid
-
-# 2. Abrir la web (cualquier servidor local)
-# Con Python:
-python -m http.server 8000
-# Luego abrir http://localhost:8000
-
-# 3. Ejecutar el scraper (opcional)
-cd scraper
-pip install requests beautifulsoup4 geopy python-dateutil
-python scraper.py
 
 🔄 Roadmap
 ✅ Implementado
@@ -187,7 +169,7 @@ python scraper.py
 Diego SB · github.com/makaquinhojr
 🙏 Agradecimientos
 	
-👨‍🏫 Diego Navarro	Profesor de tecnología
+🐐 Diego Navarro	Profesor de tecnología
 🏛️ Ayuntamiento de Madrid	API de eventos municipales
 🌍 Comunidad de Madrid	API de eventos regionales
 🗺️ OpenStreetMap	Datos cartográficos libres
