@@ -1,6 +1,7 @@
 // ===== VARIABLES GLOBALES =====
 let map;
 let allEvents = [];
+let currentFilteredEvents = [];
 let markersLayer;
 let currentView = 'map';
 let currentSort = 'date';
@@ -49,6 +50,7 @@ async function loadEvents() {
             return eventDate >= today;
         }).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 
+        currentFilteredEvents = [...allEvents];
         updateCounter(allEvents.length);
         displayEvents(allEvents);
         actualizarEstadisticas(allEvents);
@@ -131,6 +133,7 @@ function displayEvents(events) {
         marker.addTo(markersLayer);
     });
 
+    currentFilteredEvents = events;
     // Sincronizar con vista lista si está activa
     if (currentView === 'list') {
         renderListView(events);
@@ -151,7 +154,7 @@ function switchView(view) {
     document.getElementById(view === 'map' ? 'map' : 'list-view').classList.add('active');
 
     if (view === 'list') {
-        renderListView(allEvents);
+        renderListView(currentFilteredEvents);
     }
 }
 
@@ -330,6 +333,7 @@ function applyFilters() {
         });
     }
 
+    currentFilteredEvents = filtered;
     displayEvents(filtered);
     updateCounter(filtered.length);
     actualizarEstadisticas(filtered);
