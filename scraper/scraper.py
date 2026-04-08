@@ -3,12 +3,14 @@
 
 """
 EventosMadrid - Web Scraper
-Fuentes: ES Madrid API + Comunidad de Madrid
+Fuentes: ES Madrid API + Municipios Comunidad de Madrid
 """
 
 import requests
+from bs4 import BeautifulSoup
 import json
 import time
+import re
 from datetime import datetime, date
 from pathlib import Path
 import sys
@@ -26,7 +28,7 @@ try:
     from geopy.exc import GeocoderTimedOut, GeocoderServiceError
     GEOPY_AVAILABLE = True
 except ImportError:
-    print("⚠️ geopy no disponible, geocodificación desactivada")
+    print("⚠️ geopy no disponible")
     GEOPY_AVAILABLE = False
 
 
@@ -37,7 +39,7 @@ class EventosScraper:
         self.eventos_existentes = []
         self.stats = {
             'esmadrid': 0,
-            'comunidad': 0,
+            'municipios': 0,
             'duplicados': 0,
             'errores': 0
         }
@@ -59,35 +61,37 @@ class EventosScraper:
                     self.eventos_existentes = json.load(f)
                 print(f"📂 Cargados {len(self.eventos_existentes)} eventos existentes")
             except Exception as e:
-                print(f"⚠️ Error cargando eventos existentes: {e}")
+                print(f"⚠️ Error: {e}")
                 self.eventos_existentes = []
         else:
-            print("📂 No hay eventos previos, creando desde cero")
+            print("📂 No hay eventos previos")
             self.eventos_existentes = []
 
     def guardar_eventos(self):
         print("\n💾 Guardando eventos...")
 
-        # Filtrar eventos pasados de los existentes
         hoy = date.today().isoformat()
+
+        # Eliminar eventos pasados de los existentes
         existentes_vigentes = [
             e for e in self.eventos_existentes
             if (e.get('fecha_fin') or e.get('fecha', ''))[:10] >= hoy
         ]
-        print(f"   🗑️ Eliminados {len(self.eventos_existentes) - len(existentes_vigentes)} eventos pasados")
+        eliminados = len(self.eventos_existentes) - len(existentes_vigentes)
+        print(f"   🗑️ Eliminados {eliminados} eventos pasados")
 
-        # Combinar: existentes vigentes + nuevos sin duplicar
+        # Añadir nuevos sin duplicar
         nombres_existentes = {e['nombre'].lower().strip() for e in existentes_vigentes}
-        nuevos_añadidos = 0
+        nuevos = 0
 
         for evento in self.eventos:
             nombre_lower = evento['nombre'].lower().strip()
             if nombre_lower not in nombres_existentes:
                 existentes_vigentes.append(evento)
                 nombres_existentes.add(nombre_lower)
-                nuevos_añadidos += 1
+                nuevos += 1
 
-        self.stats['nuevos'] = nuevos_añadidos
+        self.stats['nuevos'] = nuevos
 
         # Ordenar por fecha
         existentes_vigentes.sort(key=lambda x: x.get('fecha', '9999-12-31')[:10])
@@ -110,7 +114,7 @@ class EventosScraper:
 
     # ===== HELPERS =====
 
-    def hacer_request(self, url):
+    def hacer_request(self, url, as_json=False):
         for intento in range(MAX_RETRIES):
             try:
                 print(f"   🌐 Request a {url[:70]}...")
@@ -131,24 +135,45 @@ class EventosScraper:
                 return categoria
         return 'cultural'
 
-    def geocodificar(self, lugar):
+    def geocodificar(self, lugar, municipio=None):
+        """
+        Geocodifica un lugar con múltiples estrategias:
+        1. Venues conocidos exactos
+        2. Municipios conocidos
+        3. Nominatim como último recurso
+        """
         if not lugar or lugar.strip() == '':
+            if municipio:
+                return self.geocodificar(municipio)
             return 40.4168, -3.7038
 
         lugar_lower = lugar.lower().strip()
 
-        # Buscar en venues conocidos
+        # 1. Buscar en venues conocidos
         for venue, coords in KNOWN_VENUES.items():
             if venue in lugar_lower:
                 return coords['lat'], coords['lng']
 
-        # Geocodificar con Nominatim
+        # 2. Buscar en municipios conocidos
+        for muni, coords in MUNICIPIOS.items():
+            if muni in lugar_lower:
+                return coords['lat'], coords['lng']
+
+        # 3. Si el lugar es solo "Madrid" o muy genérico, no geocodificar
+        lugares_genericos = ['madrid', 'españa', 'spain', 'comunidad de madrid']
+        if lugar_lower in lugares_genericos:
+            if municipio and municipio.lower() in MUNICIPIOS:
+                coords = MUNICIPIOS[municipio.lower()]
+                return coords['lat'], coords['lng']
+            return 40.4168, -3.7038
+
+        # 4. Nominatim para lugares específicos
         if self.geolocator:
             try:
                 query = f"{lugar}, Madrid, España"
                 location = self.geolocator.geocode(query, timeout=10)
                 if location:
-                    print(f"      🗺️ Geocodificado: {lugar[:40]}")
+                    print(f"      🗺️ Geocodificado: {lugar[:40]} → {location.latitude:.4f}, {location.longitude:.4f}")
                     time.sleep(GEOCODING_DELAY)
                     return round(location.latitude, 6), round(location.longitude, 6)
             except (GeocoderTimedOut, GeocoderServiceError) as e:
@@ -159,31 +184,35 @@ class EventosScraper:
     def limpiar_texto(self, texto, max_length=300):
         if not texto:
             return ''
-        import re
         texto = re.sub(r'<[^>]+>', '', str(texto))
         texto = texto.replace('&nbsp;', ' ').replace('&amp;', '&')
         texto = texto.replace('&lt;', '<').replace('&gt;', '>')
+        texto = texto.replace('&#34;', '"').replace('&#39;', "'")
         texto = ' '.join(texto.split())
         return texto[:max_length] if len(texto) > max_length else texto
 
     def parsear_fecha(self, fecha_str):
-        """Convierte cualquier formato de fecha a YYYY-MM-DD"""
         if not fecha_str:
             return None
         try:
-            # Formato ISO con T
-            if 'T' in str(fecha_str):
-                return str(fecha_str).split('T')[0]
-            # Formato con espacio
-            if ' ' in str(fecha_str):
-                return str(fecha_str).split(' ')[0]
-            # Ya está en formato correcto
-            return str(fecha_str)[:10]
+            s = str(fecha_str).strip()
+            # ISO con T
+            if 'T' in s:
+                return s.split('T')[0]
+            # Con espacio
+            if ' ' in s:
+                return s.split(' ')[0]
+            # DD/MM/YYYY
+            if '/' in s:
+                partes = s.split('/')
+                if len(partes) == 3:
+                    return f"{partes[2]}-{partes[1].zfill(2)}-{partes[0].zfill(2)}"
+            # Ya en formato correcto
+            return s[:10]
         except Exception:
             return None
 
     def es_fecha_futura(self, fecha_str):
-        """Comprueba si una fecha es hoy o futura"""
         fecha = self.parsear_fecha(fecha_str)
         if not fecha:
             return False
@@ -195,19 +224,12 @@ class EventosScraper:
     # ===== FUENTE 1: ES MADRID API =====
 
     def scrape_esmadrid(self):
-        """
-        API oficial del Ayuntamiento de Madrid
-        Sin límite de eventos, con paginación
-        """
         print("\n🔍 Scrapeando ES Madrid API...")
 
-        # La API tiene paginación, iterar hasta conseguir todos
-        base_url = "https://datos.madrid.es/egob/catalogo/206974-0-agenda-eventos-culturales-100.json"
-        total_extraidos = 0
-
-        response = self.hacer_request(base_url)
+        url = URLS['esmadrid_api']
+        response = self.hacer_request(url)
         if not response:
-            print("   ❌ No se pudo acceder a ES Madrid API")
+            print("   ❌ No se pudo acceder")
             return
 
         try:
@@ -215,20 +237,17 @@ class EventosScraper:
             eventos_json = data.get('@graph', [])
             print(f"   📄 Total eventos en API: {len(eventos_json)}")
 
+            total = 0
             for evento_data in eventos_json:
                 try:
-                    # Nombre
                     nombre = self.limpiar_texto(evento_data.get('title', ''))
-                    if not nombre or nombre == 'Sin título':
+                    if not nombre:
                         continue
 
-                    # Fechas
                     fecha_inicio = self.parsear_fecha(evento_data.get('dtstart', ''))
                     fecha_fin = self.parsear_fecha(evento_data.get('dtend', ''))
 
-                    # Saltar eventos pasados
-                    fecha_check = fecha_fin or fecha_inicio
-                    if not self.es_fecha_futura(fecha_check):
+                    if not self.es_fecha_futura(fecha_fin or fecha_inicio):
                         continue
 
                     # Ubicación
@@ -237,47 +256,41 @@ class EventosScraper:
                     lugar = 'Madrid'
 
                     if isinstance(location, dict):
-                        lat = float(location.get('latitude', 40.4168) or 40.4168)
-                        lng = float(location.get('longitude', -3.7038) or -3.7038)
+                        lat_raw = location.get('latitude')
+                        lng_raw = location.get('longitude')
 
-                        direccion = location.get('address', {})
-                        if isinstance(direccion, dict):
-                            calle = direccion.get('street-address', '')
-                            localidad = direccion.get('locality', 'Madrid')
-                            lugar = calle if calle else localidad
-                        
+                        if lat_raw and lng_raw:
+                            try:
+                                lat = float(lat_raw)
+                                lng = float(lng_raw)
+                            except (ValueError, TypeError):
+                                pass
+
+                        # Nombre del lugar
                         org = location.get('organization', {})
-                        if isinstance(org, dict):
-                            nombre_lugar = org.get('organization-name', '')
-                            if nombre_lugar:
-                                lugar = nombre_lugar
+                        if isinstance(org, dict) and org.get('organization-name'):
+                            lugar = org['organization-name']
+                        else:
+                            direccion = location.get('address', {})
+                            if isinstance(direccion, dict):
+                                lugar = (direccion.get('street-address') or
+                                        direccion.get('locality') or 'Madrid')
 
-                    # Si las coordenadas son 0 o inválidas, geocodificar
-                    if lat == 0 or lng == 0 or (lat == 40.4168 and lng == -3.7038):
+                    # Si coordenadas son genéricas, intentar geocodificar por lugar
+                    if lat == 40.4168 and lng == -3.7038 and lugar != 'Madrid':
                         lat, lng = self.geocodificar(lugar)
 
-                    # Descripción
-                    descripcion = self.limpiar_texto(
-                        evento_data.get('description', ''), 300
-                    )
+                    descripcion = self.limpiar_texto(evento_data.get('description', ''), 300)
+                    url_evento = evento_data.get('link', '') or evento_data.get('@id', '')
 
-                    # URL
-                    url = evento_data.get('link', '')
-                    if not url:
-                        url = evento_data.get('@id', '')
-
-                    # Precio
-                    precio_raw = self.limpiar_texto(
-                        evento_data.get('price', '')
-                    ).lower()
-                    if any(p in precio_raw for p in ['gratis', 'free', 'gratuito', '0 €', '0€']):
+                    precio_raw = self.limpiar_texto(str(evento_data.get('price', ''))).lower()
+                    if any(p in precio_raw for p in ['gratis', 'gratuito', 'free', '0 €', '0€']):
                         precio = 'gratis'
                     elif precio_raw:
                         precio = 'pago'
                     else:
-                        precio = 'gratis'  # Por defecto en eventos municipales
+                        precio = 'gratis'
 
-                    # Tipo
                     tipo = self.categorizar_evento(nombre, descripcion)
 
                     evento = {
@@ -289,7 +302,7 @@ class EventosScraper:
                         'lugar': lugar,
                         'precio': precio,
                         'descripcion': descripcion,
-                        'url': url,
+                        'url': url_evento,
                         'fuente': 'esmadrid'
                     }
 
@@ -297,176 +310,168 @@ class EventosScraper:
                         evento['fecha_fin'] = fecha_fin
 
                     self.eventos.append(evento)
-                    total_extraidos += 1
+                    total += 1
 
-                    if total_extraidos % 50 == 0:
-                        print(f"   ✅ {total_extraidos} eventos procesados...")
+                    if total % 100 == 0:
+                        print(f"   ✅ {total} eventos procesados...")
 
                 except Exception as e:
                     self.stats['errores'] += 1
                     continue
 
+            self.stats['esmadrid'] = total
+            print(f"   📊 Total extraídos de ES Madrid: {total}")
+
         except Exception as e:
-            print(f"   ❌ Error parseando respuesta: {e}")
-            return
+            print(f"   ❌ Error: {e}")
 
-        self.stats['esmadrid'] = total_extraidos
-        print(f"   📊 Total extraídos de ES Madrid: {total_extraidos}")
+    # ===== FUENTE 2: MUNICIPIOS DE LA COMUNIDAD =====
 
-    # ===== FUENTE 2: COMUNIDAD DE MADRID =====
-
-    def scrape_comunidad_madrid(self):
+    def scrape_municipios(self):
         """
-        API de la Comunidad de Madrid
-        Eventos de toda la comunidad, no solo el municipio
+        Scrapea agendas de municipios del sur/este de Madrid
+        usando la API de datos abiertos de cada ayuntamiento
         """
-        print("\n🔍 Scrapeando Comunidad de Madrid...")
+        print("\n🔍 Scrapeando municipios de la Comunidad de Madrid...")
 
-        # La Comunidad tiene varios endpoints, probamos los principales
-        endpoints = [
-            "https://www.comunidad.madrid/sites/default/files/doc/agenda/agenda.json",
-            "https://gestiona3.madrid.org/wpad_pub/run/j/MostrarAnuncioDetalle.icm?dato=79205",
+        # APIs de datos abiertos municipales que SÍ funcionan
+        fuentes_municipios = [
+            {
+                'nombre': 'Alcalá de Henares',
+                'url': 'https://datos.alcaladehenares.es/api/explore/v2.1/catalog/datasets/agenda-cultural/records?limit=100&where=date_fin%3E%3Dnow()',
+                'municipio': 'Alcalá de Henares',
+                'tipo': 'opendatasoft'
+            },
+            {
+                'nombre': 'Getafe',
+                'url': 'https://datos.getafe.es/api/explore/v2.1/catalog/datasets/agenda/records?limit=100',
+                'municipio': 'Getafe',
+                'tipo': 'opendatasoft'
+            },
+            {
+                'nombre': 'Leganés',
+                'url': 'https://datos.leganes.org/api/explore/v2.1/catalog/datasets/agenda-cultural/records?limit=100',
+                'municipio': 'Leganés',
+                'tipo': 'opendatasoft'
+            },
         ]
 
-        total_extraidos = 0
+        total = 0
 
-        for endpoint in endpoints:
-            response = self.hacer_request(endpoint)
+        for fuente in fuentes_municipios:
+            print(f"\n   📍 {fuente['nombre']}...")
+            response = self.hacer_request(fuente['url'])
+
             if not response:
+                print(f"   ⚠️ No se pudo acceder a {fuente['nombre']}")
                 continue
 
             try:
                 data = response.json()
 
-                # La estructura puede variar según el endpoint
-                eventos_raw = []
-                if isinstance(data, list):
-                    eventos_raw = data
-                elif isinstance(data, dict):
-                    # Buscar la lista de eventos en distintas claves posibles
-                    for key in ['eventos', 'items', 'data', 'results', '@graph']:
-                        if key in data:
-                            eventos_raw = data[key]
-                            break
+                # Formato OpenDataSoft
+                if fuente['tipo'] == 'opendatasoft':
+                    registros = data.get('results', [])
+                    print(f"   📄 {len(registros)} eventos encontrados")
 
-                print(f"   📄 Encontrados {len(eventos_raw)} eventos en {endpoint[:50]}")
+                    for registro in registros:
+                        try:
+                            # Los campos varían por municipio, intentamos varios nombres
+                            nombre = self.limpiar_texto(
+                                registro.get('titulo') or
+                                registro.get('title') or
+                                registro.get('nombre') or
+                                registro.get('denominacion') or ''
+                            )
+                            if not nombre:
+                                continue
 
-                for evento_data in eventos_raw:
-                    try:
-                        if not isinstance(evento_data, dict):
+                            fecha_inicio = self.parsear_fecha(
+                                registro.get('fecha_inicio') or
+                                registro.get('date_debut') or
+                                registro.get('fecha') or
+                                registro.get('dtstart') or ''
+                            )
+                            fecha_fin = self.parsear_fecha(
+                                registro.get('fecha_fin') or
+                                registro.get('date_fin') or
+                                registro.get('dtend') or ''
+                            )
+
+                            if not fecha_inicio:
+                                continue
+                            if not self.es_fecha_futura(fecha_fin or fecha_inicio):
+                                continue
+
+                            # Coordenadas
+                            lat, lng = 0, 0
+                            geo = registro.get('geo_point_2d') or registro.get('coordenadas') or {}
+                            if isinstance(geo, dict):
+                                lat = float(geo.get('lat', 0) or 0)
+                                lng = float(geo.get('lon', 0) or 0)
+
+                            lugar = self.limpiar_texto(
+                                registro.get('lugar') or
+                                registro.get('location') or
+                                registro.get('espacio') or
+                                fuente['municipio']
+                            )
+
+                            if lat == 0 or lng == 0:
+                                lat, lng = self.geocodificar(lugar, fuente['municipio'])
+
+                            descripcion = self.limpiar_texto(
+                                registro.get('descripcion') or
+                                registro.get('description') or
+                                registro.get('resumen') or '', 300
+                            )
+
+                            url = (
+                                registro.get('url') or
+                                registro.get('link') or
+                                registro.get('enlace') or ''
+                            )
+
+                            precio_raw = str(registro.get('precio', '') or
+                                           registro.get('price', '') or '').lower()
+                            if any(p in precio_raw for p in ['gratis', 'gratuito', 'free', '0']):
+                                precio = 'gratis'
+                            elif precio_raw and precio_raw.strip():
+                                precio = 'pago'
+                            else:
+                                precio = 'gratis'
+
+                            tipo = self.categorizar_evento(nombre, descripcion)
+
+                            evento = {
+                                'nombre': nombre,
+                                'fecha': fecha_inicio,
+                                'tipo': tipo,
+                                'lat': lat,
+                                'lng': lng,
+                                'lugar': f"{lugar} ({fuente['municipio']})" if fuente['municipio'].lower() not in lugar.lower() else lugar,
+                                'precio': precio,
+                                'descripcion': descripcion,
+                                'url': url,
+                                'fuente': fuente['municipio'].lower().replace(' ', '_')
+                            }
+
+                            if fecha_fin and fecha_fin != fecha_inicio:
+                                evento['fecha_fin'] = fecha_fin
+
+                            self.eventos.append(evento)
+                            total += 1
+
+                        except Exception as e:
+                            self.stats['errores'] += 1
                             continue
-
-                        # Nombre — distintas claves posibles
-                        nombre = self.limpiar_texto(
-                            evento_data.get('titulo') or
-                            evento_data.get('title') or
-                            evento_data.get('nombre') or
-                            ''
-                        )
-                        if not nombre:
-                            continue
-
-                        # Fechas
-                        fecha_inicio = self.parsear_fecha(
-                            evento_data.get('fecha_inicio') or
-                            evento_data.get('fechaInicio') or
-                            evento_data.get('dtstart') or
-                            evento_data.get('fecha') or
-                            ''
-                        )
-                        fecha_fin = self.parsear_fecha(
-                            evento_data.get('fecha_fin') or
-                            evento_data.get('fechaFin') or
-                            evento_data.get('dtend') or
-                            ''
-                        )
-
-                        if not fecha_inicio:
-                            continue
-
-                        fecha_check = fecha_fin or fecha_inicio
-                        if not self.es_fecha_futura(fecha_check):
-                            continue
-
-                        # Lugar
-                        lugar = self.limpiar_texto(
-                            evento_data.get('lugar') or
-                            evento_data.get('location') or
-                            evento_data.get('municipio') or
-                            'Madrid'
-                        )
-
-                        # Coordenadas
-                        lat = float(evento_data.get('latitud') or
-                                    evento_data.get('lat') or
-                                    evento_data.get('latitude') or 0)
-                        lng = float(evento_data.get('longitud') or
-                                    evento_data.get('lng') or
-                                    evento_data.get('longitude') or 0)
-
-                        if lat == 0 or lng == 0:
-                            lat, lng = self.geocodificar(lugar)
-
-                        # Descripción
-                        descripcion = self.limpiar_texto(
-                            evento_data.get('descripcion') or
-                            evento_data.get('description') or
-                            evento_data.get('resumen') or
-                            '', 300
-                        )
-
-                        # URL
-                        url = (
-                            evento_data.get('url') or
-                            evento_data.get('link') or
-                            evento_data.get('enlace') or
-                            'https://www.comunidad.madrid/agenda'
-                        )
-
-                        # Precio
-                        precio_raw = self.limpiar_texto(
-                            str(evento_data.get('precio', '') or
-                                evento_data.get('price', '') or '')
-                        ).lower()
-
-                        if any(p in precio_raw for p in ['gratis', 'gratuito', 'free', '0']):
-                            precio = 'gratis'
-                        elif precio_raw and precio_raw != '':
-                            precio = 'pago'
-                        else:
-                            precio = 'gratis'
-
-                        tipo = self.categorizar_evento(nombre, descripcion)
-
-                        evento = {
-                            'nombre': nombre,
-                            'fecha': fecha_inicio,
-                            'tipo': tipo,
-                            'lat': lat,
-                            'lng': lng,
-                            'lugar': lugar,
-                            'precio': precio,
-                            'descripcion': descripcion,
-                            'url': url,
-                            'fuente': 'comunidad_madrid'
-                        }
-
-                        if fecha_fin and fecha_fin != fecha_inicio:
-                            evento['fecha_fin'] = fecha_fin
-
-                        self.eventos.append(evento)
-                        total_extraidos += 1
-
-                    except Exception as e:
-                        self.stats['errores'] += 1
-                        continue
 
             except Exception as e:
-                print(f"   ⚠️ Error con endpoint {endpoint[:50]}: {e}")
+                print(f"   ⚠️ Error procesando {fuente['nombre']}: {e}")
                 continue
 
-        self.stats['comunidad'] = total_extraidos
-        print(f"   📊 Total extraídos de Comunidad de Madrid: {total_extraidos}")
+        self.stats['municipios'] = total
+        print(f"\n   📊 Total extraídos de municipios: {total}")
 
     # ===== ELIMINAR DUPLICADOS =====
 
@@ -478,11 +483,9 @@ class EventosScraper:
         vistos = set()
 
         for evento in self.eventos:
-            # Clave: nombre normalizado + fecha inicio
             nombre_norm = evento['nombre'].lower().strip()
-            # Quitar artículos y palabras comunes para mejor deduplicación
-            nombre_norm = nombre_norm.replace('el ', '').replace('la ', '').replace('los ', '')
-            clave = f"{nombre_norm[:50]}_{evento.get('fecha', '')[:10]}"
+            nombre_norm = re.sub(r'\s+', ' ', nombre_norm)
+            clave = f"{nombre_norm[:60]}_{evento.get('fecha', '')[:10]}"
 
             if clave not in vistos:
                 vistos.add(clave)
@@ -502,26 +505,22 @@ class EventosScraper:
         print("=" * 60)
         print(f"📅 Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
-        # Scrapear fuentes
         self.scrape_esmadrid()
-        self.scrape_comunidad_madrid()
+        self.scrape_municipios()
 
-        # Procesar
         self.eliminar_duplicados()
 
-        # Guardar
         total = self.guardar_eventos()
 
-        # Resumen
         print()
         print("=" * 60)
         print("📈 RESUMEN")
         print("=" * 60)
-        print(f"🏛️  ES Madrid:           {self.stats['esmadrid']} eventos")
-        print(f"🌍  Comunidad Madrid:    {self.stats['comunidad']} eventos")
-        print(f"🔄  Duplicados eliminados: {self.stats['duplicados']}")
-        print(f"⚠️   Errores:             {self.stats['errores']}")
-        print(f"📊  Total en base datos: {total}")
+        print(f"🏛️  ES Madrid:          {self.stats['esmadrid']} eventos")
+        print(f"🌍  Municipios CM:      {self.stats['municipios']} eventos")
+        print(f"🔄  Duplicados:         {self.stats['duplicados']}")
+        print(f"⚠️   Errores:            {self.stats['errores']}")
+        print(f"📊  Total base datos:   {total}")
         print()
         print("✅ PROCESO COMPLETADO")
         print("=" * 60)

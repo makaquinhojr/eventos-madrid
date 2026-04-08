@@ -4,54 +4,97 @@ Configuración del scraper
 
 # URLs de las webs a scrapear
 URLS = {
+    # API oficial Ayuntamiento Madrid - funciona bien
     'esmadrid_api': 'https://datos.madrid.es/egob/catalogo/206974-0-agenda-eventos-culturales-100.json',
-    'comunidad_madrid': 'https://www.comunidad.madrid/sites/default/files/doc/agenda/agenda.json',
+    
+    # Comunidad de Madrid - nueva URL correcta
+    'comunidad_madrid': 'https://www.comunidad.madrid/agenda',
+
+    # APIs municipios del sur de Madrid
+    'mostoles': 'https://www.mostoles.es/es/agenda',
+    'alcorcon': 'https://www.alcorcon.es/agenda',
+    'leganes': 'https://www.leganes.org/agenda',
+    'getafe': 'https://www.getafe.es/agenda',
 }
 
 # Headers para identificarnos
 HEADERS = {
     'User-Agent': 'EventosMadrid Educational Project - github.com/makaquinhojr/eventos-madrid',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept': 'application/json, text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
 }
 
-# Configuración de rate limiting (no sobrecargar servidores)
-DELAY_BETWEEN_REQUESTS = 2  # Segundos entre cada request
-MAX_RETRIES = 3              # Intentos si falla una request
+# Rate limiting
+DELAY_BETWEEN_REQUESTS = 2
+MAX_RETRIES = 3
 
-# Configuración de geocodificación
+# Geocodificación
 GEOCODING_ENABLED = True
-GEOCODING_DELAY = 1          # Segundos entre geocodificaciones
+GEOCODING_DELAY = 1
 
-# Paths de archivos
+# Path
 EVENTOS_JSON_PATH = '../data/eventos.json'
 
-# Categorización automática por palabras clave
+# Categorización
 KEYWORDS = {
     'concierto': [
         'concierto', 'festival', 'música', 'show', 'actuación',
-        'directo', 'live', 'banda', 'orquesta', 'recital', 'dj set'
+        'directo', 'live', 'banda', 'orquesta', 'recital', 'dj set',
+        'jazz', 'rock', 'pop', 'flamenco', 'clásica', 'sinfonía'
     ],
     'fiesta': [
         'fiesta', 'verbena', 'celebración', 'romería', 'carnaval',
-        'feria', 'san isidro', 'orgullo', 'nochevieja'
+        'feria', 'san isidro', 'orgullo', 'nochevieja', 'festividad',
+        'patron', 'patrona', 'fiestas populares'
     ],
     'mercado': [
         'mercado', 'mercadillo', 'rastro', 'artesanía', 'flea market',
-        'vintage', 'segunda mano', 'coleccionismo'
+        'vintage', 'segunda mano', 'coleccionismo', 'feria artesanal'
     ],
     'gastronomia': [
         'gastro', 'comida', 'tapas', 'restaurante', 'cocina',
-        'gastronóm', 'maridaje', 'cata', 'vino', 'cerveza', 'food'
+        'gastronóm', 'maridaje', 'cata', 'vino', 'cerveza', 'food',
+        'degustación', 'enología', 'gastronomía'
     ],
     'cultural': [
         'museo', 'exposición', 'teatro', 'obra', 'arte', 'cultura',
         'danza', 'ballet', 'cine', 'literatura', 'conferencia',
-        'taller', 'visita', 'tour', 'flamenco', 'ópera'
+        'taller', 'visita', 'tour', 'ópera', 'títeres', 'magia',
+        'circo', 'monólogo', 'humor', 'fotografía', 'escultura',
+        'pintura', 'lectura', 'poesía', 'infantil', 'familiar'
     ],
 }
 
-# Lugares conocidos en Madrid (para geocodificación rápida)
+# Municipios de la Comunidad de Madrid con coordenadas
+MUNICIPIOS = {
+    'madrid': {'lat': 40.4168, 'lng': -3.7038},
+    'móstoles': {'lat': 40.3224, 'lng': -3.8652},
+    'mostoles': {'lat': 40.3224, 'lng': -3.8652},
+    'alcorcón': {'lat': 40.3494, 'lng': -3.8244},
+    'alcorcon': {'lat': 40.3494, 'lng': -3.8244},
+    'leganés': {'lat': 40.3281, 'lng': -3.7638},
+    'leganes': {'lat': 40.3281, 'lng': -3.7638},
+    'getafe': {'lat': 40.3058, 'lng': -3.7326},
+    'fuenlabrada': {'lat': 40.2842, 'lng': -3.7946},
+    'alcalá de henares': {'lat': 40.4818, 'lng': -3.3641},
+    'alcala de henares': {'lat': 40.4818, 'lng': -3.3641},
+    'torrejón de ardoz': {'lat': 40.4599, 'lng': -3.4794},
+    'torrejon de ardoz': {'lat': 40.4599, 'lng': -3.4794},
+    'parla': {'lat': 40.2390, 'lng': -3.7754},
+    'pozuelo de alarcón': {'lat': 40.4350, 'lng': -3.8138},
+    'pozuelo de alarcon': {'lat': 40.4350, 'lng': -3.8138},
+    'las rozas': {'lat': 40.4930, 'lng': -3.8740},
+    'majadahonda': {'lat': 40.4728, 'lng': -3.8726},
+    'collado villalba': {'lat': 40.6346, 'lng': -4.0076},
+    'coslada': {'lat': 40.4233, 'lng': -3.5645},
+    'san sebastián de los reyes': {'lat': 40.5487, 'lng': -3.6271},
+    'arganda del rey': {'lat': 40.3008, 'lng': -3.4394},
+    'rivas vaciamadrid': {'lat': 40.3561, 'lng': -3.5234},
+    'valdemoro': {'lat': 40.1908, 'lng': -3.6742},
+    'aranjuez': {'lat': 40.0319, 'lng': -3.6010},
+}
+
+# Lugares conocidos en Madrid capital
 KNOWN_VENUES = {
     # Música
     'wizink center': {'lat': 40.4225, 'lng': -3.6703},
@@ -59,7 +102,6 @@ KNOWN_VENUES = {
     'mad cool': {'lat': 40.4637, 'lng': -3.6748},
     'palacio vistalegre': {'lat': 40.3864, 'lng': -3.7196},
     'la riviera': {'lat': 40.4077, 'lng': -3.7218},
-    'sala caracol': {'lat': 40.4021, 'lng': -3.7078},
     'movistar arena': {'lat': 40.4225, 'lng': -3.6703},
 
     # Cultura
@@ -85,7 +127,6 @@ KNOWN_VENUES = {
     'madrid río': {'lat': 40.4018, 'lng': -3.7245},
     'matadero': {'lat': 40.3936, 'lng': -3.7006},
     'matadero madrid': {'lat': 40.3936, 'lng': -3.7006},
-    'parque tierno galván': {'lat': 40.3936, 'lng': -3.7006},
     'jardín botánico': {'lat': 40.4112, 'lng': -3.6899},
     'templo de debod': {'lat': 40.4241, 'lng': -3.7178},
 
@@ -99,8 +140,6 @@ KNOWN_VENUES = {
     'la latina': {'lat': 40.4106, 'lng': -3.7088},
     'lavapiés': {'lat': 40.4098, 'lng': -3.7082},
     'chamberí': {'lat': 40.4294, 'lng': -3.7023},
-    'salamanca': {'lat': 40.4294, 'lng': -3.6803},
-    'arganzuela': {'lat': 40.3986, 'lng': -3.7068},
 
     # Mercados
     'mercado de san miguel': {'lat': 40.4155, 'lng': -3.7092},
