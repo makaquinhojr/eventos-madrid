@@ -118,6 +118,8 @@ function mostrarEventos(eventos) {
         marker.bindPopup(popupContent);
         marker.addTo(markersLayer);
     });
+    
+    actualizarEstadisticas(eventos);
 }
 
 // ===== FORMATEAR FECHA =====
@@ -340,3 +342,82 @@ document.addEventListener('DOMContentLoaded', function() {
         
     }, 1000);
 });
+
+// ===== MODO OSCURO =====
+document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    const icon = themeToggle.querySelector('i');
+    
+    // Cargar preferencia guardada
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+    }
+    
+    // Toggle al hacer click
+    themeToggle.addEventListener('click', function() {
+        body.classList.toggle('dark-mode');
+        
+        if (body.classList.contains('dark-mode')) {
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+            localStorage.setItem('theme', 'dark');
+            console.log('🌙 Modo oscuro activado');
+        } else {
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+            localStorage.setItem('theme', 'light');
+            console.log('☀️ Modo claro activado');
+        }
+    });
+});
+
+// ===== ACTUALIZAR ESTADÍSTICAS =====
+function actualizarEstadisticas(eventos) {
+    const stats = {
+        concierto: 0,
+        fiesta: 0,
+        mercado: 0,
+        cultural: 0,
+        gastronomia: 0,
+        gratis: 0
+    };
+    
+    eventos.forEach(evento => {
+        stats[evento.tipo]++;
+        if (evento.precio === 'gratis') {
+            stats.gratis++;
+        }
+    });
+    
+    // Animar contadores
+    animarContador('stat-conciertos', stats.concierto);
+    animarContador('stat-fiestas', stats.fiesta);
+    animarContador('stat-mercados', stats.mercado);
+    animarContador('stat-cultural', stats.cultural);
+    animarContador('stat-gastronomia', stats.gastronomia);
+    animarContador('stat-gratis', stats.gratis);
+}
+
+function animarContador(elementId, valorFinal) {
+    const elemento = document.getElementById(elementId);
+    if (!elemento) return;
+    
+    const duracion = 1000; // 1 segundo
+    const pasos = 60;
+    const incremento = valorFinal / pasos;
+    let valorActual = 0;
+    
+    const intervalo = setInterval(() => {
+        valorActual += incremento;
+        if (valorActual >= valorFinal) {
+            elemento.textContent = valorFinal;
+            clearInterval(intervalo);
+        } else {
+            elemento.textContent = Math.floor(valorActual);
+        }
+    }, duracion / pasos);
+}

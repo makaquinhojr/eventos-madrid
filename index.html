@@ -23,6 +23,12 @@
         <div class="logo">
             🎉 <span>EventosMadrid</span>
         </div>
+        
+        <!-- NUEVO: Toggle Modo Oscuro -->
+        <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema">
+            <i class="fas fa-moon"></i>
+        </button>
+        
         <div class="stats" id="stats">
             <span id="evento-count">0 eventos</span>
         </div>
@@ -105,6 +111,43 @@
                 placeholder="Nombre, lugar o descripción..."
                 class="search-input"
             >
+        </div>
+
+        <!-- NUEVO: Estadísticas visuales -->
+        <div class="stats-panel">
+            <h3>📊 Resumen</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🎵</div>
+                    <div class="stat-number" id="stat-conciertos">0</div>
+                    <div class="stat-label">Conciertos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎪</div>
+                    <div class="stat-number" id="stat-fiestas">0</div>
+                    <div class="stat-label">Fiestas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🛍️</div>
+                    <div class="stat-number" id="stat-mercados">0</div>
+                    <div class="stat-label">Mercados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎭</div>
+                    <div class="stat-number" id="stat-cultural">0</div>
+                    <div class="stat-label">Cultural</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🍽️</div>
+                    <div class="stat-number" id="stat-gastronomia">0</div>
+                    <div class="stat-label">Gastro</div>
+                </div>
+                <div class="stat-card highlight">
+                    <div class="stat-icon">💚</div>
+                    <div class="stat-number" id="stat-gratis">0</div>
+                    <div class="stat-label">Gratis</div>
+                </div>
+            </div>
         </div>
 
         <!-- Botón aplicar filtros -->
