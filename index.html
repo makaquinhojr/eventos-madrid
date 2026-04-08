@@ -32,8 +32,38 @@
         </div>
     </header>
 
-    <!-- MAPA FULLSCREEN -->
-    <div id="map"></div>
+    <!-- Toggle de vistas -->
+    <div class="view-toggle">
+        <button class="view-btn active" id="view-map-btn">
+            <i class="fas fa-map"></i> Mapa
+        </button>
+        <button class="view-btn" id="view-list-btn">
+            <i class="fas fa-list"></i> Lista
+        </button>
+    </div>
+
+    <!-- Vista Mapa -->
+    <div id="map" class="view-container active"></div>
+
+    <!-- Vista Lista -->
+    <div id="list-view" class="view-container">
+        <div class="list-container">
+            <div class="list-header">
+                <h2>📋 Eventos encontrados</h2>
+                <div class="list-sort">
+                    <label>Ordenar por:</label>
+                    <select id="sort-by">
+                        <option value="date">Fecha</option>
+                        <option value="name">Nombre</option>
+                        <option value="type">Tipo</option>
+                    </select>
+                </div>
+            </div>
+            <div id="events-list" class="events-list">
+                <!-- Se llenará dinámicamente con JavaScript -->
+            </div>
+        </div>
+    </div>
 
     <!-- BOTÓN FLOTANTE FILTROS -->
     <button class="fab-filters" id="fab-filters">

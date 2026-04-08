@@ -233,3 +233,177 @@ document.addEventListener('DOMContentLoaded', () => {
         cb.addEventListener('change', applyFilters);
     });
 });
+// ===== VISTA LISTA =====
+let currentView = 'map'; // 'map' o 'list'
+let currentSort = 'date';
+
+// Toggle entre vistas
+document.getElementById('view-map-btn').addEventListener('click', () => {
+    switchView('map');
+});
+
+document.getElementById('view-list-btn').addEventListener('click', () => {
+    switchView('list');
+});
+
+function switchView(view) {
+    currentView = view;
+    
+    // Actualizar botones
+    document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`view-${view}-btn`).classList.add('active');
+    
+    // Actualizar contenedores
+    document.querySelectorAll('.view-container').forEach(container => {
+        container.classList.remove('active');
+    });
+    document.getElementById(view === 'map' ? 'map' : 'list-view').classList.add('active');
+    
+    // Si cambiamos a lista, renderizarla
+    if (view === 'list') {
+        renderListView(allEvents);
+    }
+}
+
+// Ordenar eventos en lista
+document.getElementById('sort-by').addEventListener('change', (e) => {
+    currentSort = e.target.value;
+    renderListView(allEvents);
+});
+
+// Renderizar vista lista
+function renderListView(events) {
+    const listContainer = document.getElementById('events-list');
+    
+    if (events.length === 0) {
+        listContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-search"></i>
+                <h3>No se encontraron eventos</h3>
+                <p>Prueba a cambiar los filtros o la búsqueda</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Ordenar eventos
+    const sortedEvents = [...events].sort((a, b) => {
+        switch(currentSort) {
+            case 'date':
+                return new Date(a.fecha) - new Date(b.fecha);
+            case 'name':
+                return a.nombre.localeCompare(b.nombre);
+            case 'type':
+                return a.tipo.localeCompare(b.tipo);
+            default:
+                return 0;
+        }
+    });
+    
+    // Generar HTML
+    listContainer.innerHTML = sortedEvents.map(evento => {
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const fechaEvento = new Date(evento.fecha);
+        const esHoy = fechaEvento.toDateString() === hoy.toDateString();
+        const esMañana = fechaEvento.toDateString() === new Date(hoy.getTime() + 86400000).toDateString();
+        
+        let proximidadBadge = '';
+        if (esHoy) {
+            proximidadBadge = '<span class="event-badge hoy">🔥 HOY</span>';
+        } else if (esMañana) {
+            proximidadBadge = '<span class="event-badge hoy">⚡ MAÑANA</span>';
+        }
+        
+        const precioBadge = evento.precio === 'gratis' 
+            ? '<span class="event-badge gratis">💚 GRATIS</span>'
+            : `<span class="event-badge pago">💰 ${evento.precio_desde || 'Pago'}</span>`;
+        
+        const iconEmoji = icons[evento.tipo] || '📍';
+        
+        const fechaTexto = evento.fecha_fin 
+            ? `${formatDate(evento.fecha)} - ${formatDate(evento.fecha_fin)}`
+            : formatDate(evento.fecha);
+        
+        return `
+            <div class="event-card">
+                <div class="event-icon ${evento.tipo}">
+                    ${iconEmoji}
+                </div>
+                
+                <div class="event-info">
+                    <div class="event-title">
+                        ${evento.nombre}
+                        ${proximidadBadge}
+                        ${precioBadge}
+                    </div>
+                    
+                    <div class="event-meta">
+                        <div class="event-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            ${fechaTexto}
+                        </div>
+                        <div class="event-meta-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            ${evento.lugar}
+                        </div>
+                    </div>
+                    
+                    <div class="event-description">
+                        ${evento.descripcion}
+                    </div>
+                </div>
+                
+                <div class="event-actions">
+                    <button class="event-btn event-btn-primary" onclick="verEnMapa(${evento.id})">
+                        <i class="fas fa-map-marked-alt"></i> Ver en mapa
+                    </button>
+                    <a href="${evento.url}" target="_blank" class="event-btn event-btn-secondary">
+                        <i class="fas fa-external-link-alt"></i> Más info
+                    </a>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Ver evento en mapa
+function verEnMapa(eventoId) {
+    // Cambiar a vista mapa
+    switchView('map');
+    
+    // Buscar evento
+    const evento = allEvents.find(e => e.id === eventoId);
+    if (!evento) return;
+    
+    // Centrar mapa y hacer zoom
+    map.setView([evento.lat, evento.lng], 15);
+    
+    // Abrir popup del marker correspondiente
+    markersLayer.eachLayer(marker => {
+        const popup = marker.getPopup();
+        if (popup && popup.getContent().includes(evento.nombre)) {
+            marker.openPopup();
+        }
+    });
+}
+
+// Formatear fecha corta
+function formatDate(dateStr) {
+    const date = new Date(dateStr + 'T00:00:00');
+    return date.toLocaleDateString('es-ES', { 
+        day: 'numeric',
+        month: 'short'
+    });
+}
+
+// Actualizar también la función displayEvents para sincronizar con lista
+const originalDisplayEvents = displayEvents;
+displayEvents = function(events) {
+    originalDisplayEvents(events);
+    
+    // Si estamos en vista lista, actualizarla también
+    if (currentView === 'list') {
+        renderListView(events);
+    }
+};
