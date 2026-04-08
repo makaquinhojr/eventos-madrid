@@ -1091,3 +1091,51 @@ body.dark-mode .popup-link {
 .event-meta-item.distancia {
     font-weight: 600;
 }
+
+/* ===== CLUSTERS ===== */
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+    background-clip: padding-box;
+    border-radius: 50%;
+}
+
+.marker-cluster-small {
+    background-color: rgba(198, 11, 30, 0.3);
+}
+.marker-cluster-small div {
+    background-color: rgba(198, 11, 30, 0.7);
+}
+
+.marker-cluster-medium {
+    background-color: rgba(198, 11, 30, 0.4);
+}
+.marker-cluster-medium div {
+    background-color: rgba(198, 11, 30, 0.8);
+}
+
+.marker-cluster-large {
+    background-color: rgba(198, 11, 30, 0.5);
+}
+.marker-cluster-large div {
+    background-color: rgba(198, 11, 30, 0.9);
+}
+
+.marker-cluster div {
+    width: 30px;
+    height: 30px;
+    margin-left: 5px;
+    margin-top: 5px;
+    text-align: center;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.marker-cluster span {
+    line-height: 30px;
+}

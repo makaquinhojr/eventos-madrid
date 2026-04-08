@@ -31,7 +31,16 @@ function initMap() {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap'
     }).addTo(map);
-    markersLayer = L.layerGroup().addTo(map);
+    markersLayer = L.markerClusterGroup({
+        chunkedLoading: true,        // Carga por chunks, no bloquea el navegador
+        chunkInterval: 100,          // Ms entre chunks
+        maxClusterRadius: 60,        // Radio en px para agrupar
+        spiderfyOnMaxZoom: true,     // Al hacer zoom máximo, separa los markers
+        showCoverageOnHover: false,  // No mostrar área del cluster al pasar el ratón
+        zoomToBoundsOnClick: true,   // Click en cluster → zoom a sus markers
+        animate: true,               // Animación al expandir clusters
+        animateAddingMarkers: false, // Sin animación al añadir (más rápido)
+    }).addTo(map);
 }
 
 
@@ -130,7 +139,7 @@ function displayEvents(events) {
             </div>
         `);
 
-        marker.addTo(markersLayer);
+        markersLayer.addLayer(marker);
     });
 
     currentFilteredEvents = events;
