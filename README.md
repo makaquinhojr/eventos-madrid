@@ -11,7 +11,7 @@
 
 <br>
 
-*Proyecto de fin de curso · Instituto · 2024-2025*
+*Proyecto del Falla · Curso 2026*
 
 </div>
 
