@@ -1,0 +1,37 @@
+name: 🤖 Actualizar Eventos Automáticamente
+
+on:
+  schedule:
+    # Cada lunes a las 8:00 AM UTC
+    - cron: '0 8 * * 1'
+  
+  # Permite ejecutar manualmente desde GitHub
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout código
+        uses: actions/checkout@v3
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: 📦 Instalar dependencias
+        run: |
+          pip install -r scraper/requirements.txt
+      
+      - name: 🤖 Ejecutar scraper
+        run: |
+          python scraper/scraper.py
+      
+      - name: 📤 Commit y push cambios
+        run: |
+          git config user.name "EventosBot"
+          git config user.email "bot@eventos-madrid.com"
+          git add data/eventos.json
+          git diff --quiet && echo "No hay cambios" || (git commit -m "🤖 Auto-update: Eventos actualizados $(date +'%Y-%m-%d')" && git push)
