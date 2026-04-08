@@ -238,6 +238,7 @@ function toggleTheme() {
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
     loadEvents();
+    initGeolocate(); // ← AÑADIR ESTA LÍNEA
     
     // Tema guardado
     if (localStorage.getItem('theme') === 'dark') {
@@ -572,4 +573,150 @@ function limpiarDescripcion(descripcion, maxLength = 150) {
     }
     
     return texto;
+}
+
+// ===== GEOLOCALIZACIÓN =====
+let userMarker = null;
+let userLocation = null;
+
+function initGeolocate() {
+    const btn = document.getElementById('btn-geolocate');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+        // Si ya está activo, desactivar
+        if (btn.classList.contains('active')) {
+            desactivarGeolocalizacion();
+            return;
+        }
+
+        // Comprobar soporte
+        if (!navigator.geolocation) {
+            mostrarToast('Tu navegador no soporta geolocalización', 'error');
+            return;
+        }
+
+        // Estado: cargando
+        btn.classList.add('loading');
+        btn.innerHTML = '<i class="fas fa-circle-notch"></i>';
+        mostrarToast('📍 Buscando tu ubicación...');
+
+        navigator.geolocation.getCurrentPosition(
+            onGeoSuccess,
+            onGeoError,
+            {
+                enableHighAccuracy: true,
+                timeout: 8000,
+                maximumAge: 60000
+            }
+        );
+    });
+}
+
+function onGeoSuccess(position) {
+    const { latitude, longitude, accuracy } = position.coords;
+    const btn = document.getElementById('btn-geolocate');
+
+    // Guardar posición
+    userLocation = { lat: latitude, lng: longitude };
+
+    // Actualizar botón
+    btn.classList.remove('loading');
+    btn.classList.add('active');
+    btn.innerHTML = '<i class="fas fa-location-arrow"></i>';
+
+    // Centrar mapa
+    map.setView([latitude, longitude], 14);
+
+    // Poner marker del usuario
+    colocarMarkerUsuario(latitude, longitude);
+
+    // Toast de éxito
+    const precisionTexto = accuracy < 100 
+        ? '✅ Ubicación encontrada' 
+        : '📍 Ubicación aproximada';
+    mostrarToast(precisionTexto);
+}
+
+function onGeoError(error) {
+    const btn = document.getElementById('btn-geolocate');
+
+    // Restaurar botón
+    btn.classList.remove('loading');
+    btn.innerHTML = '<i class="fas fa-location-arrow"></i>';
+
+    // Mensaje según tipo de error
+    const mensajes = {
+        1: '❌ Permiso denegado',
+        2: '❌ Posición no disponible',
+        3: '❌ Tiempo de espera agotado'
+    };
+
+    mostrarToast(mensajes[error.code] || '❌ Error desconocido', 'error');
+}
+
+function colocarMarkerUsuario(lat, lng) {
+    // Eliminar marker anterior si existe
+    if (userMarker) {
+        map.removeLayer(userMarker);
+    }
+
+    // Crear marker personalizado
+    const icon = L.divIcon({
+        html: '<div class="user-marker"></div>',
+        className: '',
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+    });
+
+    userMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 })
+        .bindPopup(`
+            <div class="popup-evento">
+                <h3>📍 Tu ubicación</h3>
+                <p>Estás aquí</p>
+            </div>
+        `)
+        .addTo(map);
+}
+
+function desactivarGeolocalizacion() {
+    const btn = document.getElementById('btn-geolocate');
+
+    // Restaurar botón
+    btn.classList.remove('active');
+    btn.innerHTML = '<i class="fas fa-location-arrow"></i>';
+
+    // Eliminar marker
+    if (userMarker) {
+        map.removeLayer(userMarker);
+        userMarker = null;
+        userLocation = null;
+    }
+
+    // Volver a vista general de Madrid
+    map.setView([40.4168, -3.7038], 12);
+
+    mostrarToast('📍 Geolocalización desactivada');
+}
+
+// Toast de notificaciones
+function mostrarToast(mensaje, tipo = 'normal') {
+    // Eliminar toast anterior si existe
+    const toastAnterior = document.querySelector('.geo-toast');
+    if (toastAnterior) toastAnterior.remove();
+
+    // Crear toast
+    const toast = document.createElement('div');
+    toast.className = `geo-toast ${tipo === 'error' ? 'error' : ''}`;
+    toast.textContent = mensaje;
+    document.body.appendChild(toast);
+
+    // Animar entrada
+    setTimeout(() => toast.classList.add('visible'), 10);
+
+    // Animar salida
+    setTimeout(() => {
+        toast.classList.remove('visible');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }

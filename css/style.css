@@ -979,3 +979,98 @@ body.dark-mode .popup-evento p {
 body.dark-mode .popup-link {
     background: var(--primary);
 }
+/* ===== GEOLOCALIZACIÓN ===== */
+.btn-geolocate {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 52px;
+    height: 52px;
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    font-size: 18px;
+    color: var(--text-light);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg);
+    z-index: 900;
+    transition: all 0.3s;
+}
+
+.btn-geolocate:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: scale(1.1);
+}
+
+/* Estado: buscando */
+.btn-geolocate.loading {
+    background: var(--bg-alt);
+    color: var(--primary);
+    border-color: var(--primary);
+    animation: spin 1s linear infinite;
+    pointer-events: none;
+}
+
+/* Estado: activo (ya localizado) */
+.btn-geolocate.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Toast de notificación */
+.geo-toast {
+    position: fixed;
+    bottom: 85px;
+    right: 20px;
+    background: var(--text);
+    color: var(--bg);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 1100;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    max-width: 220px;
+    text-align: center;
+}
+
+.geo-toast.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.geo-toast.error {
+    background: #DC2626;
+    color: white;
+}
+
+/* Marker de posición del usuario */
+.user-marker {
+    width: 20px;
+    height: 20px;
+    background: #2563EB;
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.3);
+    animation: userPulse 2s ease-in-out infinite;
+}
+
+@keyframes userPulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.3); }
+    50% { box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.1); }
+}
