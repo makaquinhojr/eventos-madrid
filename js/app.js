@@ -661,6 +661,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('view-list-btn').addEventListener('click', () => switchView('list'));
     document.getElementById('sort-by').addEventListener('change', (e) => {
         currentSort = e.target.value;
+
+        if (currentSort === 'distance' && !userLocation) {
+            mostrarToast('📍 Activa tu ubicación primero', 'error');
+            // Volver a fecha
+            e.target.value = 'date';
+            currentSort = 'date';
+        }
+
         renderListView(allEvents);
     });
 
