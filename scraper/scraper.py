@@ -325,7 +325,7 @@ class EventosScraper:
         page = 0
         has_more = True
 
-        while has_more and page < 15:
+        while has_more and page < 10:
             params = {
                 'apikey': api_key,
                 'city': 'Madrid',
@@ -463,7 +463,7 @@ class EventosScraper:
 
                 # Paginación
                 page += 1
-                has_more = page < total_pages and page < 15
+                has_more = page < total_pages and page < 10
                 time.sleep(DELAY_BETWEEN_REQUESTS)
 
             except Exception as e:
