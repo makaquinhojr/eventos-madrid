@@ -170,8 +170,12 @@ Diego SB · github.com/makaquinhojr
 🙏 Agradecimientos
 	
 🐐 Diego Navarro	Profesor de tecnología
+
 🏛️ Ayuntamiento de Madrid	API de eventos municipales
+
 🌍 Comunidad de Madrid	API de eventos regionales
+
 🗺️ OpenStreetMap	Datos cartográficos libres
+
 📦 Leaflet.js	Librería de mapas open source
 
