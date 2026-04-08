@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EventosMadrid - Mapa de Eventos</title>
+    <title>EventosMadrid - Todos los eventos en un mapa</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -11,53 +11,111 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <!-- Nuestro CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <!-- Header -->
     <header class="header">
-        <div class="logo">🎉 EventosMadrid</div>
-        <div class="stats">
+        <div class="logo">
+            🎉 <span>EventosMadrid</span>
+        </div>
+        <div class="stats" id="stats">
             <span id="evento-count">0 eventos</span>
         </div>
     </header>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <h2>Filtros</h2>
-        
+    <!-- Sidebar con filtros -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>Filtros</h2>
+        </div>
+
+        <!-- Filtro por fecha -->
         <div class="filter-group">
-            <label>📅 Fecha</label>
+            <label>
+                <i class="fas fa-calendar"></i> Fecha
+            </label>
             <select id="filtro-fecha">
                 <option value="todos">Todos</option>
                 <option value="hoy">Hoy</option>
-                <option value="semana">Esta semana</option>
+                <option value="finde">Este fin de semana</option>
+                <option value="semana">Próximos 7 días</option>
+                <option value="mes">Este mes</option>
             </select>
         </div>
 
+        <!-- Filtro por tipo -->
         <div class="filter-group">
-            <label>🎭 Tipo</label>
+            <label>
+                <i class="fas fa-tag"></i> Tipo de evento
+            </label>
             <div class="checkbox-group">
-                <label>
-                    <input type="checkbox" value="concierto" checked> Conciertos
+                <label class="checkbox-label">
+                    <input type="checkbox" value="concierto" checked>
+                    <span class="tipo-badge concierto">🎵 Conciertos</span>
                 </label>
-                <label>
-                    <input type="checkbox" value="fiesta" checked> Fiestas
+                <label class="checkbox-label">
+                    <input type="checkbox" value="fiesta" checked>
+                    <span class="tipo-badge fiesta">🎪 Fiestas</span>
                 </label>
-                <label>
-                    <input type="checkbox" value="mercado" checked> Mercados
+                <label class="checkbox-label">
+                    <input type="checkbox" value="mercado" checked>
+                    <span class="tipo-badge mercado">🛍️ Mercados</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" value="cultural" checked>
+                    <span class="tipo-badge cultural">🎭 Cultural</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" value="gastronomia" checked>
+                    <span class="tipo-badge gastronomia">🍽️ Gastronomía</span>
                 </label>
             </div>
         </div>
 
+        <!-- Filtro por precio -->
         <div class="filter-group">
-            <label>🔍 Buscar</label>
-            <input type="text" id="buscador" placeholder="Nombre del evento...">
+            <label>
+                <i class="fas fa-euro-sign"></i> Precio
+            </label>
+            <div class="checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" value="gratis" checked>
+                    <span>💚 Gratis</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" value="pago" checked>
+                    <span>💰 De pago</span>
+                </label>
+            </div>
         </div>
 
-        <button id="aplicar-filtros">Aplicar filtros</button>
-        <button id="limpiar-filtros">Limpiar</button>
+        <!-- Buscador -->
+        <div class="filter-group">
+            <label>
+                <i class="fas fa-search"></i> Buscar
+            </label>
+            <input 
+                type="text" 
+                id="buscador" 
+                placeholder="Nombre, lugar o descripción..."
+                class="search-input"
+            >
+        </div>
+
+        <!-- Botón aplicar filtros -->
+        <button class="btn-primary" id="aplicar-filtros">
+            <i class="fas fa-filter"></i> Aplicar filtros
+        </button>
+
+        <!-- Botón limpiar -->
+        <button class="btn-secondary" id="limpiar-filtros">
+            <i class="fas fa-redo"></i> Limpiar todo
+        </button>
     </aside>
 
     <!-- Mapa -->
@@ -66,7 +124,7 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- Nuestro JS -->
+    <!-- Nuestro JavaScript -->
     <script src="js/app.js"></script>
 </body>
 </html>
