@@ -338,19 +338,19 @@ class EventosScraper:
         fuentes_municipios = [
             {
                 'nombre': 'Alcalá de Henares',
-                'url': 'https://datos.alcaladehenares.es/api/explore/v2.1/catalog/datasets/agenda-cultural/records?limit=100&where=date_fin%3E%3Dnow()',
+                'url': 'https://www.turismoalcala.es/agenda/?format=json',
                 'municipio': 'Alcalá de Henares',
                 'tipo': 'opendatasoft'
             },
             {
                 'nombre': 'Getafe',
-                'url': 'https://datos.getafe.es/api/explore/v2.1/catalog/datasets/agenda/records?limit=100',
+                'url': 'https://www.getafe.es/agenda/?format=json',
                 'municipio': 'Getafe',
                 'tipo': 'opendatasoft'
             },
             {
                 'nombre': 'Leganés',
-                'url': 'https://datos.leganes.org/api/explore/v2.1/catalog/datasets/agenda-cultural/records?limit=100',
+                'url': 'https://www.leganes.org/agenda/?format=json',
                 'municipio': 'Leganés',
                 'tipo': 'opendatasoft'
             },
@@ -495,20 +495,19 @@ class EventosScraper:
 
         while has_more:
             params = {
-                'location.address': 'Madrid, España',
-                'location.within': '50km',       # Radio de 50km cubre toda la CM
+                'q': 'Madrid',
+                'location.address': 'Madrid, Spain',
+                'location.within': '50km',
                 'start_date.range_start': datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'expand': 'venue,category',
                 'page_size': 50,
                 'page': page,
-                'sort_by': 'date',
-                'locale': 'es_ES'
             }
 
             try:
                 print(f"   🌐 Página {page}...")
                 response = requests.get(
-                    EVENTBRITE_URL,
+                    'https://www.eventbriteapi.com/v3/events/search/',
                     headers=headers,
                     params=params,
                     timeout=15
@@ -645,7 +644,7 @@ class EventosScraper:
         vistos = set()
 
         for evento in self.eventos:
-            nombre_norm = evento['nombre'].lower().strip()
+            nombre_norm = evento['nombre'].lower().strip()  
             nombre_norm = re.sub(r'\s+', ' ', nombre_norm)
             clave = f"{nombre_norm[:60]}_{evento.get('fecha', '')[:10]}"
 
