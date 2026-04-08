@@ -14457,6 +14457,32 @@
     "id": 1105
   },
   {
+    "nombre": "ERIC CLAPTON - EUROPEAN TOUR 2026 | VIP Packages",
+    "fecha": "2026-05-07",
+    "tipo": "concierto",
+    "lat": 40.42394,
+    "lng": -3.6758,
+    "lugar": "Movistar Arena (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/eric-clapton-european-tour-2026-%7C-vip-packages-tickets/2071511599?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3486
+  },
+  {
+    "nombre": "ERIC CLAPTON - EUROPEAN TOUR 2026",
+    "fecha": "2026-05-07",
+    "tipo": "concierto",
+    "lat": 40.42394,
+    "lng": -3.6758,
+    "lugar": "Movistar Arena (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/eric-clapton-european-tour-2026-tickets/1476933376?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3487
+  },
+  {
     "nombre": "Barrio de los Jerónimos. Tramo II",
     "fecha": "2026-05-08",
     "tipo": "cultural",
@@ -14535,6 +14561,19 @@
     "url": "http://www.madrid.es/sites/v/index.jsp?vgnextchannel=ca9671ee4a9eb410VgnVCM100000171f5a0aRCRD&vgnextoid=effe7b3f2bbfc910VgnVCM100000891ecb1aRCRD",
     "fuente": "esmadrid",
     "id": 1111
+  },
+  {
+    "nombre": "Fito & Fitipaldis - Aullidos Tour 25/26",
+    "fecha": "2026-05-08",
+    "tipo": "concierto",
+    "lat": 40.42394,
+    "lng": -3.6758,
+    "lugar": "Movistar Arena (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/fito--fitipaldis-aullidos-tour-25-26-tickets/762140958?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3494
   },
   {
     "id": 5,
@@ -14666,6 +14705,32 @@
     "fuente": "esmadrid",
     "fecha_fin": "2026-05-14",
     "id": 1121
+  },
+  {
+    "nombre": "Arcángel - La 8va Maravilla World Tour 20 Aniversario | VIP Packages",
+    "fecha": "2026-05-11",
+    "tipo": "cultural",
+    "lat": 40.42394,
+    "lng": -3.6758,
+    "lugar": "Movistar Arena (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/arcangel-la-8va-maravilla-world-tour-20-aniversario-%7C-vip-packages-tickets/1041104222?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3505
+  },
+  {
+    "nombre": "Arcángel - La 8va Maravilla World Tour 20 Aniversario",
+    "fecha": "2026-05-11",
+    "tipo": "cultural",
+    "lat": 40.42394,
+    "lng": -3.6758,
+    "lugar": "Movistar Arena (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/arcangel-la-8va-maravilla-world-tour-20-aniversario-tickets/349248004?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3506
   },
   {
     "nombre": "Barrio de los Jerónimos. Tramo III",
@@ -14826,6 +14891,19 @@
     "url": "http://www.madrid.es/sites/v/index.jsp?vgnextchannel=ca9671ee4a9eb410VgnVCM100000171f5a0aRCRD&vgnextoid=7857b9a8b07ec910VgnVCM200000f921e388RCRD",
     "fuente": "esmadrid",
     "id": 1133
+  },
+  {
+    "nombre": "RAWAYANA - ¿Dónde Es El After? World Tour",
+    "fecha": "2026-05-15",
+    "tipo": "concierto",
+    "lat": 40.42394,
+    "lng": -3.6758,
+    "lugar": "Movistar Arena (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/rawayana-donde-es-el-after-world-tour-tickets/2059790414?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3519
   },
   {
     "id": 22,
@@ -14996,6 +15074,19 @@
     "id": 1146
   },
   {
+    "nombre": "Rodrigo Gallardo",
+    "fecha": "2026-05-19",
+    "tipo": "cultural",
+    "lat": 40.45146,
+    "lng": -3.69482,
+    "lugar": "Sala Nazca (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/rodrigo-gallardo-tickets/1144481950?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3533
+  },
+  {
     "nombre": "Esquejódromo",
     "fecha": "2026-05-20",
     "tipo": "cultural",
@@ -15140,6 +15231,19 @@
     "id": 1157
   },
   {
+    "nombre": "The Commoners - Runnin' Blind Tour",
+    "fecha": "2026-05-21",
+    "tipo": "concierto",
+    "lat": 40.43128,
+    "lng": -3.7002,
+    "lugar": "Sala B (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/the-commoners-runnin-blind-tour-tickets/828683112?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3545
+  },
+  {
     "id": 9,
     "nombre": "Tomavistas Festival",
     "fecha": "2026-05-22",
@@ -15259,6 +15363,19 @@
     "url": "http://www.madrid.es/sites/v/index.jsp?vgnextchannel=ca9671ee4a9eb410VgnVCM100000171f5a0aRCRD&vgnextoid=eca0934ebbbfc910VgnVCM100000891ecb1aRCRD",
     "fuente": "esmadrid",
     "id": 1166
+  },
+  {
+    "nombre": "Uña Y Carne - QUE LA RUMBA TE ACOMPAÑE",
+    "fecha": "2026-05-22",
+    "tipo": "cultural",
+    "lat": 40.47144,
+    "lng": -3.682,
+    "lugar": "Sala Wagon (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.universe.com/events/una-y-carne-que-la-rumba-te-acompane-tickets-Z0KH9G?ref=ticketmaster",
+    "fuente": "ticketmaster",
+    "id": 3555
   },
   {
     "id": 38,
@@ -15392,6 +15509,32 @@
     "id": 1176
   },
   {
+    "nombre": "Chris Grey",
+    "fecha": "2026-05-24",
+    "tipo": "concierto",
+    "lat": 40.41716,
+    "lng": -3.70656,
+    "lugar": "Teatro Eslava (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/chris-grey-tickets/282178928?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3566
+  },
+  {
+    "nombre": "Madison Beer: the locket tour",
+    "fecha": "2026-05-24",
+    "tipo": "concierto",
+    "lat": 40.386,
+    "lng": -3.7385,
+    "lugar": "Palacio Vistalegre (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/madison-beer-the-locket-tour-tickets/1421049294?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3567
+  },
+  {
     "nombre": "Encuentros con Altura: CRUA - Moncloa - Aravaca",
     "fecha": "2026-05-25",
     "tipo": "cultural",
@@ -15432,6 +15575,19 @@
     "id": 1179
   },
   {
+    "nombre": "Elle Coves",
+    "fecha": "2026-05-25",
+    "tipo": "concierto",
+    "lat": 40.45449,
+    "lng": -3.69404,
+    "lugar": "Moby Dick Club (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/elle-coves-tickets/1724047737?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3571
+  },
+  {
     "nombre": "Compañía Nacional de Danza | Luz Arcas | Kor'sia",
     "fecha": "2026-05-26",
     "tipo": "cultural",
@@ -15457,6 +15613,32 @@
     "url": "http://www.madrid.es/sites/v/index.jsp?vgnextchannel=ca9671ee4a9eb410VgnVCM100000171f5a0aRCRD&vgnextoid=5a8fe58cdebdc910VgnVCM200000f921e388RCRD",
     "fuente": "esmadrid",
     "id": 1181
+  },
+  {
+    "nombre": "LANY: soft world tour | VIP Packages",
+    "fecha": "2026-05-26",
+    "tipo": "concierto",
+    "lat": 40.413,
+    "lng": -3.72215,
+    "lugar": "La Riviera (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/lany-soft-world-tour-%7C-vip-packages-tickets/1969272677?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3574
+  },
+  {
+    "nombre": "LANY: soft world tour",
+    "fecha": "2026-05-26",
+    "tipo": "concierto",
+    "lat": 40.413,
+    "lng": -3.72215,
+    "lugar": "La Riviera (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/lany-soft-world-tour-tickets/248298763?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3575
   },
   {
     "nombre": "Escribir con IA. Taller de la palabra e imagen",
@@ -15736,6 +15918,84 @@
     "id": 1202
   },
   {
+    "nombre": "Bad Bunny - DeBÍ TiRAR MáS FOToS World Tour | VIP Packages",
+    "fecha": "2026-05-30",
+    "tipo": "cultural",
+    "lat": 40.43624,
+    "lng": -3.59947,
+    "lugar": "Estadio Riyadh Air Metropolitano (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/bad-bunny-debi-tirar-mas-fotos-world-tour-%7C-vip-packages-tickets/1875547694?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3597
+  },
+  {
+    "nombre": "Bad Bunny - DeBÍ TiRAR MáS FOToS World Tour",
+    "fecha": "2026-05-30",
+    "tipo": "cultural",
+    "lat": 40.43624,
+    "lng": -3.59947,
+    "lugar": "Estadio Riyadh Air Metropolitano (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/bad-bunny-debi-tirar-mas-fotos-world-tour-tickets/417009905?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3598
+  },
+  {
+    "nombre": "Bad Bunny",
+    "fecha": "2026-05-30",
+    "tipo": "cultural",
+    "lat": 0.0,
+    "lng": 0.0,
+    "lugar": "Estadio Riyadh Air Metropolitano (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.com/event/Z7r9jZ1A7p8QF",
+    "fuente": "ticketmaster",
+    "id": 3599
+  },
+  {
+    "nombre": "PUBLIC IMAGE LTD - THIS IS NOT THE LAST TOUR",
+    "fecha": "2026-05-30",
+    "tipo": "concierto",
+    "lat": 40.42703,
+    "lng": -3.69969,
+    "lugar": "Sala But (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/public-image-ltd-this-is-not-the-last-tour-tickets/1677259367?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3600
+  },
+  {
+    "nombre": "Plaza de Parking-Bad Bunny - DeBÍ TiRAR MáS FOToS World Tour 30-05-26",
+    "fecha": "2026-05-30",
+    "tipo": "cultural",
+    "lat": 40.43624,
+    "lng": -3.59947,
+    "lugar": "Estadio Riyadh Air Metropolitano (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/plaza-de-parking-bad-bunny-debi-tirar-mas-fotos-world-tour-30-05-26-tickets/602424274?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3601
+  },
+  {
+    "nombre": "Plaza de Parking-Bad Bunny - DeBÍ TiRAR MáS FOToS World Tour 31-05-26",
+    "fecha": "2026-05-31",
+    "tipo": "cultural",
+    "lat": 40.43624,
+    "lng": -3.59947,
+    "lugar": "Estadio Riyadh Air Metropolitano (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/plaza-de-parking-bad-bunny-debi-tirar-mas-fotos-world-tour-31-05-26-tickets/1442512508?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3602
+  },
+  {
     "id": 33,
     "nombre": "Yoga Templo de Debod",
     "fecha": "2026-06-01",
@@ -15804,6 +16064,19 @@
     "id": 1207
   },
   {
+    "nombre": "Plaza de Parking-Bad Bunny - DeBÍ TiRAR MáS FOToS World Tour 02-06-26",
+    "fecha": "2026-06-02",
+    "tipo": "cultural",
+    "lat": 40.43624,
+    "lng": -3.59947,
+    "lugar": "Estadio Riyadh Air Metropolitano (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/plaza-de-parking-bad-bunny-debi-tirar-mas-fotos-world-tour-02-06-26-tickets/824078800?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3608
+  },
+  {
     "id": 15,
     "nombre": "PhotoEspaña 2026",
     "fecha": "2026-06-03",
@@ -15854,6 +16127,19 @@
     "url": "http://www.madrid.es/sites/v/index.jsp?vgnextchannel=ca9671ee4a9eb410VgnVCM100000171f5a0aRCRD&vgnextoid=9af4965df92cc910VgnVCM200000f921e388RCRD",
     "fuente": "esmadrid",
     "id": 1211
+  },
+  {
+    "nombre": "Plaza de Parking-Bad Bunny - DeBÍ TiRAR MáS FOToS World Tour 03-06-26",
+    "fecha": "2026-06-03",
+    "tipo": "cultural",
+    "lat": 40.43624,
+    "lng": -3.59947,
+    "lugar": "Estadio Riyadh Air Metropolitano (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/plaza-de-parking-bad-bunny-debi-tirar-mas-fotos-world-tour-03-06-26-tickets/1888856540?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3613
   },
   {
     "nombre": "Árboles de El Retiro",
@@ -16066,6 +16352,45 @@
     "id": 1227
   },
   {
+    "nombre": "Conan Gray: Wishbone World Tour | VIP Packages",
+    "fecha": "2026-06-06",
+    "tipo": "concierto",
+    "lat": 40.386,
+    "lng": -3.7385,
+    "lugar": "Palacio Vistalegre (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/conan-gray-wishbone-world-tour-%7C-vip-packages-tickets/233140889?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3630
+  },
+  {
+    "nombre": "Conan Gray: Wishbone World Tour",
+    "fecha": "2026-06-06",
+    "tipo": "concierto",
+    "lat": 40.386,
+    "lng": -3.7385,
+    "lugar": "Palacio Vistalegre (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/conan-gray-wishbone-world-tour-tickets/685964309?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3631
+  },
+  {
+    "nombre": "Plaza de Parking-Bad Bunny - DeBÍ TiRAR MáS FOToS World Tour 06-06-26",
+    "fecha": "2026-06-06",
+    "tipo": "cultural",
+    "lat": 40.43624,
+    "lng": -3.59947,
+    "lugar": "Estadio Riyadh Air Metropolitano (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/plaza-de-parking-bad-bunny-debi-tirar-mas-fotos-world-tour-06-06-26-tickets/676046362?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3632
+  },
+  {
     "nombre": "Escuela de circo Puente de Vallecas",
     "fecha": "2026-06-07",
     "tipo": "cultural",
@@ -16103,6 +16428,19 @@
     "url": "http://www.madrid.es/sites/v/index.jsp?vgnextchannel=ca9671ee4a9eb410VgnVCM100000171f5a0aRCRD&vgnextoid=80132892905fa810VgnVCM1000001d4a900aRCRD",
     "fuente": "esmadrid",
     "id": 1230
+  },
+  {
+    "nombre": "Plaza de Parking-Bad Bunny - DeBÍ TiRAR MáS FOToS World Tour 07-06-26",
+    "fecha": "2026-06-07",
+    "tipo": "cultural",
+    "lat": 40.43624,
+    "lng": -3.59947,
+    "lugar": "Estadio Riyadh Air Metropolitano (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/plaza-de-parking-bad-bunny-debi-tirar-mas-fotos-world-tour-07-06-26-tickets/1907662258?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3636
   },
   {
     "nombre": "YoConecto. Seguridad: Protege tu mundo digital",
@@ -16156,6 +16494,19 @@
     "url": "http://www.madrid.es/sites/v/index.jsp?vgnextchannel=ca9671ee4a9eb410VgnVCM100000171f5a0aRCRD&vgnextoid=d7d63d9e2baeb910VgnVCM200000f921e388RCRD",
     "fuente": "esmadrid",
     "id": 1234
+  },
+  {
+    "nombre": "Sasha Velour - Travesty",
+    "fecha": "2026-06-09",
+    "tipo": "cultural",
+    "lat": 40.42088,
+    "lng": -3.7188,
+    "lugar": "G. Teatro Caixabank Príncipe Pío (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/sasha-velour-travesty-tickets/379281243?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3641
   },
   {
     "id": 50,
@@ -16222,6 +16573,19 @@
     "url": "http://www.madrid.es/sites/v/index.jsp?vgnextchannel=ca9671ee4a9eb410VgnVCM100000171f5a0aRCRD&vgnextoid=8fd3b841c57bb910VgnVCM100000891ecb1aRCRD",
     "fuente": "esmadrid",
     "id": 1239
+  },
+  {
+    "nombre": "Plaza de Parking-Bad Bunny - DeBÍ TiRAR MáS FOToS World Tour 10-06-26",
+    "fecha": "2026-06-10",
+    "tipo": "cultural",
+    "lat": 40.43624,
+    "lng": -3.59947,
+    "lugar": "Estadio Riyadh Air Metropolitano (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/plaza-de-parking-bad-bunny-debi-tirar-mas-fotos-world-tour-10-06-26-tickets/1214172267?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3647
   },
   {
     "nombre": "Artes en el Retiro",
@@ -16301,6 +16665,19 @@
     "url": "http://www.madrid.es/sites/v/index.jsp?vgnextchannel=ca9671ee4a9eb410VgnVCM100000171f5a0aRCRD&vgnextoid=369537d5571bb910VgnVCM100000891ecb1aRCRD",
     "fuente": "esmadrid",
     "id": 1245
+  },
+  {
+    "nombre": "Plaza de Parking-Bad Bunny - DeBÍ TiRAR MáS FOToS World Tour 11-06-26",
+    "fecha": "2026-06-11",
+    "tipo": "cultural",
+    "lat": 40.43624,
+    "lng": -3.59947,
+    "lugar": "Estadio Riyadh Air Metropolitano (Madrid)",
+    "precio": "pago",
+    "descripcion": "",
+    "url": "https://www.ticketmaster.es/event/plaza-de-parking-bad-bunny-debi-tirar-mas-fotos-world-tour-11-06-26-tickets/1264661970?language=en-us",
+    "fuente": "ticketmaster",
+    "id": 3654
   },
   {
     "nombre": "4 escenas, 4 estilos",
