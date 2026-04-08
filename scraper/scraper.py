@@ -33,7 +33,7 @@ class EventosScraper:
         self.eventos_existentes = []
         self.stats = {
             'esmadrid': 0,
-            'eventbrite': 0,
+            'ticketmaster': 0,
             'duplicados': 0,
             'errores': 0
         }
@@ -309,86 +309,95 @@ class EventosScraper:
 
     # ===== FUENTE 2: EVENTBRITE =====
 
-    def scrape_eventbrite(self):
-        print("\n🔍 Scrapeando Eventbrite...")
+    def scrape_ticketmaster(self):
+        """
+        API oficial de Ticketmaster
+        Gratuita, cubre Madrid y toda la Comunidad
+        """
+        print("\n🔍 Scrapeando Ticketmaster...")
 
-        token = os.environ.get('EVENTBRITE_TOKEN', '')
-        if not token:
-            print("   ⚠️ No hay token configurado")
+        api_key = os.environ.get('TICKETMASTER_KEY', '')
+        if not api_key:
+            print("   ⚠️ No hay API key configurada")
             return
 
-        headers = {
-            'Authorization': f'Bearer {token}',
-            'Accept': 'application/json'
-        }
-
         total = 0
-        page = 1
+        page = 0
         has_more = True
 
-        while has_more and page <= 10:
+        while has_more and page < 5:
             params = {
-                'location.address': 'Madrid, Spain',
-                'location.within': '50km',
-                'start_date.range_start': datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
-                'expand': 'venue,category',
-                'page_size': 50,
-                'sort_by': 'date',
-                'status': 'live'
+                'apikey': api_key,
+                'city': 'Madrid',
+                'countryCode': 'ES',
+                'radius': '50',
+                'unit': 'km',
+                'size': 100,
+                'page': page,
+                'sort': 'date,asc',
+                'startDateTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             }
 
             try:
-                print(f"   🌐 Página {page}...")
+                print(f"   🌐 Página {page + 1}...")
                 response = requests.get(
-                    'https://www.eventbriteapi.com/v3/events/',
-                    headers=headers,
+                    'https://app.ticketmaster.com/discovery/v2/events.json',
                     params=params,
                     timeout=15
                 )
 
-                # Mostrar error detallado si falla
                 if response.status_code != 200:
                     print(f"   ❌ Error {response.status_code}: {response.text[:200]}")
                     break
 
                 data = response.json()
-                eventos_raw = data.get('events', [])
-                pagination = data.get('pagination', {})
 
-                print(f"   📄 {len(eventos_raw)} eventos en página {page}")
+                # Comprobar si hay eventos
+                embedded = data.get('_embedded', {})
+                eventos_raw = embedded.get('events', [])
+                page_info = data.get('page', {})
+
+                total_pages = page_info.get('totalPages', 1)
+                print(f"   📄 {len(eventos_raw)} eventos en página {page + 1} de {total_pages}")
 
                 for evento_data in eventos_raw:
                     try:
-                        nombre = self.limpiar_texto(
-                            evento_data.get('name', {}).get('text', '')
-                        )
+                        # Nombre
+                        nombre = self.limpiar_texto(evento_data.get('name', ''))
                         if not nombre:
                             continue
 
+                        # Fechas
+                        dates = evento_data.get('dates', {})
+                        start = dates.get('start', {})
                         fecha_inicio = self.parsear_fecha(
-                            evento_data.get('start', {}).get('local', '')
-                        )
-                        fecha_fin = self.parsear_fecha(
-                            evento_data.get('end', {}).get('local', '')
+                            start.get('localDate', '')
                         )
 
                         if not fecha_inicio or not self.es_fecha_futura(fecha_inicio):
                             continue
 
                         # Venue
-                        venue = evento_data.get('venue') or {}
+                        venues = evento_data.get('_embedded', {}).get('venues', [])
                         lat, lng = 40.4168, -3.7038
                         lugar = 'Madrid'
 
-                        if venue:
+                        if venues:
+                            venue = venues[0]
                             nombre_venue = self.limpiar_texto(venue.get('name', ''))
-                            address = venue.get('address') or {}
-                            ciudad = address.get('city', 'Madrid')
-
+                            ciudad = venue.get('city', {}).get('name', 'Madrid')
+                            
                             lugar = nombre_venue if nombre_venue else ciudad
 
-                            lat_raw = address.get('latitude')
-                            lng_raw = address.get('longitude')
+                            # Añadir ciudad si no está en el nombre
+                            if ciudad and ciudad.lower() not in lugar.lower():
+                                lugar = f"{lugar} ({ciudad})"
+
+                            # Coordenadas
+                            location = venue.get('location', {})
+                            lat_raw = location.get('latitude')
+                            lng_raw = location.get('longitude')
+
                             if lat_raw and lng_raw:
                                 try:
                                     lat = float(lat_raw)
@@ -396,26 +405,38 @@ class EventosScraper:
                                 except (ValueError, TypeError):
                                     pass
 
-                            # Añadir ciudad si no está en el nombre
-                            if ciudad and ciudad.lower() not in lugar.lower():
-                                lugar = f"{lugar} ({ciudad})"
-
-                        if lat == 0 or lng == 0:
-                            lat, lng = self.geocodificar(lugar)
-
+                        # Descripción
                         descripcion = self.limpiar_texto(
-                            (evento_data.get('description') or {}).get('text', '') or
-                            evento_data.get('summary', ''),
+                            evento_data.get('info', '') or
+                            evento_data.get('pleaseNote', ''),
                             300
                         )
 
+                        # URL
                         url = evento_data.get('url', '')
-                        is_free = evento_data.get('is_free', False)
-                        precio = 'gratis' if is_free else 'pago'
 
-                        category = evento_data.get('category') or {}
-                        category_name = category.get('name', '')
-                        tipo = self.categorizar_evento(nombre, f"{descripcion} {category_name}")
+                        # Precio
+                        price_ranges = evento_data.get('priceRanges', [])
+                        if price_ranges:
+                            precio_min = price_ranges[0].get('min', 0)
+                            precio = 'gratis' if precio_min == 0 else 'pago'
+                            if precio == 'pago':
+                                precio_desde = f"{precio_min:.0f}€"
+                        else:
+                            precio = 'pago'
+                            precio_desde = None
+
+                        # Clasificación → tipo
+                        classifications = evento_data.get('classifications', [])
+                        segment = ''
+                        genre = ''
+                        if classifications:
+                            segment = classifications[0].get('segment', {}).get('name', '')
+                            genre = classifications[0].get('genre', {}).get('name', '')
+
+                        tipo = self.categorizar_evento(
+                            nombre, f"{descripcion} {segment} {genre}"
+                        )
 
                         evento = {
                             'nombre': nombre,
@@ -427,11 +448,11 @@ class EventosScraper:
                             'precio': precio,
                             'descripcion': descripcion,
                             'url': url,
-                            'fuente': 'eventbrite'
+                            'fuente': 'ticketmaster'
                         }
 
-                        if fecha_fin and fecha_fin != fecha_inicio:
-                            evento['fecha_fin'] = fecha_fin
+                        if precio == 'pago' and precio_desde:
+                            evento['precio_desde'] = precio_desde
 
                         self.eventos.append(evento)
                         total += 1
@@ -440,16 +461,17 @@ class EventosScraper:
                         self.stats['errores'] += 1
                         continue
 
-                has_more = pagination.get('has_more_items', False)
+                # Paginación
                 page += 1
+                has_more = page < total_pages and page < 5
                 time.sleep(DELAY_BETWEEN_REQUESTS)
 
             except Exception as e:
                 print(f"   ❌ Error en página {page}: {e}")
                 break
 
-        self.stats['eventbrite'] = total
-        print(f"   📊 Total extraídos de Eventbrite: {total}")
+        self.stats['ticketmaster'] = total
+        print(f"   📊 Total extraídos de Ticketmaster: {total}")
 
     # ===== ELIMINAR DUPLICADOS =====
 
@@ -484,7 +506,7 @@ class EventosScraper:
         print(f"📅 Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
         self.scrape_esmadrid()
-        self.scrape_eventbrite()
+        self.scrape_ticketmaster()
         self.eliminar_duplicados()
 
         total = self.guardar_eventos()
@@ -494,7 +516,7 @@ class EventosScraper:
         print("📈 RESUMEN")
         print("=" * 60)
         print(f"🏛️  ES Madrid:      {self.stats['esmadrid']} eventos")
-        print(f"🎟️  Eventbrite:     {self.stats['eventbrite']} eventos")
+        print(f"🎟️  Ticketmaster:   {self.stats.get('ticketmaster', 0)} eventos")
         print(f"🔄  Duplicados:     {self.stats['duplicados']}")
         print(f"⚠️   Errores:        {self.stats['errores']}")
         print(f"📊  Total:          {total}")
