@@ -29,6 +29,8 @@ jobs:
         run: pip install requests beautifulsoup4 geopy python-dateutil
 
       - name: Ejecutar scraper
+        env:
+          EVENTBRITE_TOKEN: ${{ secrets.EVENTBRITE_TOKEN }}
         run: |
           cd scraper
           python scraper.py
