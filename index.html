@@ -12,7 +12,7 @@
 </head>
 <body>
     
-    <!-- HEADER CLEAN -->
+    <!-- HEADER -->
     <header class="top-bar">
         <div class="logo">🎉 EventosMadrid</div>
         
@@ -42,7 +42,7 @@
         </button>
     </div>
 
-    <!-- AÑADIR ESTO justo después del view-toggle -->
+    <!-- Botón geolocalización -->
     <button class="btn-geolocate" id="btn-geolocate">
         <i class="fas fa-location-arrow"></i>
     </button>
@@ -58,15 +58,14 @@
                 <div class="list-sort">
                     <label>Ordenar por:</label>
                     <select id="sort-by">
-                        <option value="date">Fecha</option>
-                        <option value="name">Nombre</option>
-                        <option value="type">Tipo</option>
+                        <option value="date">📅 Fecha</option>
+                        <option value="name">🔤 Nombre</option>
+                        <option value="type">🎭 Tipo</option>
                         <option value="distance">📍 Distancia</option>
                     </select>
                 </div>
             </div>
             <div id="events-list" class="events-list">
-                <!-- Se llenará dinámicamente con JavaScript -->
             </div>
         </div>
     </div>
@@ -77,7 +76,7 @@
         <span>Filtros</span>
     </button>
 
-    <!-- PANEL LATERAL FILTROS (oculto por defecto) -->
+    <!-- PANEL FILTROS -->
     <aside class="filters-panel" id="filters-panel">
         <div class="panel-header">
             <h2>🔍 Filtros</h2>
@@ -88,7 +87,6 @@
 
         <div class="panel-content">
             
-            <!-- Buscador primero -->
             <div class="filter-section">
                 <input 
                     type="text" 
@@ -98,19 +96,18 @@
                 >
             </div>
 
-            <!-- Filtro Fecha -->
+            <!-- ✅ Valores en español, igual que en app.js -->
             <div class="filter-section">
                 <label class="filter-label">📅 Cuándo</label>
-                <select id="filter-date" class="filter-select">
-                    <option value="all">Todos</option>
-                    <option value="today">Hoy</option>
-                    <option value="weekend">Este fin de semana</option>
-                    <option value="week">Próximos 7 días</option>
-                    <option value="month">Este mes</option>
+                <select id="filtro-fecha" class="filter-select">
+                    <option value="todos">Todos</option>
+                    <option value="hoy">Hoy</option>
+                    <option value="finde">Este fin de semana</option>
+                    <option value="semana">Próximos 7 días</option>
+                    <option value="mes">Este mes</option>
                 </select>
             </div>
 
-            <!-- Filtro Tipo -->
             <div class="filter-section">
                 <label class="filter-label">🎭 Tipo</label>
                 <div class="filter-chips">
@@ -137,7 +134,6 @@
                 </div>
             </div>
 
-            <!-- Filtro Precio -->
             <div class="filter-section">
                 <label class="filter-label">💰 Precio</label>
                 <div class="filter-chips">
@@ -152,14 +148,13 @@
                 </div>
             </div>
 
-            <!-- Botón limpiar -->
             <button class="btn-clear" id="btn-clear">
                 <i class="fas fa-redo"></i> Limpiar filtros
             </button>
         </div>
     </aside>
 
-    <!-- PANEL STATS (oculto por defecto) -->
+    <!-- PANEL STATS -->
     <aside class="stats-panel" id="stats-panel">
         <div class="panel-header">
             <h2>📊 Estadísticas</h2>
