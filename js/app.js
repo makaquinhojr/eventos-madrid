@@ -82,6 +82,9 @@ function esLinkUtil(url) {
     if (urlLower.includes('madrid.es') && urlLower.includes('index.jsp')) {
         return false;
     }
+    if (urlLower.includes('madrid.es/portales/munimadrid')) {
+    return true;
+}
 
     const urlsGenericas = [
         'madrid.es', 'esmadrid.com',
