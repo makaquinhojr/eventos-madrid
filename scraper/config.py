@@ -248,5 +248,3 @@ KNOWN_VENUES = {
 # Ticketmaster
 TICKETMASTER_KEY = os.environ.get('TICKETMASTER_KEY', '')
 
-# Meetup (se añadirá cuando tengamos API key)
-MEETUP_KEY = os.environ.get('MEETUP_KEY', '')
