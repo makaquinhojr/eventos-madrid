@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#C60B1E">
-<meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>EventosMadrid - Mapa de eventos</title>
-    
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
 <!-- LOADER -->
 <div class="loader-overlay" id="loader">
     <div class="loader-contenido">
@@ -27,222 +28,214 @@
         </div>
         <p class="loader-count" id="loader-count"></p>
     </div>
-</div>    
-    
-    <!-- HEADER -->
-    <header class="top-bar">
-        <div class="logo">🎉 EventosMadrid</div>
-        
-        <div class="top-bar-actions">
-            <button class="stats-toggle" id="stats-toggle">
-                <i class="fas fa-chart-bar"></i>
-                <span class="desktop-only">Stats</span>
-            </button>
-            
-            <button class="theme-toggle" id="theme-toggle">
-                <i class="fas fa-moon"></i>
-            </button>
-            
-            <div class="event-counter">
-                <span id="event-count">0</span>
-            </div>
-        </div>
-    </header>
-    <!-- BANNER HOY -->
-<div class="banner-hoy" id="banner-hoy" style="display:none">
-    <span class="banner-hoy-texto">
-        🔥 <strong id="banner-hoy-count">0</strong> eventos hoy en Madrid
-    </span>
-    <button class="banner-hoy-btn" id="banner-hoy-btn">
-        Ver todos →
+</div>
+
+<!-- HEADER -->
+<header class="top-bar">
+    <div class="logo">
+        <div class="logo-icon">🎉</div>
+        EventosMadrid
+    </div>
+
+    <div class="top-bar-actions">
+        <!-- Badge hoy — reemplaza el banner -->
+        <button class="hoy-badge" id="hoy-badge" style="display:none">
+            <span class="hoy-badge-dot"></span>
+            <span id="hoy-badge-count">0</span> hoy
+        </button>
+
+        <button class="stats-toggle" id="stats-toggle">
+            <i class="fas fa-chart-bar"></i>
+            <span>Stats</span>
+        </button>
+
+        <button class="theme-toggle" id="theme-toggle">
+            <i class="fas fa-sun"></i>
+        </button>
+
+        <div class="event-counter" id="event-count">0</div>
+    </div>
+</header>
+
+<!-- Toggle de vistas -->
+<div class="view-toggle">
+    <button class="view-btn active" id="view-map-btn">
+        <i class="fas fa-map"></i> Mapa
+    </button>
+    <button class="view-btn" id="view-list-btn">
+        <i class="fas fa-list"></i> Lista
     </button>
 </div>
 
-    <!-- Toggle de vistas -->
-    <div class="view-toggle">
-        <button class="view-btn active" id="view-map-btn">
-            <i class="fas fa-map"></i> Mapa
-        </button>
-        <button class="view-btn" id="view-list-btn">
-            <i class="fas fa-list"></i> Lista
-        </button>
-    </div>
+<!-- Botón geolocalización -->
+<button class="btn-geolocate" id="btn-geolocate">
+    <i class="fas fa-location-arrow"></i>
+</button>
 
-    <!-- Botón geolocalización -->
-    <button class="btn-geolocate" id="btn-geolocate">
-        <i class="fas fa-location-arrow"></i>
-    </button>
+<!-- Vista Mapa -->
+<div id="map" class="view-container active"></div>
 
-    <!-- Vista Mapa -->
-    <div id="map" class="view-container active"></div>
-
-    <!-- Vista Lista -->
-    <div id="list-view" class="view-container">
-        <div class="list-container">
-            <div class="list-header">
-                <h2>📋 Eventos encontrados</h2>
-                <div class="list-sort">
-                    <label>Ordenar por:</label>
-                    <select id="sort-by">
-                        <option value="date">📅 Fecha</option>
-                        <option value="name">🔤 Nombre</option>
-                        <option value="type">🎭 Tipo</option>
-                        <option value="distance">📍 Distancia</option>
-                    </select>
-                </div>
-            </div>
-            <div id="events-list" class="events-list">
-            </div>
-        </div>
-    </div>
-
-    <!-- BOTÓN FLOTANTE FILTROS -->
-    <button class="fab-filters" id="fab-filters">
-        <i class="fas fa-filter"></i>
-        <span>Filtros</span>
-    </button>
-
-    <!-- PANEL FILTROS -->
-    <aside class="filters-panel" id="filters-panel">
-        <div class="panel-header">
-            <h2>🔍 Filtros</h2>
-            <button class="close-panel" id="close-panel">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-
-        <div class="panel-content">
-            
-            <div class="filter-section">
-                <input 
-                    type="text" 
-                    id="search" 
-                    class="search-box" 
-                    placeholder="🔎 Buscar eventos..."
-                >
-            </div>
-
-            <!-- ✅ Valores en español, igual que en app.js -->
-            <div class="filter-section">
-                <label class="filter-label">📅 Cuándo</label>
-                <select id="filtro-fecha" class="filter-select">
-                    <option value="todos">Todos</option>
-                    <option value="hoy">Hoy</option>
-                    <option value="finde">Este fin de semana</option>
-                    <option value="semana">Próximos 7 días</option>
-                    <option value="mes">Este mes</option>
+<!-- Vista Lista -->
+<div id="list-view" class="view-container">
+    <div class="list-container">
+        <div class="list-header">
+            <h2>Eventos</h2>
+            <div class="list-sort">
+                <label>Ordenar:</label>
+                <select id="sort-by">
+                    <option value="date">📅 Fecha</option>
+                    <option value="name">🔤 Nombre</option>
+                    <option value="type">🎭 Tipo</option>
+                    <option value="distance">📍 Distancia</option>
                 </select>
             </div>
-
-           <div class="filter-section">
-    <label class="filter-label">🎭 Tipo</label>
-    <div class="filter-chips">
-        <label class="chip">
-            <input type="checkbox" value="concierto" checked>
-            <span class="chip-content concierto">🎵 Conciertos</span>
-        </label>
-        <label class="chip">
-            <input type="checkbox" value="fiesta" checked>
-            <span class="chip-content fiesta">🎪 Fiestas</span>
-        </label>
-        <label class="chip">
-            <input type="checkbox" value="mercado" checked>
-            <span class="chip-content mercado">🛍️ Mercados</span>
-        </label>
-        <label class="chip">
-            <input type="checkbox" value="cultural" checked>
-            <span class="chip-content cultural">🎭 Cultural</span>
-        </label>
-        <label class="chip">
-            <input type="checkbox" value="gastronomia" checked>
-            <span class="chip-content gastronomia">🍽️ Gastro</span>
-        </label>
-        <label class="chip">
-            <input type="checkbox" value="deporte" checked>
-            <span class="chip-content deporte">⚽ Deportes</span>
-        </label>
-        <label class="chip">
-            <input type="checkbox" value="infantil" checked>
-            <span class="chip-content infantil">👶 Infantil</span>
-        </label>
+        </div>
+        <div id="events-list" class="events-list"></div>
     </div>
 </div>
 
-            <div class="filter-section">
-                <label class="filter-label">💰 Precio</label>
-                <div class="filter-chips">
-                    <label class="chip">
-                        <input type="checkbox" value="gratis" checked>
-                        <span class="chip-content gratis">💚 Gratis</span>
-                    </label>
-                    <label class="chip">
-                        <input type="checkbox" value="pago" checked>
-                        <span class="chip-content pago">💵 De pago</span>
-                    </label>
-                </div>
+<!-- BOTÓN FLOTANTE FILTROS -->
+<button class="fab-filters" id="fab-filters">
+    <i class="fas fa-sliders-h"></i>
+    <span>Filtros</span>
+</button>
+
+<!-- PANEL FILTROS -->
+<aside class="filters-panel" id="filters-panel">
+    <div class="panel-header">
+        <h2>Filtros</h2>
+        <button class="close-panel" id="close-panel">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <div class="panel-content">
+        <div class="filter-section">
+            <input type="text" id="search" class="search-box" placeholder="Buscar eventos...">
+        </div>
+
+        <div class="filter-section">
+            <label class="filter-label">Cuándo</label>
+            <select id="filtro-fecha" class="filter-select">
+                <option value="todos">Todos</option>
+                <option value="hoy">Hoy</option>
+                <option value="finde">Este fin de semana</option>
+                <option value="semana">Próximos 7 días</option>
+                <option value="mes">Este mes</option>
+            </select>
+        </div>
+
+        <div class="filter-section">
+            <label class="filter-label">Tipo</label>
+            <div class="filter-chips">
+                <label class="chip">
+                    <input type="checkbox" value="concierto" checked>
+                    <span class="chip-content concierto">🎵 Conciertos</span>
+                </label>
+                <label class="chip">
+                    <input type="checkbox" value="fiesta" checked>
+                    <span class="chip-content fiesta">🎪 Fiestas</span>
+                </label>
+                <label class="chip">
+                    <input type="checkbox" value="mercado" checked>
+                    <span class="chip-content mercado">🛍️ Mercados</span>
+                </label>
+                <label class="chip">
+                    <input type="checkbox" value="cultural" checked>
+                    <span class="chip-content cultural">🎭 Cultural</span>
+                </label>
+                <label class="chip">
+                    <input type="checkbox" value="gastronomia" checked>
+                    <span class="chip-content gastronomia">🍽️ Gastro</span>
+                </label>
+                <label class="chip">
+                    <input type="checkbox" value="deporte" checked>
+                    <span class="chip-content deporte">⚽ Deportes</span>
+                </label>
+                <label class="chip">
+                    <input type="checkbox" value="infantil" checked>
+                    <span class="chip-content infantil">👶 Infantil</span>
+                </label>
             </div>
-
-            <button class="btn-clear" id="btn-clear">
-                <i class="fas fa-redo"></i> Limpiar filtros
-            </button>
-        </div>
-    </aside>
-
-    <!-- PANEL STATS -->
-    <aside class="stats-panel" id="stats-panel">
-        <div class="panel-header">
-            <h2>📊 Estadísticas</h2>
-            <button class="close-panel" id="close-stats">
-                <i class="fas fa-times"></i>
-            </button>
         </div>
 
-        <div class="panel-content">
-<div class="stats-grid">
-    <div class="stat-box">
-        <div class="stat-icon">🎵</div>
-        <div class="stat-value" id="stat-conciertos">0</div>
-        <div class="stat-name">Conciertos</div>
-    </div>
-    <div class="stat-box">
-        <div class="stat-icon">🎪</div>
-        <div class="stat-value" id="stat-fiestas">0</div>
-        <div class="stat-name">Fiestas</div>
-    </div>
-    <div class="stat-box">
-        <div class="stat-icon">🛍️</div>
-        <div class="stat-value" id="stat-mercados">0</div>
-        <div class="stat-name">Mercados</div>
-    </div>
-    <div class="stat-box">
-        <div class="stat-icon">🎭</div>
-        <div class="stat-value" id="stat-cultural">0</div>
-        <div class="stat-name">Cultural</div>
-    </div>
-    <div class="stat-box">
-        <div class="stat-icon">🍽️</div>
-        <div class="stat-value" id="stat-gastronomia">0</div>
-        <div class="stat-name">Gastro</div>
-    </div>
-    <div class="stat-box">
-        <div class="stat-icon">⚽</div>
-        <div class="stat-value" id="stat-deporte">0</div>
-        <div class="stat-name">Deportes</div>
-    </div>
-    <div class="stat-box">
-        <div class="stat-icon">👶</div>
-        <div class="stat-value" id="stat-infantil">0</div>
-        <div class="stat-name">Infantil</div>
-    </div>
-    <div class="stat-box highlight">
-        <div class="stat-icon">💚</div>
-        <div class="stat-value" id="stat-gratis">0</div>
-        <div class="stat-name">Gratis</div>
-    </div>
-</div>
+        <div class="filter-section">
+            <label class="filter-label">Precio</label>
+            <div class="filter-chips">
+                <label class="chip">
+                    <input type="checkbox" value="gratis" checked>
+                    <span class="chip-content gratis">✓ Gratis</span>
+                </label>
+                <label class="chip">
+                    <input type="checkbox" value="pago" checked>
+                    <span class="chip-content pago">€ De pago</span>
+                </label>
+            </div>
+        </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-    <script src="js/app.js"></script>
+        <button class="btn-clear" id="btn-clear">
+            <i class="fas fa-redo"></i> Limpiar filtros
+        </button>
+    </div>
+</aside>
+
+<!-- PANEL STATS -->
+<aside class="stats-panel" id="stats-panel">
+    <div class="panel-header">
+        <h2>Estadísticas</h2>
+        <button class="close-panel" id="close-stats">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <div class="panel-content">
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-icon">🎵</div>
+                <div class="stat-value" id="stat-conciertos">0</div>
+                <div class="stat-name">Conciertos</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">🎪</div>
+                <div class="stat-value" id="stat-fiestas">0</div>
+                <div class="stat-name">Fiestas</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">🛍️</div>
+                <div class="stat-value" id="stat-mercados">0</div>
+                <div class="stat-name">Mercados</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">🎭</div>
+                <div class="stat-value" id="stat-cultural">0</div>
+                <div class="stat-name">Cultural</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">🍽️</div>
+                <div class="stat-value" id="stat-gastronomia">0</div>
+                <div class="stat-name">Gastro</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">⚽</div>
+                <div class="stat-value" id="stat-deporte">0</div>
+                <div class="stat-name">Deportes</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">👶</div>
+                <div class="stat-value" id="stat-infantil">0</div>
+                <div class="stat-name">Infantil</div>
+            </div>
+            <div class="stat-box highlight">
+                <div class="stat-icon">✓</div>
+                <div class="stat-value" id="stat-gratis">0</div>
+                <div class="stat-name">Gratis</div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

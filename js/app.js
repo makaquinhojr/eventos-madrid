@@ -724,10 +724,10 @@ function updateCounter(count) {
 
 // ===== TEMA =====
 function toggleTheme() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    document.querySelector('.theme-toggle i').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    document.body.classList.toggle('light-mode');
+    const isLight = document.body.classList.contains('light-mode');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    document.querySelector('.theme-toggle i').className = isLight ? 'fas fa-moon' : 'fas fa-sun';
 }
 
 
@@ -737,28 +737,28 @@ function iniciarBannerHoy() {
     hoy.setHours(0, 0, 0, 0);
 
     const eventosHoy = allEvents.filter(e => {
-        const fecha = new Date(e.fecha + 'T00:00:00');
-        return fecha.toDateString() === hoy.toDateString();
+        const fechaInicio = new Date(e.fecha + 'T00:00:00');
+        const fechaFin = e.fecha_fin
+            ? new Date(e.fecha_fin + 'T00:00:00')
+            : fechaInicio;
+        return fechaInicio <= hoy && fechaFin >= hoy;
     });
 
-    const banner = document.getElementById('banner-hoy');
-    const count = document.getElementById('banner-hoy-count');
-    const btn = document.getElementById('banner-hoy-btn');
+    const badge = document.getElementById('hoy-badge');
+    const count = document.getElementById('hoy-badge-count');
 
     if (eventosHoy.length === 0) {
-        banner.style.display = 'none';
+        badge.style.display = 'none';
         return;
     }
 
     count.textContent = eventosHoy.length;
-    banner.style.display = 'flex';
-    document.body.classList.add('banner-visible');
+    badge.style.display = 'flex';
 
-    btn.addEventListener('click', () => {
+    badge.addEventListener('click', () => {
         document.getElementById('filtro-fecha').value = 'hoy';
         applyFilters();
-        document.getElementById('filters-panel').classList.remove('active');
-        mostrarToast(`🔥 ${eventosHoy.length} eventos hoy en Madrid`);
+        mostrarToast(`${eventosHoy.length} eventos hoy en Madrid`);
     });
 }
 
@@ -822,10 +822,12 @@ document.addEventListener('DOMContentLoaded', () => {
     loadEvents();
     initGeolocate();
 
-    if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-        document.querySelector('.theme-toggle i').className = 'fas fa-sun';
-    }
+   // Oscuro por defecto
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'light') {
+    document.body.classList.add('light-mode');
+    document.querySelector('.theme-toggle i').className = 'fas fa-moon';
+}
 
     document.getElementById('fab-filters').addEventListener('click', () => {
         document.getElementById('filters-panel').classList.add('active');
