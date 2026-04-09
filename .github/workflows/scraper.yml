@@ -2,11 +2,11 @@ name: 🤖 Actualizar Eventos Madrid
 
 on:
   schedule:
-    - cron: '0 8 * * 1'
+    - cron: '0 8 * * 1'   # Lunes a las 8:00 UTC
   workflow_dispatch:
     inputs:
       motivo:
-        description: 'Por que ejecutas el scraper'
+        description: 'Por qué ejecutas el scraper'
         required: false
         default: 'Actualización manual'
 
@@ -17,18 +17,21 @@ jobs:
       contents: write
 
     steps:
-      - name: Descargar repositorio
+      - name: 📥 Descargar repositorio
         uses: actions/checkout@v4
 
-      - name: Configurar Python
-        uses: actions/setup-python@v4
+      - name: 🐍 Configurar Python 3.11
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
-      - name: Instalar dependencias
-        run: pip install requests beautifulsoup4 geopy python-dateutil
+      - name: 📦 Instalar dependencias
+        run: |
+          pip install --upgrade pip
+          pip install requests beautifulsoup4 geopy python-dateutil
 
-      - name: Ejecutar scraper
+      - name: 🤖 Ejecutar scraper
         env:
           TICKETMASTER_KEY: ${{ secrets.TICKETMASTER_KEY }}
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
@@ -36,10 +39,15 @@ jobs:
           cd scraper
           python scraper.py
 
-      - name: Guardar cambios
+      - name: 💾 Guardar cambios
         run: |
           git config --local user.email "scraper@eventosmadrid.com"
           git config --local user.name "EventosMadrid Bot"
           git add data/eventos.json
-          git diff --staged --quiet || git commit -m "🤖 Eventos actualizados $(date '+%Y-%m-%d')"
-          git push
+          if git diff --staged --quiet; then
+            echo "ℹ️ No hay cambios nuevos en eventos.json"
+          else
+            git commit -m "🤖 Eventos actualizados $(date '+%Y-%m-%d %H:%M')"
+            git push
+            echo "✅ Cambios subidos al repositorio"
+          fi
