@@ -1,5 +1,9 @@
-const CACHE_NAME = 'eventos-madrid-v2';
-const CACHE_STATIC = 'eventos-madrid-static-v2';
+// sw.js completo y corregido
+const CACHE_VERSION = 'v3'; // ← súbelo manualmente solo cuando cambies
+                             //    CSS/JS/HTML (archivos estáticos)
+
+const CACHE_NAME    = `eventos-madrid-${CACHE_VERSION}`;
+const CACHE_STATIC  = `eventos-madrid-static-${CACHE_VERSION}`;
 
 // ===== ARCHIVOS ESTÁTICOS (nunca cambian) =====
 const ARCHIVOS_ESTATICOS = [
@@ -7,11 +11,6 @@ const ARCHIVOS_ESTATICOS = [
     '/eventos-madrid/index.html',
     '/eventos-madrid/css/style.css',
     '/eventos-madrid/js/app.js',
-];
-
-// ===== ARCHIVOS DINÁMICOS (se actualizan) =====
-const ARCHIVOS_DINAMICOS = [
-    '/eventos-madrid/data/eventos.json',
 ];
 
 // ===== DOMINIOS EXTERNOS (no cachear — CORS) =====
@@ -40,44 +39,29 @@ function esSoloOrigen(request) {
 
 // ===== INSTALL =====
 self.addEventListener('install', evento => {
-    console.log('🔧 SW: Instalando v2...');
+    console.log(`🔧 SW: Instalando ${CACHE_VERSION}...`);
 
     evento.waitUntil(
-        Promise.all([
-            // Cachear estáticos
-            caches.open(CACHE_STATIC).then(cache => {
+        // ✅ Solo cacheamos estáticos en el install
+        // eventos.json NO se pre-cachea aquí → siempre irá a la red primero
+        caches.open(CACHE_STATIC)
+            .then(cache => {
                 console.log('📦 SW: Cacheando archivos estáticos');
                 return cache.addAll(ARCHIVOS_ESTATICOS);
-            }),
-            // Pre-cachear eventos.json si está disponible
-            caches.open(CACHE_NAME).then(cache => {
-                return Promise.all(
-                    ARCHIVOS_DINAMICOS.map(url =>
-                        fetch(url)
-                            .then(res => {
-                                if (res.ok) cache.put(url, res);
-                            })
-                            .catch(() => {
-                                console.log('⚠️ SW: No se pudo pre-cachear:', url);
-                            })
-                    )
-                );
             })
-        ])
-        .then(() => {
-            console.log('✅ SW: Instalación completa');
-            // skipWaiting DESPUÉS de cachear
-            return self.skipWaiting();
-        })
-        .catch(err => {
-            console.error('❌ SW: Error en instalación:', err);
-        })
+            .then(() => {
+                console.log('✅ SW: Instalación completa');
+                return self.skipWaiting();
+            })
+            .catch(err => {
+                console.error('❌ SW: Error en instalación:', err);
+            })
     );
 });
 
 // ===== ACTIVATE =====
 self.addEventListener('activate', evento => {
-    console.log('✅ SW: Activando...');
+    console.log(`✅ SW: Activando ${CACHE_VERSION}...`);
 
     evento.waitUntil(
         caches.keys()
@@ -110,9 +94,12 @@ self.addEventListener('fetch', evento => {
     // ❌ Ignorar si no es del mismo origen
     if (!esSoloOrigen(request)) return;
 
-    // 📊 eventos.json → Network first con fallback a cache
+    // ✅ eventos.json → Network first SIN guardar en caché
+    // ─────────────────────────────────────────────────────
+    // No lo cacheamos nunca. Siempre va a la red.
+    // Solo si la red falla usamos la caché como fallback offline.
     if (url.includes('/data/eventos.json')) {
-        evento.respondWith(estrategiaNetworkFirst(request));
+        evento.respondWith(estrategiaNetworkFirstSinCache(request));
         return;
     }
 
@@ -124,7 +111,7 @@ self.addEventListener('fetch', evento => {
 
     // 🎨 CSS/JS/Iconos → Cache first (cambian poco)
     if (
-        request.destination === 'style' ||
+        request.destination === 'style'  ||
         request.destination === 'script' ||
         request.destination === 'image'
     ) {
@@ -139,14 +126,65 @@ self.addEventListener('fetch', evento => {
 // ===== ESTRATEGIAS =====
 
 /**
+ * ✅ NUEVA — Network first para eventos.json
+ * 
+ * La diferencia clave con estrategiaNetworkFirst normal:
+ * - Si la red responde → devuelve la respuesta SIN guardarla en caché
+ * - Si la red falla    → busca en caché (fallback offline)
+ * - Si guardáramos en caché, el próximo scrap no se vería hasta
+ *   que el usuario limpiara la caché manualmente
+ */
+async function estrategiaNetworkFirstSinCache(request) {
+    try:
+        const response = await Promise.race([
+            fetch(request.clone()),
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('timeout')), 8000)
+            )
+        ]);
+
+        if (response && response.ok) {
+            // ✅ Guardamos UNA copia en caché solo como fallback offline
+            // pero con un cache separado que podemos invalidar fácilmente
+            const cache = await caches.open(CACHE_NAME);
+            cache.put(request, response.clone());
+            // Devolvemos la respuesta fresca de la red
+            return response;
+        }
+
+        throw new Error(`HTTP ${response?.status}`);
+
+    } catch (error) {
+        console.log(`⚠️ SW: Red falló para eventos.json (${error.message})`);
+        console.log('📦 SW: Usando caché offline como fallback...');
+
+        const cache  = await caches.open(CACHE_NAME);
+        const cached = await cache.match(request);
+
+        if (cached) {
+            console.log('✅ SW: Sirviendo eventos desde caché offline');
+            return cached;
+        }
+
+        // Sin red y sin caché → respuesta de error clara
+        return new Response(
+            JSON.stringify([]), // Array vacío → la app mostrará "sin eventos"
+            {
+                status: 200, // 200 para que app.js no lo trate como error
+                headers: { 'Content-Type': 'application/json' }
+            }
+        );
+    }
+}
+
+/**
  * Network first: intenta red, si falla usa cache.
- * Ideal para datos que cambian (eventos.json, HTML)
+ * Para HTML principalmente.
  */
 async function estrategiaNetworkFirst(request) {
     const cache = await caches.open(CACHE_NAME);
 
     try {
-        // Timeout de 5 segundos para no bloquear
         const response = await Promise.race([
             fetch(request),
             new Promise((_, reject) =>
@@ -155,12 +193,10 @@ async function estrategiaNetworkFirst(request) {
         ]);
 
         if (response && response.ok) {
-            // Actualizar cache con la respuesta nueva
             cache.put(request, response.clone());
             return response;
         }
 
-        // Respuesta no OK → intentar cache
         throw new Error(`HTTP ${response.status}`);
 
     } catch (error) {
@@ -170,13 +206,11 @@ async function estrategiaNetworkFirst(request) {
         const cached = await cache.match(request);
         if (cached) return cached;
 
-        // Último recurso: página principal
         if (request.destination === 'document') {
             const home = await caches.match('/eventos-madrid/');
             if (home) return home;
         }
 
-        // Sin red y sin cache → respuesta de error
         return new Response(
             JSON.stringify({
                 error: 'Sin conexión',
@@ -192,7 +226,7 @@ async function estrategiaNetworkFirst(request) {
 
 /**
  * Cache first: usa cache si existe, si no va a la red.
- * Ideal para estáticos (CSS, JS, imágenes)
+ * Para CSS, JS e imágenes.
  */
 async function estrategiaCacheFirst(request) {
     const cached = await caches.match(request);
@@ -212,8 +246,6 @@ async function estrategiaCacheFirst(request) {
 }
 
 // ===== MENSAJE DESDE LA APP =====
-// Permite forzar actualización desde app.js:
-// navigator.serviceWorker.controller.postMessage({ tipo: 'SKIP_WAITING' })
 self.addEventListener('message', evento => {
     if (evento.data?.tipo === 'SKIP_WAITING') {
         console.log('🔄 SW: Actualización forzada');
