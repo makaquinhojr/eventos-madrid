@@ -79,9 +79,6 @@ function esLinkUtil(url) {
 
     const urlLower = url.toLowerCase();
 
-    if (urlLower.includes('madrid.es') && urlLower.includes('index.jsp')) {
-        return false;
-    }
     if (urlLower.includes('madrid.es/portales/munimadrid')) {
     return true;
 }
