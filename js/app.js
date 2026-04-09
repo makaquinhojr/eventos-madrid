@@ -340,26 +340,61 @@ function comoLlegar(eventoId) {
  * Al cargar la app, mira si hay ?evento=ID en la URL.
  * Si lo hay, espera a que el mapa esté listo y abre ese evento.
  */
+// ===== ✅ PROCESARURLEVENTO CORREGIDO =====
 function procesarUrlEvento() {
     const params   = new URLSearchParams(window.location.search);
     const eventoId = parseInt(params.get('evento'));
     if (!eventoId) return;
 
     const evento = allEvents.find(e => e.id === eventoId);
-    if (!evento) return;
+    if (!evento) {
+        console.warn(`⚠️ Evento ID ${eventoId} no encontrado`);
+        return;
+    }
 
-    // Pequeño delay para que el mapa y los clusters estén listos
-    setTimeout(() => {
-        map.setView([evento.lat, evento.lng], 15);
+    // Función que busca y abre el marker
+    // Se llama en cuanto los clusters están listos
+    function abrirEvento() {
+        let encontrado = false;
+
         markersLayer.eachLayer(marker => {
             if (marker.eventoId === eventoId) {
+                encontrado = true;
                 markersLayer.zoomToShowLayer(marker, () => {
-                    marker.openPopup();
+                    // Pequeño delay para que el popup se posicione bien
+                    setTimeout(() => marker.openPopup(), 100);
                 });
             }
         });
-        mostrarToast(`📍 ${evento.nombre}`);
-    }, 800);
+
+        if (!encontrado) {
+            // El marker no está visible aún (dentro de un cluster)
+            // Hacemos zoom a las coords directamente y reintentamos
+            map.setView([evento.lat, evento.lng], 16, { animate: false });
+            setTimeout(() => {
+                markersLayer.eachLayer(marker => {
+                    if (marker.eventoId === eventoId) {
+                        markersLayer.zoomToShowLayer(marker, () => {
+                            setTimeout(() => marker.openPopup(), 100);
+                        });
+                    }
+                });
+            }, 400);
+        }
+    }
+
+    // Esperamos al evento 'animationend' del cluster
+    // que se dispara cuando Leaflet termina de procesar los markers
+    markersLayer.once('animationend', () => {
+        // Primero centramos el mapa en el evento
+        map.setView([evento.lat, evento.lng], 15, { animate: false });
+
+        // Luego buscamos y abrimos el marker
+        setTimeout(abrirEvento, 300);
+    });
+
+    // Toast informativo mientras carga
+    mostrarToast(`🔍 Buscando: ${evento.nombre.substring(0, 30)}...`);
 }
 
 // ===== MOSTRAR EVENTOS EN MAPA =====
