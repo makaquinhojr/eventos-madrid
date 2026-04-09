@@ -1300,3 +1300,8 @@ body.light-mode .leaflet-tile {
 * {
     transition: background-color 0.15s, color 0.15s, border-color 0.15s;
 }
+.leaflet-tile,
+.leaflet-tile-container img,
+.leaflet-layer img {
+    filter: none !important;
+}   
