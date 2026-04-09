@@ -30,7 +30,6 @@ jobs:
 
       - name: Ejecutar scraper
         env:
-          EVENTBRITE_TOKEN: ${{ secrets.EVENTBRITE_TOKEN }}
           TICKETMASTER_KEY: ${{ secrets.TICKETMASTER_KEY }}
         run: |
           cd scraper
