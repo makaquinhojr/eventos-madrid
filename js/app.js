@@ -59,14 +59,15 @@ async function loadEvents() {
             return eventDate >= today;
         }).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 
-        currentFilteredEvents = [...allEvents];
         updateCounter(allEvents.length);
         displayEvents(allEvents);
         actualizarEstadisticas(allEvents);
         iniciarBannerHoy();
+        ocultarLoader(allEvents.length); // ← AÑADIR ESTA LÍNEA
 
     } catch (error) {
         console.error('Error cargando eventos:', error);
+        ocultarLoader(0);
     }
 }
 
@@ -729,4 +730,28 @@ function iniciarBannerHoy() {
         // Toast informativo
         mostrarToast(`🔥 ${eventosHoy.length} eventos hoy en Madrid`);
     });
+}
+// ===== PWA - SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/eventos-madrid/sw.js')
+            .then(reg => console.log('✅ SW registrado:', reg.scope))
+            .catch(err => console.log('❌ SW error:', err));
+    });
+}
+// ===== LOADER =====
+function ocultarLoader(numEventos) {
+    const loader = document.getElementById('loader');
+    const count = document.getElementById('loader-count');
+
+    if (count) {
+        count.textContent = `✅ ${numEventos} eventos cargados`;
+    }
+
+    // Esperar un momento para que se vea el mensaje
+    setTimeout(() => {
+        if (loader) {
+            loader.classList.add('oculto');
+        }
+    }, 600);
 }
