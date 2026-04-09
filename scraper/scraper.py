@@ -38,7 +38,11 @@ class EventosScraper:
             'football': 0,
             'duplicados': 0,
             'errores': 0,
-            'nuevos': 0
+            'nuevos': 0,
+            # ✅ NUEVO: contador para saber cuántos se geocodificaron
+            'geocodificados': 0,
+            # ✅ NUEVO: contador de eventos descartados por coords imposibles
+            'descartados_coords': 0,
         }
 
         if GEOPY_AVAILABLE and GEOCODING_ENABLED:
@@ -85,6 +89,42 @@ class EventosScraper:
         ]
         eliminados = len(self.eventos_existentes) - len(existentes_vigentes)
         print(f"   🗑️  Eliminados {eliminados} eventos pasados")
+
+        # ✅ NUEVO — CAPA 3: Sanidad final antes de guardar
+        # ─────────────────────────────────────────────────
+        # Revisamos TODOS los eventos (existentes + nuevos) antes de guardar.
+        # Cualquier evento con coordenadas imposibles recibe un último intento
+        # de geocodificación por su campo 'lugar'. Si sigue sin poder
+        # geocodificarse correctamente, se descarta para no contaminar el mapa.
+        print("   🔍 Validando coordenadas de todos los eventos...")
+        eventos_saneados = []
+        for evento in existentes_vigentes:
+            lat = evento.get('lat', 0)
+            lng = evento.get('lng', 0)
+
+            if not self.validar_coordenadas(lat, lng):
+                # Las coords son malas → intentamos rescatar el evento
+                lugar = evento.get('lugar', '')
+                nueva_lat, nueva_lng = self.geocodificar(lugar)
+
+                if self.validar_coordenadas(nueva_lat, nueva_lng):
+                    # Geocodificación exitosa → corregimos y guardamos
+                    evento['lat'] = nueva_lat
+                    evento['lng'] = nueva_lng
+                    evento['zona'] = self.asignar_zona(nueva_lat, nueva_lng)
+                    self.stats['geocodificados'] += 1
+                    print(f"      ✅ Rescatado: {evento['nombre'][:50]}")
+                else:
+                    # No se pudo geocodificar → descartamos el evento
+                    self.stats['descartados_coords'] += 1
+                    print(f"      ❌ Descartado (coords imposibles): "
+                          f"{evento['nombre'][:50]}")
+                    continue
+
+            eventos_saneados.append(evento)
+
+        existentes_vigentes = eventos_saneados
+        # ─────────────────────────────────────────────────
 
         nombres_existentes = {
             e['nombre'].lower().strip() for e in existentes_vigentes
@@ -539,6 +579,26 @@ class EventosScraper:
                                 except (ValueError, TypeError):
                                     pass
 
+                        # ✅ FIX — CAPA 2: Geocodificación como plan B
+                        # ────────────────────────────────────────────
+                        # Si después de procesar el venue las coords siguen
+                        # siendo las genéricas (40.4168, -3.7038), significa
+                        # que la API no nos dio coords válidas.
+                        # Intentamos geocodificar por el nombre del venue,
+                        # que primero buscará en KNOWN_VENUES (instantáneo)
+                        # y si no, usará Nominatim (llamada externa).
+                        coords_son_genericas = (
+                            lat == 40.4168 and lng == -3.7038
+                        )
+                        if coords_son_genericas and lugar != 'Madrid':
+                            lat_geo, lng_geo = self.geocodificar(lugar)
+                            if self.validar_coordenadas(lat_geo, lng_geo):
+                                lat, lng = lat_geo, lng_geo
+                                self.stats['geocodificados'] += 1
+                                print(f"      🗺️ Geocodificado venue TM: "
+                                      f"{lugar[:40]}")
+                        # ────────────────────────────────────────────
+
                         descripcion = self.limpiar_texto(
                             evento_data.get('info', '') or
                             evento_data.get('pleaseNote', ''),
@@ -838,6 +898,9 @@ class EventosScraper:
         print(f"➕  Nuevos:         {self.stats['nuevos']:>5}")
         print(f"🔄  Duplicados:     {self.stats['duplicados']:>5}")
         print(f"⚠️   Errores:        {self.stats['errores']:>5}")
+        # ✅ NUEVO: mostramos las nuevas stats en el resumen
+        print(f"🗺️  Geocodificados: {self.stats['geocodificados']:>5}")
+        print(f"🚫  Descartados:    {self.stats['descartados_coords']:>5}")
         print(f"📊  Total final:    {total:>5}")
         print()
         print("✅ PROCESO COMPLETADO")

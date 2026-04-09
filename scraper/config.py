@@ -162,7 +162,9 @@ MUNICIPIOS = {
 
 # Lugares conocidos en Madrid capital
 KNOWN_VENUES = {
+    # ─────────────────────────────────────────────
     # Música
+    # ─────────────────────────────────────────────
     'wizink center': {'lat': 40.4225, 'lng': -3.6703},
     'wizink': {'lat': 40.4225, 'lng': -3.6703},
     'mad cool': {'lat': 40.4637, 'lng': -3.6748},
@@ -174,9 +176,14 @@ KNOWN_VENUES = {
     'joy eslava': {'lat': 40.4168, 'lng': -3.7043},
     'teatro joy eslava': {'lat': 40.4168, 'lng': -3.7043},
 
+    # ─────────────────────────────────────────────
     # Deportes
+    # ─────────────────────────────────────────────
     'wanda metropolitano': {'lat': 40.4361, 'lng': -3.5995},
     'estadio wanda metropolitano': {'lat': 40.4361, 'lng': -3.5995},
+    # ✅ NUEVO: nombre actualizado del Wanda Metropolitano
+    'riyadh air metropolitano': {'lat': 40.4361, 'lng': -3.5995},
+    'estadio riyadh air metropolitano': {'lat': 40.4361, 'lng': -3.5995},
     'santiago bernabéu': {'lat': 40.4531, 'lng': -3.6883},
     'bernabéu': {'lat': 40.4531, 'lng': -3.6883},
     'estadio de vallecas': {'lat': 40.3919, 'lng': -3.6546},
@@ -187,7 +194,9 @@ KNOWN_VENUES = {
     'pabellón magariños': {'lat': 40.4394, 'lng': -3.6808},
     'caja mágica': {'lat': 40.3747, 'lng': -3.6897},
 
+    # ─────────────────────────────────────────────
     # Cultura
+    # ─────────────────────────────────────────────
     'teatro real': {'lat': 40.4179, 'lng': -3.7106},
     'teatro español': {'lat': 40.4147, 'lng': -3.6991},
     'teatro fernán gómez': {'lat': 40.4192, 'lng': -3.6933},
@@ -209,8 +218,13 @@ KNOWN_VENUES = {
     'museo nacional de antropología': {'lat': 40.4072, 'lng': -3.6933},
     'casa encendida': {'lat': 40.4061, 'lng': -3.7005},
     'fundación mapfre': {'lat': 40.4192, 'lng': -3.6933},
+    # ✅ NUEVO: venues que daban problemas con Ticketmaster
+    'tablao flamenco 1911': {'lat': 40.4168, 'lng': -3.7043},
+    'espacio madriz': {'lat': 40.4098, 'lng': -3.7039},
 
+    # ─────────────────────────────────────────────
     # Parques y espacios
+    # ─────────────────────────────────────────────
     'parque del retiro': {'lat': 40.4153, 'lng': -3.6844},
     'retiro': {'lat': 40.4153, 'lng': -3.6844},
     'casa de campo': {'lat': 40.4233, 'lng': -3.7598},
@@ -222,7 +236,9 @@ KNOWN_VENUES = {
     'parque el capricho': {'lat': 40.4647, 'lng': -3.6281},
     'parque de berlín': {'lat': 40.4558, 'lng': -3.6789},
 
+    # ─────────────────────────────────────────────
     # Plazas y barrios
+    # ─────────────────────────────────────────────
     'plaza mayor': {'lat': 40.4192, 'lng': -3.7025},
     'puerta del sol': {'lat': 40.4169, 'lng': -3.7033},
     'gran vía': {'lat': 40.4200, 'lng': -3.7025},
@@ -237,7 +253,9 @@ KNOWN_VENUES = {
     'usera': {'lat': 40.3897, 'lng': -3.7108},
     'carabanchel': {'lat': 40.3828, 'lng': -3.7364},
 
+    # ─────────────────────────────────────────────
     # Mercados
+    # ─────────────────────────────────────────────
     'mercado de san miguel': {'lat': 40.4155, 'lng': -3.7092},
     'mercado de motores': {'lat': 40.3985, 'lng': -3.6904},
     'el rastro': {'lat': 40.4089, 'lng': -3.7077},
@@ -247,4 +265,3 @@ KNOWN_VENUES = {
 
 # Ticketmaster
 TICKETMASTER_KEY = os.environ.get('TICKETMASTER_KEY', '')
-
