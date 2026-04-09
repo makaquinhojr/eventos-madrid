@@ -9,25 +9,90 @@ let userMarker = null;
 let userLocation = null;
 
 const icons = {
-    concierto: '🎵',
-    fiesta: '🎪',
-    mercado: '🛍️',
-    cultural: '🎭',
+    concierto:   '🎵',
+    fiesta:      '🎪',
+    mercado:     '🛍️',
+    cultural:    '🎭',
     gastronomia: '🍽️',
-    deporte: '⚽',
-    infantil: '👶'
+    deporte:     '⚽',
+    infantil:    '👶'
 };
 
 const colors = {
-    concierto: '#7C3AED',
-    fiesta: '#DC2626',
-    mercado: '#059669',
-    cultural: '#2563EB',
+    concierto:   '#7C3AED',
+    fiesta:      '#DC2626',
+    mercado:     '#059669',
+    cultural:    '#2563EB',
     gastronomia: '#D97706',
-    deporte: '#16A34A',
-    infantil: '#F59E0B'
+    deporte:     '#16A34A',
+    infantil:    '#F59E0B'
 };
 
+// ===== ZONAS POR COORDENADAS =====
+const ZONAS_COORDS = {
+    'Centro':                     { lat: 40.4168, lng: -3.7038, radio: 1.5 },
+    'Arganzuela':                 { lat: 40.3964, lng: -3.7006, radio: 1.8 },
+    'Retiro':                     { lat: 40.4083, lng: -3.6844, radio: 1.8 },
+    'Salamanca':                  { lat: 40.4286, lng: -3.6824, radio: 1.5 },
+    'Chamartín':                  { lat: 40.4536, lng: -3.6772, radio: 2.0 },
+    'Tetuán':                     { lat: 40.4597, lng: -3.7031, radio: 1.5 },
+    'Chamberí':                   { lat: 40.4394, lng: -3.7023, radio: 1.5 },
+    'Fuencarral':                 { lat: 40.4894, lng: -3.7108, radio: 3.0 },
+    'Moncloa':                    { lat: 40.4350, lng: -3.7245, radio: 2.5 },
+    'Latina':                     { lat: 40.4061, lng: -3.7364, radio: 2.0 },
+    'Carabanchel':                { lat: 40.3828, lng: -3.7364, radio: 2.5 },
+    'Usera':                      { lat: 40.3897, lng: -3.7108, radio: 1.5 },
+    'Puente de Vallecas':         { lat: 40.3919, lng: -3.6546, radio: 2.0 },
+    'Moratalaz':                  { lat: 40.4061, lng: -3.6394, radio: 1.5 },
+    'Ciudad Lineal':              { lat: 40.4394, lng: -3.6508, radio: 2.5 },
+    'Hortaleza':                  { lat: 40.4772, lng: -3.6394, radio: 3.0 },
+    'Villaverde':                 { lat: 40.3469, lng: -3.7108, radio: 2.5 },
+    'Villa de Vallecas':          { lat: 40.3736, lng: -3.6197, radio: 2.5 },
+    'Vicálvaro':                  { lat: 40.4061, lng: -3.6053, radio: 2.0 },
+    'San Blas':                   { lat: 40.4286, lng: -3.6053, radio: 2.5 },
+    'Barajas':                    { lat: 40.4772, lng: -3.5800, radio: 3.0 },
+    'Getafe':                     { lat: 40.3058, lng: -3.7326, radio: 5.0 },
+    'Leganés':                    { lat: 40.3281, lng: -3.7638, radio: 5.0 },
+    'Alcorcón':                   { lat: 40.3494, lng: -3.8244, radio: 5.0 },
+    'Móstoles':                   { lat: 40.3224, lng: -3.8652, radio: 5.0 },
+    'Fuenlabrada':                { lat: 40.2842, lng: -3.7946, radio: 5.0 },
+    'Alcalá de Henares':          { lat: 40.4818, lng: -3.3641, radio: 6.0 },
+    'Torrejón de Ardoz':          { lat: 40.4599, lng: -3.4794, radio: 5.0 },
+    'Alcobendas':                 { lat: 40.5469, lng: -3.6398, radio: 4.0 },
+    'Las Rozas':                  { lat: 40.4930, lng: -3.8740, radio: 5.0 },
+    'Pozuelo':                    { lat: 40.4350, lng: -3.8138, radio: 4.0 },
+    'Majadahonda':                { lat: 40.4728, lng: -3.8726, radio: 4.0 },
+    'Collado Villalba':           { lat: 40.6346, lng: -4.0076, radio: 5.0 },
+    'Tres Cantos':                { lat: 40.5927, lng: -3.7090, radio: 4.0 },
+    'San Sebastián de los Reyes': { lat: 40.5487, lng: -3.6271, radio: 4.0 },
+    'Coslada':                    { lat: 40.4233, lng: -3.5645, radio: 3.0 },
+    'Rivas Vaciamadrid':          { lat: 40.3561, lng: -3.5234, radio: 4.0 },
+    'Aranjuez':                   { lat: 40.0319, lng: -3.6010, radio: 5.0 },
+    'Valdemoro':                  { lat: 40.1908, lng: -3.6742, radio: 4.0 },
+    'Parla':                      { lat: 40.2390, lng: -3.7754, radio: 4.0 },
+    'Torrelodones':               { lat: 40.5756, lng: -3.9287, radio: 4.0 },
+    'Boadilla del Monte':         { lat: 40.4067, lng: -3.8760, radio: 4.0 },
+    'Arganda del Rey':            { lat: 40.3008, lng: -3.4394, radio: 4.0 },
+};
+
+// ===== INFERIR ZONA POR COORDENADAS =====
+function inferirZona(lat, lng) {
+    let mejorZona = null;
+    let mejorDistancia = Infinity;
+
+    for (const [zona, datos] of Object.entries(ZONAS_COORDS)) {
+        const dist = calcularDistancia(lat, lng, datos.lat, datos.lng);
+        if (dist <= datos.radio && dist < mejorDistancia) {
+            mejorDistancia = dist;
+            mejorZona = zona;
+        }
+    }
+    return mejorZona || 'Madrid';
+}
+
+function getZonaEvento(evento) {
+    return evento.zona || inferirZona(evento.lat, evento.lng);
+}
 
 // ===== MAPA =====
 function initMap() {
@@ -35,6 +100,7 @@ function initMap() {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap'
     }).addTo(map);
+
     markersLayer = L.markerClusterGroup({
         chunkedLoading: true,
         chunkInterval: 100,
@@ -46,7 +112,6 @@ function initMap() {
         animateAddingMarkers: false,
     }).addTo(map);
 }
-
 
 // ===== CARGAR EVENTOS =====
 async function loadEvents() {
@@ -75,7 +140,6 @@ async function loadEvents() {
     }
 }
 
-
 // ===== HELPERS DE LINK =====
 function esLinkUtil(url) {
     if (!url || typeof url !== 'string' || url.trim() === '') return false;
@@ -83,9 +147,7 @@ function esLinkUtil(url) {
 
     const urlLower = url.toLowerCase();
 
-    if (urlLower.includes('madrid.es/portales/munimadrid')) {
-        return true;
-    }
+    if (urlLower.includes('madrid.es/portales/munimadrid')) return true;
 
     const urlsGenericas = [
         'madrid.es', 'esmadrid.com',
@@ -115,8 +177,7 @@ function getLinkHTML(evento) {
     }
     const busqueda = encodeURIComponent(`${evento.nombre} Madrid`);
     return `<a href="https://www.google.com/search?q=${busqueda}"
-               target="_blank"
-               class="popup-link popup-link-google">
+               target="_blank" class="popup-link popup-link-google">
                 🔍 Buscar en Google
             </a>`;
 }
@@ -124,15 +185,16 @@ function getLinkHTML(evento) {
 function getBotonMasInfo(evento) {
     const busqueda = encodeURIComponent(`${evento.nombre} Madrid`);
     if (esLinkUtil(evento.url)) {
-        return `<a href="${evento.url}" target="_blank" class="event-btn event-btn-secondary">
+        return `<a href="${evento.url}" target="_blank"
+                   class="event-btn event-btn-secondary">
                     <i class="fas fa-external-link-alt"></i> Más info
                 </a>`;
     }
-    return `<a href="https://www.google.com/search?q=${busqueda}" target="_blank" class="event-btn event-btn-google">
+    return `<a href="https://www.google.com/search?q=${busqueda}"
+               target="_blank" class="event-btn event-btn-google">
                 <i class="fas fa-search"></i> Buscar
             </a>`;
 }
-
 
 // ===== MOSTRAR EVENTOS EN MAPA =====
 function displayEvents(events) {
@@ -159,9 +221,7 @@ function displayEvents(events) {
                     box-shadow: 0 3px 10px rgba(0,0,0,0.3);
                     cursor: pointer;
                     transform: translate(-50%, -50%);
-                ">
-                    ${emoji}
-                </div>
+                ">${emoji}</div>
             `,
             className: '',
             iconSize: [40, 40],
@@ -170,20 +230,22 @@ function displayEvents(events) {
         });
 
         const marker = L.marker([event.lat, event.lng], {
-            icon: icon,
+            icon,
             riseOnHover: true
         });
 
         marker.eventoId = event.id;
 
-        const dateText = formatearFechaSafe(event.fecha, event.fecha_fin);
-        const descripcionLimpia = limpiarDescripcion(event.descripcion, 150);
-        const linkHTML = getLinkHTML(event);
+        const dateText    = formatearFechaSafe(event.fecha, event.fecha_fin);
+        const descripcion = limpiarDescripcion(event.descripcion, 150);
+        const linkHTML    = getLinkHTML(event);
+        const zona        = getZonaEvento(event);
 
         const calendarLink = generarLinkCalendar(event);
         const calendarHTML = calendarLink
-            ? `<a href="${calendarLink}" target="_blank" class="popup-link popup-link-calendar">
-                 📅 Añadir al calendario
+            ? `<a href="${calendarLink}" target="_blank"
+                  class="popup-link popup-link-calendar">
+                    📅 Añadir al calendario
                </a>`
             : '';
 
@@ -196,13 +258,17 @@ function displayEvents(events) {
                 <h3>${event.nombre}</h3>
                 <p><strong>📅</strong> ${dateText}</p>
                 <p><strong>📍</strong> ${event.lugar}</p>
-                <p><strong>💰</strong> ${event.precio === 'gratis'
-                    ? '<strong style="color:#059669;">Gratis</strong>'
-                    : event.precio_desde || 'De pago'}</p>
+                <p><strong>🗺️</strong> ${zona}</p>
+                <p><strong>💰</strong> ${
+                    event.precio === 'gratis'
+                        ? '<strong style="color:#059669;">Gratis</strong>'
+                        : event.precio_desde || 'De pago'
+                }</p>
                 ${distanciaHTML}
-                ${descripcionLimpia
-                    ? `<p style="color:#6B7280;font-size:13px;margin-top:8px;line-height:1.4;">
-                         ${descripcionLimpia}
+                ${descripcion
+                    ? `<p style="color:#6B7280;font-size:13px;
+                                 margin-top:8px;line-height:1.4;">
+                            ${descripcion}
                        </p>`
                     : ''}
                 <div class="popup-actions">
@@ -224,20 +290,23 @@ function displayEvents(events) {
     actualizarEstadisticas(events);
 }
 
-
 // ===== VISTA LISTA =====
 function switchView(view) {
     currentView = view;
 
-    document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.view-btn').forEach(btn =>
+        btn.classList.remove('active')
+    );
     document.getElementById(`view-${view}-btn`).classList.add('active');
 
-    document.querySelectorAll('.view-container').forEach(c => c.classList.remove('active'));
-    document.getElementById(view === 'map' ? 'map' : 'list-view').classList.add('active');
+    document.querySelectorAll('.view-container').forEach(c =>
+        c.classList.remove('active')
+    );
+    document.getElementById(
+        view === 'map' ? 'map' : 'list-view'
+    ).classList.add('active');
 
-    if (view === 'list') {
-        renderListView(currentFilteredEvents);
-    }
+    if (view === 'list') renderListView(currentFilteredEvents);
 }
 
 function renderListView(events) {
@@ -264,9 +333,11 @@ function renderListView(events) {
                 return a.tipo.localeCompare(b.tipo);
             case 'distance':
                 if (!userLocation) return 0;
-                const dA = calcularDistancia(userLocation.lat, userLocation.lng, a.lat, a.lng);
-                const dB = calcularDistancia(userLocation.lat, userLocation.lng, b.lat, b.lng);
-                return dA - dB;
+                return calcularDistancia(
+                    userLocation.lat, userLocation.lng, a.lat, a.lng
+                ) - calcularDistancia(
+                    userLocation.lat, userLocation.lng, b.lat, b.lng
+                );
             default:
                 return 0;
         }
@@ -278,15 +349,19 @@ function renderListView(events) {
     listContainer.innerHTML = sortedEvents.map(evento => {
         const fechaEvento = new Date(evento.fecha);
         const esHoy = fechaEvento.toDateString() === hoy.toDateString();
-        const esMañana = fechaEvento.toDateString() === new Date(hoy.getTime() + 86400000).toDateString();
+        const esMañana = fechaEvento.toDateString() ===
+            new Date(hoy.getTime() + 86400000).toDateString();
 
         let proximidadBadge = '';
-        if (esHoy) proximidadBadge = '<span class="event-badge hoy">🔥 HOY</span>';
+        if (esHoy)    proximidadBadge = '<span class="event-badge hoy">🔥 HOY</span>';
         else if (esMañana) proximidadBadge = '<span class="event-badge hoy">⚡ MAÑANA</span>';
 
         const precioBadge = evento.precio === 'gratis'
             ? '<span class="event-badge gratis">💚 GRATIS</span>'
             : `<span class="event-badge pago">💰 ${evento.precio_desde || 'Pago'}</span>`;
+
+        const zona = getZonaEvento(evento);
+        const zonaBadge = `<span class="event-badge zona">📍 ${zona}</span>`;
 
         const fechaTexto = evento.fecha_fin
             ? `${formatDate(evento.fecha)} - ${formatDate(evento.fecha_fin)}`
@@ -298,12 +373,12 @@ function renderListView(events) {
             </div>
         ` : '';
 
-        const botonMasInfo = getBotonMasInfo(evento);
-
-        const calendarLink = generarLinkCalendar(evento);
+        const botonMasInfo  = getBotonMasInfo(evento);
+        const calendarLink  = generarLinkCalendar(evento);
         const botonCalendar = calendarLink
-            ? `<a href="${calendarLink}" target="_blank" class="event-btn event-btn-calendar">
-                 <i class="fas fa-calendar-plus"></i>
+            ? `<a href="${calendarLink}" target="_blank"
+                  class="event-btn event-btn-calendar">
+                    <i class="fas fa-calendar-plus"></i>
                </a>`
             : '';
 
@@ -320,6 +395,7 @@ function renderListView(events) {
                         ${evento.nombre}
                         ${proximidadBadge}
                         ${precioBadge}
+                        ${zonaBadge}
                     </div>
 
                     <div class="event-meta">
@@ -337,14 +413,17 @@ function renderListView(events) {
                     ${descripcion
                         ? `<div class="event-description">${descripcion}</div>`
                         : `<div class="event-description sin-descripcion">
-                               📍 ${evento.lugar} · 
-                               ${evento.precio === 'gratis' ? 'Entrada gratuita' : evento.precio_desde || 'De pago'}
+                               📍 ${evento.lugar} ·
+                               ${evento.precio === 'gratis'
+                                   ? 'Entrada gratuita'
+                                   : evento.precio_desde || 'De pago'}
                            </div>`
                     }
                 </div>
 
                 <div class="event-actions">
-                    <button class="event-btn event-btn-primary" onclick="verEnMapa(${evento.id})">
+                    <button class="event-btn event-btn-primary"
+                            onclick="verEnMapa(${evento.id})">
                         <i class="fas fa-map-marked-alt"></i> Ver en mapa
                     </button>
                     ${botonMasInfo}
@@ -372,11 +451,14 @@ function verEnMapa(eventoId) {
     });
 }
 
-
 // ===== FILTROS =====
 function applyFilters() {
-    const search = document.getElementById('search').value.toLowerCase();
+    const search     = document.getElementById('search').value.toLowerCase().trim();
     const dateFilter = document.getElementById('filtro-fecha').value;
+    const zonaFilter = document.getElementById('filtro-zona')?.value || 'todas';
+    const precioMax  = parseInt(
+        document.getElementById('filtro-precio-max')?.value || 100
+    );
 
     const types = Array.from(document.querySelectorAll(
         '.chip input[value="concierto"], .chip input[value="fiesta"], ' +
@@ -390,19 +472,50 @@ function applyFilters() {
     )).filter(cb => cb.checked).map(cb => cb.value);
 
     let filtered = allEvents.filter(e => {
+        // Tipo
         if (types.length && !types.includes(e.tipo)) return false;
+
+        // Precio chips
         if (prices.length && !prices.includes(e.precio)) return false;
-        if (search && !`${e.nombre} ${e.descripcion} ${e.lugar}`.toLowerCase().includes(search)) return false;
+
+        // Búsqueda texto (incluye zona)
+        if (search) {
+            const zona = getZonaEvento(e);
+            const haystack = [
+                e.nombre,
+                e.descripcion || '',
+                e.lugar,
+                zona
+            ].join(' ').toLowerCase();
+            if (!haystack.includes(search)) return false;
+        }
+
+        // Zona
+        if (zonaFilter !== 'todas') {
+            if (getZonaEvento(e) !== zonaFilter) return false;
+        }
+
+        // Precio máximo slider
+        if (precioMax < 100) {
+            if (e.precio === 'gratis') return true;
+            if (precioMax === 0) return false;
+            if (e.precio_desde) {
+                const num = parseFloat(e.precio_desde.replace('€', ''));
+                if (!isNaN(num) && num > precioMax) return false;
+            }
+        }
+
         return true;
     });
 
+    // Filtro fecha
     if (dateFilter !== 'todos') {
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
 
         filtered = filtered.filter(e => {
             const fechaInicio = new Date(e.fecha + 'T00:00:00');
-            const fechaFin = e.fecha_fin
+            const fechaFin    = e.fecha_fin
                 ? new Date(e.fecha_fin + 'T00:00:00')
                 : fechaInicio;
 
@@ -410,7 +523,7 @@ function applyFilters() {
                 case 'hoy':
                     return fechaInicio <= hoy && fechaFin >= hoy;
 
-                case 'finde':
+                case 'finde': {
                     const dia = hoy.getDay();
                     let ini, fin;
                     if (dia === 6) {
@@ -427,16 +540,19 @@ function applyFilters() {
                         fin.setDate(ini.getDate() + 1);
                     }
                     return fechaInicio <= fin && fechaFin >= ini;
+                }
 
-                case 'semana':
+                case 'semana': {
                     const semanaFin = new Date(hoy);
                     semanaFin.setDate(hoy.getDate() + 7);
                     return fechaInicio <= semanaFin && fechaFin >= hoy;
+                }
 
-                case 'mes':
+                case 'mes': {
                     const mesFin = new Date(hoy);
                     mesFin.setDate(hoy.getDate() + 30);
                     return fechaInicio <= mesFin && fechaFin >= hoy;
+                }
 
                 default:
                     return true;
@@ -448,37 +564,147 @@ function applyFilters() {
     displayEvents(filtered);
     updateCounter(filtered.length);
     actualizarEstadisticas(filtered);
+    actualizarContadorFiltros();
+    mostrarZonaActiva(zonaFilter);
+}
+
+function mostrarZonaActiva(zona) {
+    const select     = document.getElementById('filtro-zona');
+    const contenedor = select?.parentElement;
+    if (!contenedor) return;
+
+    const anterior = contenedor.querySelector('.zona-badge-activa');
+    anterior?.remove();
+
+    if (zona && zona !== 'todas') {
+        const badge = document.createElement('div');
+        badge.className = 'zona-badge-activa';
+        badge.innerHTML = `
+            <i class="fas fa-map-marker-alt"></i>
+            ${zona}
+            <i class="fas fa-times"></i>
+        `;
+        badge.addEventListener('click', () => {
+            document.getElementById('filtro-zona').value = 'todas';
+            applyFilters();
+        });
+        contenedor.appendChild(badge);
+    }
+}
+
+function actualizarContadorFiltros() {
+    const fab = document.getElementById('fab-filters');
+    let count = 0;
+
+    const zona = document.getElementById('filtro-zona')?.value;
+    if (zona && zona !== 'todas') count++;
+
+    const fecha = document.getElementById('filtro-fecha')?.value;
+    if (fecha && fecha !== 'todos') count++;
+
+    const tiposDesactivados = Array.from(
+        document.querySelectorAll('.chip input[type="checkbox"]')
+    ).filter(cb => !cb.checked).length;
+    if (tiposDesactivados > 0) count++;
+
+    const precioMax = parseInt(
+        document.getElementById('filtro-precio-max')?.value || 100
+    );
+    if (precioMax < 100) count++;
+
+    const search = document.getElementById('search')?.value;
+    if (search && search.trim()) count++;
+
+    let badge = fab.querySelector('.filtros-count');
+    if (count > 0) {
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'filtros-count';
+            fab.appendChild(badge);
+        }
+        badge.textContent = count;
+    } else {
+        badge?.remove();
+    }
 }
 
 function clearFilters() {
     document.getElementById('search').value = '';
     document.getElementById('filtro-fecha').value = 'todos';
+
+    const zonaSelect = document.getElementById('filtro-zona');
+    if (zonaSelect) zonaSelect.value = 'todas';
+
+    const slider = document.getElementById('filtro-precio-max');
+    if (slider) {
+        slider.value = 100;
+        slider.dispatchEvent(new Event('input'));
+    }
+
     document.querySelectorAll('.chip input').forEach(cb => cb.checked = true);
     applyFilters();
 }
 
+// ===== SLIDER PRECIO =====
+function initSliderPrecio() {
+    const slider = document.getElementById('filtro-precio-max');
+    const label  = document.getElementById('precio-valor-label');
+    if (!slider || !label) return;
+
+    function actualizarSlider() {
+        const val = parseInt(slider.value);
+        const pct = val + '%';
+
+        slider.style.setProperty('--pct', pct);
+
+        if (val >= 100) {
+            label.textContent = 'Cualquiera';
+            label.style.color = '';
+        } else if (val === 0) {
+            label.textContent = 'Solo gratis';
+            label.style.color = 'var(--green)';
+        } else {
+            label.textContent = `hasta ${val}€`;
+            label.style.color = '';
+        }
+
+        applyFilters();
+    }
+
+    slider.addEventListener('input', actualizarSlider);
+    actualizarSlider();
+}
 
 // ===== HELPERS DE FECHA =====
 function formatDate(dateStr) {
     const date = new Date(dateStr + 'T00:00:00');
-    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+    return date.toLocaleDateString('es-ES', {
+        day: 'numeric', month: 'short'
+    });
 }
 
 function formatearFechaSafe(fechaInicio, fechaFin) {
     const fecha1 = parsearFecha(fechaInicio);
     if (!fecha1) return 'Fecha a confirmar';
 
-    const opciones = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+    const opciones = {
+        weekday: 'short', day: 'numeric',
+        month: 'short', year: 'numeric'
+    };
     const textoFecha1 = fecha1.toLocaleDateString('es-ES', opciones);
 
     if (fechaFin) {
         const fecha2 = parsearFecha(fechaFin);
         if (fecha2) {
             if (
-                fecha1.getMonth() === fecha2.getMonth() &&
+                fecha1.getMonth()    === fecha2.getMonth() &&
                 fecha1.getFullYear() === fecha2.getFullYear()
             ) {
-                return `${fecha1.getDate()}-${fecha2.getDate()} ${fecha2.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })}`;
+                return `${fecha1.getDate()}-${fecha2.getDate()} ${
+                    fecha2.toLocaleDateString('es-ES', {
+                        month: 'short', year: 'numeric'
+                    })
+                }`;
             }
             return `${textoFecha1} - ${fecha2.toLocaleDateString('es-ES', opciones)}`;
         }
@@ -498,7 +724,6 @@ function parsearFecha(fechaStr) {
         return null;
     }
 }
-
 
 // ===== HELPERS DE TEXTO =====
 function limpiarDescripcion(descripcion, maxLength = 150) {
@@ -525,7 +750,6 @@ function limpiarDescripcion(descripcion, maxLength = 150) {
     return texto;
 }
 
-
 // ===== DISTANCIAS =====
 function calcularDistancia(lat1, lng1, lat2, lng2) {
     const R = 6371;
@@ -533,13 +757,16 @@ function calcularDistancia(lat1, lng1, lat2, lng2) {
     const dLng = (lng2 - lng1) * Math.PI / 180;
     const a =
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
         Math.sin(dLng / 2) * Math.sin(dLng / 2);
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 function formatearDistancia(km) {
-    return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
+    return km < 1
+        ? `${Math.round(km * 1000)} m`
+        : `${km.toFixed(1)} km`;
 }
 
 function getDistanciaHTML(evento) {
@@ -551,13 +778,16 @@ function getDistanciaHTML(evento) {
     );
 
     const texto = formatearDistancia(distancia);
-    const color = distancia < 1 ? '#059669' : distancia < 5 ? '#D97706' : '#DC2626';
+    const color = distancia < 1
+        ? '#059669'
+        : distancia < 5
+            ? '#D97706'
+            : '#DC2626';
 
     return `<span class="distancia-badge" style="color:${color}">
         <i class="fas fa-walking"></i> ${texto}
     </span>`;
 }
-
 
 // ===== GEOLOCALIZACIÓN =====
 function initGeolocate() {
@@ -600,9 +830,15 @@ function onGeoSuccess(position) {
     map.setView([latitude, longitude], 14);
     colocarMarkerUsuario(latitude, longitude);
 
-    displayEvents(currentFilteredEvents.length ? currentFilteredEvents : allEvents);
+    displayEvents(
+        currentFilteredEvents.length ? currentFilteredEvents : allEvents
+    );
 
-    mostrarToast(accuracy < 100 ? '✅ Ubicación encontrada' : '📍 Ubicación aproximada');
+    mostrarToast(
+        accuracy < 100
+            ? '✅ Ubicación encontrada'
+            : '📍 Ubicación aproximada'
+    );
 }
 
 function onGeoError(error) {
@@ -646,7 +882,7 @@ function desactivarGeolocalizacion() {
 
     if (userMarker) {
         map.removeLayer(userMarker);
-        userMarker = null;
+        userMarker   = null;
         userLocation = null;
     }
 
@@ -655,11 +891,9 @@ function desactivarGeolocalizacion() {
     mostrarToast('📍 Geolocalización desactivada');
 }
 
-
 // ===== TOAST =====
 function mostrarToast(mensaje, tipo = 'normal') {
-    const toastAnterior = document.querySelector('.geo-toast');
-    if (toastAnterior) toastAnterior.remove();
+    document.querySelector('.geo-toast')?.remove();
 
     const toast = document.createElement('div');
     toast.className = `geo-toast ${tipo === 'error' ? 'error' : ''}`;
@@ -672,7 +906,6 @@ function mostrarToast(mensaje, tipo = 'normal') {
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
-
 
 // ===== ESTADÍSTICAS =====
 function actualizarEstadisticas(eventos) {
@@ -687,24 +920,24 @@ function actualizarEstadisticas(eventos) {
         if (evento.precio === 'gratis') stats.gratis++;
     });
 
-    animarContador('stat-conciertos', stats.concierto);
-    animarContador('stat-fiestas', stats.fiesta);
-    animarContador('stat-mercados', stats.mercado);
-    animarContador('stat-cultural', stats.cultural);
+    animarContador('stat-conciertos',  stats.concierto);
+    animarContador('stat-fiestas',     stats.fiesta);
+    animarContador('stat-mercados',    stats.mercado);
+    animarContador('stat-cultural',    stats.cultural);
     animarContador('stat-gastronomia', stats.gastronomia);
-    animarContador('stat-deporte', stats.deporte);
-    animarContador('stat-infantil', stats.infantil);
-    animarContador('stat-gratis', stats.gratis);
+    animarContador('stat-deporte',     stats.deporte);
+    animarContador('stat-infantil',    stats.infantil);
+    animarContador('stat-gratis',      stats.gratis);
 }
 
 function animarContador(elementId, valorFinal) {
     const elemento = document.getElementById(elementId);
     if (!elemento) return;
 
-    const duracion = 1000;
-    const pasos = 60;
+    const duracion   = 1000;
+    const pasos      = 60;
     const incremento = valorFinal / pasos;
-    let valorActual = 0;
+    let valorActual  = 0;
 
     const intervalo = setInterval(() => {
         valorActual += incremento;
@@ -721,15 +954,14 @@ function updateCounter(count) {
     document.getElementById('event-count').textContent = count;
 }
 
-
 // ===== TEMA =====
 function toggleTheme() {
     document.body.classList.toggle('light-mode');
     const isLight = document.body.classList.contains('light-mode');
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
-    document.querySelector('.theme-toggle i').className = isLight ? 'fas fa-moon' : 'fas fa-sun';
+    document.querySelector('.theme-toggle i').className =
+        isLight ? 'fas fa-moon' : 'fas fa-sun';
 }
-
 
 // ===== BANNER HOY =====
 function iniciarBannerHoy() {
@@ -738,7 +970,7 @@ function iniciarBannerHoy() {
 
     const eventosHoy = allEvents.filter(e => {
         const fechaInicio = new Date(e.fecha + 'T00:00:00');
-        const fechaFin = e.fecha_fin
+        const fechaFin    = e.fecha_fin
             ? new Date(e.fecha_fin + 'T00:00:00')
             : fechaInicio;
         return fechaInicio <= hoy && fechaFin >= hoy;
@@ -762,14 +994,15 @@ function iniciarBannerHoy() {
     });
 }
 
-
 // ===== GOOGLE CALENDAR =====
 function generarLinkCalendar(evento) {
     const formatearFechaCalendar = (fechaStr) => {
         if (!fechaStr) return null;
         const fecha = new Date(fechaStr + 'T00:00:00');
         if (isNaN(fecha.getTime())) return null;
-        return fecha.toISOString().replace(/-|:|\.\d{3}/g, '').slice(0, 8);
+        return fecha.toISOString()
+            .replace(/-|:|\.d{3}/g, '')
+            .slice(0, 8);
     };
 
     const inicio = formatearFechaCalendar(evento.fecha);
@@ -778,33 +1011,27 @@ function generarLinkCalendar(evento) {
     const fin = formatearFechaCalendar(evento.fecha_fin) || inicio;
 
     const params = new URLSearchParams({
-        action: 'TEMPLATE',
-        text: evento.nombre,
-        dates: `${inicio}/${fin}`,
-        details: `${evento.descripcion || ''}\n\nMás info: ${evento.url || ''}`,
+        action:   'TEMPLATE',
+        text:     evento.nombre,
+        dates:    `${inicio}/${fin}`,
+        details:  `${evento.descripcion || ''}\n\nMás info: ${evento.url || ''}`,
         location: evento.lugar || 'Madrid'
     });
 
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
-
 // ===== LOADER =====
 function ocultarLoader(numEventos) {
     const loader = document.getElementById('loader');
-    const count = document.getElementById('loader-count');
+    const count  = document.getElementById('loader-count');
 
-    if (count) {
-        count.textContent = `✅ ${numEventos} eventos cargados`;
-    }
+    if (count) count.textContent = `✅ ${numEventos} eventos cargados`;
 
     setTimeout(() => {
-        if (loader) {
-            loader.classList.add('oculto');
-        }
+        if (loader) loader.classList.add('oculto');
     }, 600);
 }
-
 
 // ===== PWA - SERVICE WORKER =====
 if ('serviceWorker' in navigator) {
@@ -815,20 +1042,21 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-
 // ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
     loadEvents();
     initGeolocate();
+    initSliderPrecio();
 
-   // Oscuro por defecto
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme === 'light') {
-    document.body.classList.add('light-mode');
-    document.querySelector('.theme-toggle i').className = 'fas fa-moon';
-}
+    // Tema guardado
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        document.querySelector('.theme-toggle i').className = 'fas fa-moon';
+    }
 
+    // Paneles
     document.getElementById('fab-filters').addEventListener('click', () => {
         document.getElementById('filters-panel').classList.add('active');
     });
@@ -842,26 +1070,35 @@ if (savedTheme === 'light') {
         document.getElementById('stats-panel').classList.remove('active');
     });
 
-    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
-    document.getElementById('btn-clear').addEventListener('click', clearFilters);
-    document.getElementById('view-map-btn').addEventListener('click', () => switchView('map'));
-    document.getElementById('view-list-btn').addEventListener('click', () => switchView('list'));
+    // Acciones
+    document.getElementById('theme-toggle')
+        .addEventListener('click', toggleTheme);
+    document.getElementById('btn-clear')
+        .addEventListener('click', clearFilters);
+    document.getElementById('view-map-btn')
+        .addEventListener('click', () => switchView('map'));
+    document.getElementById('view-list-btn')
+        .addEventListener('click', () => switchView('list'));
 
-    document.getElementById('sort-by').addEventListener('change', (e) => {
+    // Ordenar lista
+    document.getElementById('sort-by').addEventListener('change', e => {
         currentSort = e.target.value;
-
         if (currentSort === 'distance' && !userLocation) {
             mostrarToast('📍 Activa tu ubicación primero', 'error');
             e.target.value = 'date';
             currentSort = 'date';
             return;
         }
-
         renderListView(currentFilteredEvents);
     });
 
-    document.getElementById('search').addEventListener('input', applyFilters);
-    document.getElementById('filtro-fecha').addEventListener('change', applyFilters);
+    // Filtros
+    document.getElementById('search')
+        .addEventListener('input', applyFilters);
+    document.getElementById('filtro-fecha')
+        .addEventListener('change', applyFilters);
+    document.getElementById('filtro-zona')
+        ?.addEventListener('change', applyFilters);
     document.querySelectorAll('.chip input').forEach(cb => {
         cb.addEventListener('change', applyFilters);
     });

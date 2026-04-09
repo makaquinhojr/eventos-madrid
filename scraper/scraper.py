@@ -5,6 +5,7 @@ import requests
 import json
 import time
 import re
+import math
 from datetime import datetime, date, timedelta
 from pathlib import Path
 import sys
@@ -52,7 +53,6 @@ class EventosScraper:
     # ===== CARGA Y GUARDADO =====
 
     def cargar_eventos_existentes(self):
-        # Buscar el JSON tanto desde /scraper/ como desde la raíz
         posibles_paths = [
             Path(__file__).parent / EVENTOS_JSON_PATH,
             Path(__file__).parent.parent / 'data' / 'eventos.json',
@@ -65,14 +65,13 @@ class EventosScraper:
                         self.eventos_existentes = json.load(f)
                     print(f"📂 Cargados {len(self.eventos_existentes)} "
                           f"eventos existentes desde {json_path}")
-                    self._json_path = json_path  # Guardar el path que funcionó
+                    self._json_path = json_path
                     return
                 except Exception as e:
                     print(f"⚠️ Error leyendo {json_path}: {e}")
 
         print("📂 No hay eventos previos, se creará nuevo archivo")
         self.eventos_existentes = []
-        # Usar path por defecto
         self._json_path = Path(__file__).parent / EVENTOS_JSON_PATH
 
     def guardar_eventos(self):
@@ -80,7 +79,6 @@ class EventosScraper:
 
         hoy = date.today().isoformat()
 
-        # Filtrar eventos pasados
         existentes_vigentes = [
             e for e in self.eventos_existentes
             if (e.get('fecha_fin') or e.get('fecha', ''))[:10] >= hoy
@@ -88,7 +86,6 @@ class EventosScraper:
         eliminados = len(self.eventos_existentes) - len(existentes_vigentes)
         print(f"   🗑️  Eliminados {eliminados} eventos pasados")
 
-        # Añadir nuevos sin duplicar
         nombres_existentes = {
             e['nombre'].lower().strip() for e in existentes_vigentes
         }
@@ -104,12 +101,10 @@ class EventosScraper:
         self.stats['nuevos'] = nuevos
         print(f"   ➕ {nuevos} eventos nuevos añadidos")
 
-        # Ordenar por fecha
         existentes_vigentes.sort(
             key=lambda x: x.get('fecha', '9999-12-31')[:10]
         )
 
-        # Asignar IDs a los que no tienen
         max_id = max(
             (e.get('id', 0) for e in existentes_vigentes),
             default=0
@@ -119,7 +114,6 @@ class EventosScraper:
                 max_id += 1
                 evento['id'] = max_id
 
-        # Guardar
         json_path = self._json_path
         json_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -150,9 +144,9 @@ class EventosScraper:
                 print(f"   ⚠️ HTTP {e.response.status_code} en intento "
                       f"{intento + 1}/{MAX_RETRIES}")
                 if e.response.status_code in [401, 403, 404]:
-                    break  # No reintentar si es error de auth/not found
+                    break
                 if intento < MAX_RETRIES - 1:
-                    time.sleep(5 * (intento + 1))  # Backoff exponencial
+                    time.sleep(5 * (intento + 1))
             except Exception as e:
                 print(f"   ⚠️ Intento {intento + 1}/{MAX_RETRIES} falló: {e}")
                 if intento < MAX_RETRIES - 1:
@@ -166,6 +160,41 @@ class EventosScraper:
                 return categoria
         return 'cultural'
 
+    def _distancia_km(self, lat1, lng1, lat2, lng2):
+        """Fórmula Haversine"""
+        R = 6371
+        dlat = math.radians(lat2 - lat1)
+        dlng = math.radians(lng2 - lng1)
+        a = (math.sin(dlat / 2) ** 2 +
+             math.cos(math.radians(lat1)) *
+             math.cos(math.radians(lat2)) *
+             math.sin(dlng / 2) ** 2)
+        return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+    def asignar_zona(self, lat, lng):
+        """
+        Asigna zona al evento según coordenadas.
+        Devuelve la zona más cercana dentro de su radio.
+        """
+        try:
+            lat, lng = float(lat), float(lng)
+        except (TypeError, ValueError):
+            return 'Madrid'
+
+        mejor_zona = None
+        mejor_distancia = float('inf')
+
+        for zona, datos in ZONAS.items():
+            distancia = self._distancia_km(
+                lat, lng,
+                datos['lat'], datos['lng']
+            )
+            if distancia <= datos['radio'] and distancia < mejor_distancia:
+                mejor_distancia = distancia
+                mejor_zona = zona
+
+        return mejor_zona if mejor_zona else 'Madrid'
+
     def geocodificar(self, lugar, municipio=None):
         if not lugar or lugar.strip() == '':
             if municipio and municipio.lower() in MUNICIPIOS:
@@ -175,19 +204,17 @@ class EventosScraper:
 
         lugar_lower = lugar.lower().strip()
 
-        # 1. Venues conocidos (más rápido y preciso)
         for venue, coords in KNOWN_VENUES.items():
             if venue in lugar_lower:
                 return coords['lat'], coords['lng']
 
-        # 2. Municipios conocidos
         for muni, coords in MUNICIPIOS.items():
             if muni in lugar_lower:
                 return coords['lat'], coords['lng']
 
-        # 3. Lugar genérico → usar municipio si lo tenemos
         lugares_genericos = [
-            'madrid', 'españa', 'spain', 'comunidad de madrid', 'online'
+            'madrid', 'españa', 'spain',
+            'comunidad de madrid', 'online'
         ]
         if lugar_lower in lugares_genericos:
             if municipio and municipio.lower() in MUNICIPIOS:
@@ -195,13 +222,11 @@ class EventosScraper:
                 return coords['lat'], coords['lng']
             return 40.4168, -3.7038
 
-        # 4. Geocodificación externa (lenta, solo si no hay otra opción)
         if self.geolocator:
             try:
                 query = f"{lugar}, Madrid, España"
                 location = self.geolocator.geocode(query, timeout=10)
                 if location:
-                    # Verificar que está en la Comunidad de Madrid
                     if (40.0 <= location.latitude <= 41.2 and
                             -4.5 <= location.longitude <= -3.0):
                         print(f"      🗺️ Geocodificado: {lugar[:40]}")
@@ -237,19 +262,15 @@ class EventosScraper:
             return None
         try:
             s = str(fecha_str).strip()
-            # ISO con T: "2024-06-15T20:00:00"
             if 'T' in s:
                 return s.split('T')[0]
-            # Con espacio: "2024-06-15 20:00:00"
             if ' ' in s and s[0].isdigit():
                 return s.split(' ')[0]
-            # Formato DD/MM/YYYY
             if '/' in s:
                 partes = s.split('/')
                 if len(partes) == 3:
                     d, m, y = partes
                     return f"{y.zfill(4)}-{m.zfill(2)}-{d.zfill(2)}"
-            # Ya en formato YYYY-MM-DD
             if re.match(r'^\d{4}-\d{2}-\d{2}', s):
                 return s[:10]
             return None
@@ -266,7 +287,6 @@ class EventosScraper:
             return False
 
     def validar_coordenadas(self, lat, lng):
-        """Verifica que las coordenadas estén en la Comunidad de Madrid"""
         try:
             lat, lng = float(lat), float(lng)
             return (40.0 <= lat <= 41.2 and -4.5 <= lng <= -3.0)
@@ -313,7 +333,6 @@ class EventosScraper:
                         saltados += 1
                         continue
 
-                    # Extraer ubicación
                     location = evento_data.get('location', {})
                     lat, lng = 40.4168, -3.7038
                     lugar = 'Madrid'
@@ -348,7 +367,6 @@ class EventosScraper:
                                     'Madrid'
                                 )
 
-                    # Si no hay coordenadas válidas, geocodificar
                     if lat == 40.4168 and lng == -3.7038 and lugar != 'Madrid':
                         lat, lng = self.geocodificar(lugar)
 
@@ -362,21 +380,22 @@ class EventosScraper:
                         ''
                     )
 
-                    # Precio
                     precio_raw = self.limpiar_texto(
                         str(evento_data.get('price', ''))
                     ).lower()
 
                     if any(p in precio_raw for p in [
-                        'gratis', 'gratuito', 'free', '0 €', '0€', 'entrada libre'
+                        'gratis', 'gratuito', 'free',
+                        '0 €', '0€', 'entrada libre'
                     ]):
                         precio = 'gratis'
                     elif precio_raw and precio_raw not in ['', 'none', 'null']:
                         precio = 'pago'
                     else:
-                        precio = 'gratis'  # Por defecto en eventos culturales municipales
+                        precio = 'gratis'
 
                     tipo = self.categorizar_evento(nombre, descripcion)
+                    zona = self.asignar_zona(lat, lng)
 
                     evento = {
                         'nombre': nombre,
@@ -385,6 +404,7 @@ class EventosScraper:
                         'lat': lat,
                         'lng': lng,
                         'lugar': lugar,
+                        'zona': zona,
                         'precio': precio,
                         'descripcion': descripcion,
                         'url': url_evento,
@@ -424,7 +444,7 @@ class EventosScraper:
         total = 0
         page = 0
 
-        while page < 5:  # Máximo 5 páginas (500 eventos)
+        while page < 5:
             params = {
                 'apikey': api_key,
                 'city': 'Madrid',
@@ -485,7 +505,6 @@ class EventosScraper:
                         if not fecha_inicio or not self.es_fecha_futura(fecha_inicio):
                             continue
 
-                        # Venue
                         venues = evento_data.get(
                             '_embedded', {}
                         ).get('venues', [])
@@ -528,7 +547,6 @@ class EventosScraper:
 
                         url = evento_data.get('url', '')
 
-                        # ✅ FIX: precio_desde siempre inicializado
                         precio_desde = None
                         price_ranges = evento_data.get('priceRanges', [])
                         if price_ranges:
@@ -541,7 +559,6 @@ class EventosScraper:
                         else:
                             precio = 'pago'
 
-                        # Clasificación para categorizar
                         classifications = evento_data.get(
                             'classifications', []
                         )
@@ -559,6 +576,7 @@ class EventosScraper:
                             nombre,
                             f"{descripcion} {segment} {genre}"
                         )
+                        zona = self.asignar_zona(lat, lng)
 
                         evento = {
                             'nombre': nombre,
@@ -567,6 +585,7 @@ class EventosScraper:
                             'lat': lat,
                             'lng': lng,
                             'lugar': lugar,
+                            'zona': zona,
                             'precio': precio,
                             'descripcion': descripcion,
                             'url': url,
@@ -648,10 +667,8 @@ class EventosScraper:
 
         total = 0
         hoy = date.today()
-        # 30 días hacia adelante
         fecha_fin_busq = (hoy + timedelta(days=30)).isoformat()
 
-        # Temporada actual
         temporada = datetime.now().year
         if datetime.now().month < 7:
             temporada -= 1
@@ -684,10 +701,11 @@ class EventosScraper:
                     print(f"   ⚠️ Error API Football: {errores_api}")
                     continue
 
-                # Verificar límite de peticiones
-                remaining = response.headers.get('x-ratelimit-requests-remaining')
+                remaining = response.headers.get(
+                    'x-ratelimit-requests-remaining'
+                )
                 if remaining and int(remaining) < 5:
-                    print("   ⚠️ Límite de peticiones API-Football casi agotado")
+                    print("   ⚠️ Límite de peticiones casi agotado")
 
                 partidos = data.get('response', [])
                 print(f"   📄 {len(partidos)} partidos encontrados")
@@ -735,6 +753,8 @@ class EventosScraper:
                                f"partido/{fixture_id}/"
                                if fixture_id else '')
 
+                        zona = self.asignar_zona(lat, lng)
+
                         evento = {
                             'nombre': nombre,
                             'fecha': fecha,
@@ -742,6 +762,7 @@ class EventosScraper:
                             'lat': lat,
                             'lng': lng,
                             'lugar': lugar,
+                            'zona': zona,
                             'precio': 'pago',
                             'descripcion': descripcion,
                             'url': url,
@@ -778,7 +799,6 @@ class EventosScraper:
                 r'\s+', ' ',
                 evento['nombre'].lower().strip()
             )
-            # Clave: nombre (primeros 60 chars) + fecha
             clave = f"{nombre_norm[:60]}_{evento.get('fecha', '')[:10]}"
 
             if clave not in vistos:

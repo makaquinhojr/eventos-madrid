@@ -36,23 +36,18 @@
         <div class="logo-icon">🎉</div>
         EventosMadrid
     </div>
-
     <div class="top-bar-actions">
-        <!-- Badge hoy — reemplaza el banner -->
         <button class="hoy-badge" id="hoy-badge" style="display:none">
             <span class="hoy-badge-dot"></span>
             <span id="hoy-badge-count">0</span> hoy
         </button>
-
         <button class="stats-toggle" id="stats-toggle">
             <i class="fas fa-chart-bar"></i>
             <span>Stats</span>
         </button>
-
         <button class="theme-toggle" id="theme-toggle">
             <i class="fas fa-sun"></i>
         </button>
-
         <div class="event-counter" id="event-count">0</div>
     </div>
 </header>
@@ -110,10 +105,18 @@
     </div>
 
     <div class="panel-content">
+
+        <!-- BÚSQUEDA -->
         <div class="filter-section">
-            <input type="text" id="search" class="search-box" placeholder="Buscar eventos...">
+            <input
+                type="text"
+                id="search"
+                class="search-box"
+                placeholder="🔍 Buscar eventos, lugares, zonas..."
+            >
         </div>
 
+        <!-- CUÁNDO -->
         <div class="filter-section">
             <label class="filter-label">Cuándo</label>
             <select id="filtro-fecha" class="filter-select">
@@ -125,6 +128,63 @@
             </select>
         </div>
 
+        <!-- ZONA -->
+        <div class="filter-section">
+            <label class="filter-label">Zona</label>
+            <select id="filtro-zona" class="filter-select">
+                <option value="todas">📍 Toda la Comunidad</option>
+                <optgroup label="🏙️ Madrid Capital">
+                    <option value="Centro">Centro</option>
+                    <option value="Arganzuela">Arganzuela</option>
+                    <option value="Retiro">Retiro</option>
+                    <option value="Salamanca">Salamanca</option>
+                    <option value="Chamartín">Chamartín</option>
+                    <option value="Tetuán">Tetuán</option>
+                    <option value="Chamberí">Chamberí</option>
+                    <option value="Fuencarral">Fuencarral</option>
+                    <option value="Moncloa">Moncloa</option>
+                    <option value="Latina">Latina</option>
+                    <option value="Carabanchel">Carabanchel</option>
+                    <option value="Usera">Usera</option>
+                    <option value="Puente de Vallecas">Vallecas</option>
+                    <option value="Moratalaz">Moratalaz</option>
+                    <option value="Ciudad Lineal">Ciudad Lineal</option>
+                    <option value="Hortaleza">Hortaleza</option>
+                    <option value="Villaverde">Villaverde</option>
+                    <option value="Villa de Vallecas">Villa de Vallecas</option>
+                    <option value="Vicálvaro">Vicálvaro</option>
+                    <option value="San Blas">San Blas</option>
+                    <option value="Barajas">Barajas</option>
+                </optgroup>
+                <optgroup label="🌆 Municipios">
+                    <option value="Getafe">Getafe</option>
+                    <option value="Leganés">Leganés</option>
+                    <option value="Alcorcón">Alcorcón</option>
+                    <option value="Móstoles">Móstoles</option>
+                    <option value="Fuenlabrada">Fuenlabrada</option>
+                    <option value="Alcalá de Henares">Alcalá de Henares</option>
+                    <option value="Torrejón de Ardoz">Torrejón de Ardoz</option>
+                    <option value="Alcobendas">Alcobendas</option>
+                    <option value="Las Rozas">Las Rozas</option>
+                    <option value="Pozuelo">Pozuelo</option>
+                    <option value="Majadahonda">Majadahonda</option>
+                    <option value="Collado Villalba">Collado Villalba</option>
+                    <option value="Tres Cantos">Tres Cantos</option>
+                    <option value="San Sebastián de los Reyes">San Sebastián de los Reyes</option>
+                    <option value="Coslada">Coslada</option>
+                    <option value="Rivas Vaciamadrid">Rivas Vaciamadrid</option>
+                    <option value="Aranjuez">Aranjuez</option>
+                    <option value="Valdemoro">Valdemoro</option>
+                    <option value="Parla">Parla</option>
+                    <option value="Torrelodones">Torrelodones</option>
+                    <option value="Boadilla del Monte">Boadilla del Monte</option>
+                    <option value="Arganda del Rey">Arganda del Rey</option>
+                </optgroup>
+            </select>
+            <!-- Badge zona activa — se inserta desde JS -->
+        </div>
+
+        <!-- TIPO -->
         <div class="filter-section">
             <label class="filter-label">Tipo</label>
             <div class="filter-chips">
@@ -159,6 +219,7 @@
             </div>
         </div>
 
+        <!-- PRECIO CHIPS -->
         <div class="filter-section">
             <label class="filter-label">Precio</label>
             <div class="filter-chips">
@@ -173,9 +234,33 @@
             </div>
         </div>
 
+        <!-- PRECIO MÁXIMO SLIDER -->
+        <div class="filter-section">
+            <label class="filter-label">
+                Precio máximo
+                <span class="precio-valor" id="precio-valor-label">Cualquiera</span>
+            </label>
+            <input
+                type="range"
+                id="filtro-precio-max"
+                class="precio-slider"
+                min="0"
+                max="100"
+                value="100"
+                step="5"
+            >
+            <div class="precio-marks">
+                <span>Gratis</span>
+                <span>50€</span>
+                <span>100€+</span>
+            </div>
+        </div>
+
+        <!-- LIMPIAR -->
         <button class="btn-clear" id="btn-clear">
             <i class="fas fa-redo"></i> Limpiar filtros
         </button>
+
     </div>
 </aside>
 
@@ -187,7 +272,6 @@
             <i class="fas fa-times"></i>
         </button>
     </div>
-
     <div class="panel-content">
         <div class="stats-grid">
             <div class="stat-box">
