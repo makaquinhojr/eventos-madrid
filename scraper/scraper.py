@@ -476,7 +476,6 @@ class EventosScraper:
             print("   ⚠️ No hay API key configurada")
             return
 
-        # Equipos de Madrid con sus IDs en API-Football y venues
         equipos_madrid = [
             {
                 'id': 541,
@@ -515,15 +514,18 @@ class EventosScraper:
             },
         ]
 
+        # Header correcto para dashboard.api-football.com
         headers = {
-            'x-rapidapi-host': 'v3.football.api-sports.io',
-            'x-rapidapi-key': api_key
+            'x-apisports-key': api_key
         }
 
         total = 0
         hoy = date.today()
-        # Traer partidos de los próximos 30 días
         fecha_fin = (hoy + timedelta(days=30)).isoformat()
+        temporada = datetime.now().year
+        # Si estamos antes de julio consideramos la temporada anterior
+        if datetime.now().month < 7:
+            temporada -= 1
 
         for equipo in equipos_madrid:
             try:
@@ -534,6 +536,7 @@ class EventosScraper:
                     headers=headers,
                     params={
                         'team': equipo['id'],
+                        'season': temporada,
                         'from': hoy.isoformat(),
                         'to': fecha_fin,
                         'timezone': 'Europe/Madrid'
@@ -542,10 +545,17 @@ class EventosScraper:
                 )
 
                 if response.status_code != 200:
-                    print(f"   ❌ Error {response.status_code}")
+                    print(f"   ❌ Error {response.status_code}: {response.text[:200]}")
                     continue
 
                 data = response.json()
+
+                # Mostrar errores de la API si los hay
+                errores_api = data.get('errors', {})
+                if errores_api:
+                    print(f"   ⚠️ Error API: {errores_api}")
+                    continue
+
                 partidos = data.get('response', [])
                 print(f"   📄 {len(partidos)} partidos encontrados")
 
@@ -560,25 +570,19 @@ class EventosScraper:
 
                         nombre_home = home.get('name', '')
                         nombre_away = away.get('name', '')
-
-                        # Nombre del partido
                         nombre = f"{nombre_home} vs {nombre_away}"
 
-                        # Fecha
                         fecha_raw = fixture.get('date', '')
                         fecha = self.parsear_fecha(fecha_raw)
                         if not fecha:
                             continue
 
-                        # Competición
                         competicion = league.get('name', 'Fútbol')
                         ronda = league.get('round', '')
-
-                        descripcion = f"{competicion}"
+                        descripcion = competicion
                         if ronda:
                             descripcion += f" · {ronda}"
 
-                        # Si es partido en casa → usar estadio del equipo
                         es_local = home.get('id') == equipo['id']
 
                         if es_local:
@@ -586,7 +590,6 @@ class EventosScraper:
                             lng = equipo['lng']
                             lugar = equipo['estadio']
                         else:
-                            # Partido fuera → coordenadas genéricas
                             venue = fixture.get('venue', {})
                             lugar = venue.get('name', 'Estadio visitante')
                             ciudad = venue.get('city', '')
@@ -594,7 +597,6 @@ class EventosScraper:
                                 lugar = f"{lugar} ({ciudad})"
                             lat, lng = 40.4168, -3.7038
 
-                        # URL — construir link a flashscore o similar
                         fixture_id = fixture.get('id', '')
                         url = f"https://www.flashscore.es/partido/{fixture_id}/" if fixture_id else ''
 
@@ -618,7 +620,6 @@ class EventosScraper:
                         self.stats['errores'] += 1
                         continue
 
-                # Respetar límite de la API gratuita
                 time.sleep(2)
 
             except Exception as e:
