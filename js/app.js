@@ -134,6 +134,9 @@ async function loadEvents() {
         iniciarBannerHoy();
         ocultarLoader(allEvents.length);
 
+        // ✅ NUEVO: si hay ?evento=ID en la URL, abrimos ese evento
+        procesarUrlEvento();
+
     } catch (error) {
         console.error('Error cargando eventos:', error);
         ocultarLoader(0);
@@ -196,6 +199,169 @@ function getBotonMasInfo(evento) {
             </a>`;
 }
 
+// ===== ✅ NUEVO: COMPARTIR =====
+
+/**
+ * Genera la URL de tu app con el parámetro ?evento=ID
+ * Es el link que se comparte en WhatsApp, Twitter, etc.
+ */
+function generarUrlCompartir(evento) {
+    const base = window.location.origin + window.location.pathname;
+    return `${base}?evento=${evento.id}`;
+}
+
+/**
+ * Genera el texto del mensaje para compartir.
+ * Se usa en WhatsApp y Twitter.
+ */
+function generarTextoCompartir(evento) {
+    const fecha  = formatDate(evento.fecha);
+    const precio = evento.precio === 'gratis' ? '¡GRATIS!' : (evento.precio_desde || 'De pago');
+    const emoji  = icons[evento.tipo] || '📍';
+
+    return `${emoji} *${evento.nombre}*\n📅 ${fecha}\n📍 ${evento.lugar}\n💰 ${precio}`;
+}
+
+/**
+ * Abre el modal de compartir con las opciones:
+ * WhatsApp, Twitter y Copiar link.
+ * Se llama desde los botones del popup y de la tarjeta.
+ */
+function compartirEvento(eventoId) {
+    const evento = allEvents.find(e => e.id === eventoId);
+    if (!evento) return;
+
+    const url    = generarUrlCompartir(evento);
+    const texto  = generarTextoCompartir(evento);
+    const emoji  = icons[evento.tipo] || '📍';
+
+    // Eliminar modal anterior si existe
+    document.getElementById('modal-compartir')?.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'modal-compartir';
+    modal.className = 'modal-compartir-overlay';
+    modal.innerHTML = `
+        <div class="modal-compartir">
+            <div class="modal-compartir-header">
+                <span>${emoji} Compartir evento</span>
+                <button class="modal-compartir-close" onclick="cerrarModalCompartir()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-compartir-nombre">
+                ${evento.nombre}
+            </div>
+            <div class="modal-compartir-acciones">
+                <a  class="modal-compartir-btn whatsapp"
+                    href="https://wa.me/?text=${encodeURIComponent(texto + '\n\n🗺️ Ver en EventosMadrid: ' + url)}"
+                    target="_blank"
+                    onclick="cerrarModalCompartir()">
+                    <i class="fab fa-whatsapp"></i>
+                    WhatsApp
+                </a>
+                <a  class="modal-compartir-btn twitter"
+                    href="https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(url)}"
+                    target="_blank"
+                    onclick="cerrarModalCompartir()">
+                    <i class="fab fa-x-twitter"></i>
+                    Twitter
+                </a>
+                <button class="modal-compartir-btn copiar"
+                        onclick="copiarLinkEvento('${url}', this)">
+                    <i class="fas fa-link"></i>
+                    Copiar link
+                </button>
+            </div>
+        </div>
+    `;
+
+    // Cerrar al hacer click en el fondo
+    modal.addEventListener('click', e => {
+        if (e.target === modal) cerrarModalCompartir();
+    });
+
+    document.body.appendChild(modal);
+    // Trigger animación
+    requestAnimationFrame(() => modal.classList.add('visible'));
+}
+
+function cerrarModalCompartir() {
+    const modal = document.getElementById('modal-compartir');
+    if (!modal) return;
+    modal.classList.remove('visible');
+    setTimeout(() => modal.remove(), 200);
+}
+
+/**
+ * Copia el link al portapapeles y muestra feedback en el botón.
+ */
+async function copiarLinkEvento(url, btn) {
+    try {
+        await navigator.clipboard.writeText(url);
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+        btn.classList.add('copiado');
+        setTimeout(() => {
+            btn.innerHTML = original;
+            btn.classList.remove('copiado');
+        }, 2000);
+    } catch {
+        // Fallback para navegadores sin Clipboard API
+        mostrarToast('❌ No se pudo copiar', 'error');
+    }
+}
+
+// ===== ✅ NUEVO: CÓMO LLEGAR =====
+
+/**
+ * Abre Google Maps con las coords del evento como destino.
+ * Si el usuario tiene geolocalización activa, incluye el origen.
+ */
+function comoLlegar(eventoId) {
+    const evento = allEvents.find(e => e.id === eventoId);
+    if (!evento) return;
+
+    let url;
+    if (userLocation) {
+        // Con origen (ubicación del usuario)
+        url = `https://www.google.com/maps/dir/${userLocation.lat},${userLocation.lng}/${evento.lat},${evento.lng}`;
+    } else {
+        // Sin origen → Google Maps pide la ubicación al usuario
+        url = `https://www.google.com/maps/dir/?api=1&destination=${evento.lat},${evento.lng}&destination_place_id=${encodeURIComponent(evento.lugar)}`;
+    }
+
+    window.open(url, '_blank');
+}
+
+// ===== ✅ NUEVO: PROCESAR URL CON ?evento=ID =====
+
+/**
+ * Al cargar la app, mira si hay ?evento=ID en la URL.
+ * Si lo hay, espera a que el mapa esté listo y abre ese evento.
+ */
+function procesarUrlEvento() {
+    const params   = new URLSearchParams(window.location.search);
+    const eventoId = parseInt(params.get('evento'));
+    if (!eventoId) return;
+
+    const evento = allEvents.find(e => e.id === eventoId);
+    if (!evento) return;
+
+    // Pequeño delay para que el mapa y los clusters estén listos
+    setTimeout(() => {
+        map.setView([evento.lat, evento.lng], 15);
+        markersLayer.eachLayer(marker => {
+            if (marker.eventoId === eventoId) {
+                markersLayer.zoomToShowLayer(marker, () => {
+                    marker.openPopup();
+                });
+            }
+        });
+        mostrarToast(`📍 ${evento.nombre}`);
+    }, 800);
+}
+
 // ===== MOSTRAR EVENTOS EN MAPA =====
 function displayEvents(events) {
     markersLayer.clearLayers();
@@ -253,6 +419,20 @@ function displayEvents(events) {
             ? `<p><strong>🚶</strong> ${getDistanciaHTML(event)}</p>`
             : '';
 
+        // ✅ NUEVO: botones Cómo llegar y Compartir en el popup
+        const popupAccionesExtra = `
+            <div class="popup-acciones-extra">
+                <button class="popup-btn-extra"
+                        onclick="comoLlegar(${event.id})">
+                    <i class="fas fa-route"></i> Cómo llegar
+                </button>
+                <button class="popup-btn-extra compartir"
+                        onclick="compartirEvento(${event.id})">
+                    <i class="fas fa-share-alt"></i> Compartir
+                </button>
+            </div>
+        `;
+
         marker.bindPopup(`
             <div class="popup-evento">
                 <h3>${event.nombre}</h3>
@@ -275,6 +455,7 @@ function displayEvents(events) {
                     ${linkHTML}
                     ${calendarHTML}
                 </div>
+                ${popupAccionesExtra}
             </div>
         `);
 
@@ -353,7 +534,7 @@ function renderListView(events) {
             new Date(hoy.getTime() + 86400000).toDateString();
 
         let proximidadBadge = '';
-        if (esHoy)    proximidadBadge = '<span class="event-badge hoy">🔥 HOY</span>';
+        if (esHoy)     proximidadBadge = '<span class="event-badge hoy">🔥 HOY</span>';
         else if (esMañana) proximidadBadge = '<span class="event-badge hoy">⚡ MAÑANA</span>';
 
         const precioBadge = evento.precio === 'gratis'
@@ -377,12 +558,30 @@ function renderListView(events) {
         const calendarLink  = generarLinkCalendar(evento);
         const botonCalendar = calendarLink
             ? `<a href="${calendarLink}" target="_blank"
-                  class="event-btn event-btn-calendar">
+                  class="event-btn event-btn-calendar"
+                  title="Añadir al calendario">
                     <i class="fas fa-calendar-plus"></i>
                </a>`
             : '';
 
         const descripcion = limpiarDescripcion(evento.descripcion, 200);
+
+        // ✅ NUEVO: botones Cómo llegar y Compartir en la tarjeta
+        const botonComoLlegar = `
+            <button class="event-btn event-btn-llegar"
+                    onclick="comoLlegar(${evento.id})"
+                    title="Cómo llegar">
+                <i class="fas fa-route"></i>
+            </button>
+        `;
+
+        const botonCompartir = `
+            <button class="event-btn event-btn-compartir"
+                    onclick="compartirEvento(${evento.id})"
+                    title="Compartir">
+                <i class="fas fa-share-alt"></i>
+            </button>
+        `;
 
         return `
             <div class="event-card">
@@ -427,7 +626,11 @@ function renderListView(events) {
                         <i class="fas fa-map-marked-alt"></i> Ver en mapa
                     </button>
                     ${botonMasInfo}
-                    ${botonCalendar}
+                    <div class="event-actions-row">
+                        ${botonCalendar}
+                        ${botonComoLlegar}
+                        ${botonCompartir}
+                    </div>
                 </div>
             </div>
         `;
@@ -472,13 +675,9 @@ function applyFilters() {
     )).filter(cb => cb.checked).map(cb => cb.value);
 
     let filtered = allEvents.filter(e => {
-        // Tipo
         if (types.length && !types.includes(e.tipo)) return false;
-
-        // Precio chips
         if (prices.length && !prices.includes(e.precio)) return false;
 
-        // Búsqueda texto (incluye zona)
         if (search) {
             const zona = getZonaEvento(e);
             const haystack = [
@@ -490,12 +689,10 @@ function applyFilters() {
             if (!haystack.includes(search)) return false;
         }
 
-        // Zona
         if (zonaFilter !== 'todas') {
             if (getZonaEvento(e) !== zonaFilter) return false;
         }
 
-        // Precio máximo slider
         if (precioMax < 100) {
             if (e.precio === 'gratis') return true;
             if (precioMax === 0) return false;
@@ -508,7 +705,6 @@ function applyFilters() {
         return true;
     });
 
-    // Filtro fecha
     if (dateFilter !== 'todos') {
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
@@ -1101,5 +1297,10 @@ document.addEventListener('DOMContentLoaded', () => {
         ?.addEventListener('change', applyFilters);
     document.querySelectorAll('.chip input').forEach(cb => {
         cb.addEventListener('change', applyFilters);
+    });
+
+    // ✅ NUEVO: cerrar modal compartir con Escape
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') cerrarModalCompartir();
     });
 });
