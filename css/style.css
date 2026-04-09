@@ -443,11 +443,19 @@ body.dark-mode .stat-box.highlight .stat-value {
     font-weight: 600;
     transition: all 0.2s;
 }
-.popup-link-calendar {
+.popup-link-calendar,
+.popup-link-calendar:link,
+.popup-link-calendar:visited {
     background: transparent !important;
     color: var(--primary) !important;
-    border: 2px solid var(--primary);
-    margin-top: 0;
+    border: 2px solid var(--primary) !important;
+    margin-top: 0 !important;
+    box-shadow: none !important;
+}
+
+.popup-link-calendar:hover {
+    background: var(--primary) !important;
+    color: white !important;
 }
 
 .popup-link-calendar:hover {
