@@ -247,8 +247,16 @@ class EventosScraper:
                                 pass
 
                         org = location.get('organization', {})
+
+                        # ===== CAMBIO 1: Extraer lugar real =====
                         if isinstance(org, dict) and org.get('organization-name'):
                             lugar = org['organization-name']
+                            # Añadir calle si existe y aporta info extra
+                            direccion = location.get('address', {})
+                            if isinstance(direccion, dict):
+                                calle = direccion.get('street-address', '')
+                                if calle and calle.lower() not in lugar.lower():
+                                    lugar = f"{lugar} - {calle}"
                         else:
                             direccion = location.get('address', {})
                             if isinstance(direccion, dict):
@@ -261,7 +269,13 @@ class EventosScraper:
                     descripcion = self.limpiar_texto(
                         evento_data.get('description', ''), 300
                     )
-                    url_evento = evento_data.get('link', '') or evento_data.get('@id', '')
+
+                    # ===== CAMBIO 2: Vaciar URLs inútiles de madrid.es =====
+                    url_raw = evento_data.get('link', '') or evento_data.get('@id', '')
+                    if url_raw and 'index.jsp' in url_raw.lower():
+                        url_evento = ''
+                    else:
+                        url_evento = url_raw
 
                     precio_raw = self.limpiar_texto(
                         str(evento_data.get('price', ''))
@@ -307,7 +321,7 @@ class EventosScraper:
         except Exception as e:
             print(f"   ❌ Error: {e}")
 
-    # ===== FUENTE 2: EVENTBRITE =====
+    # ===== FUENTE 2: TICKETMASTER =====
 
     def scrape_ticketmaster(self):
         """
@@ -352,7 +366,6 @@ class EventosScraper:
 
                 data = response.json()
 
-                # Comprobar si hay eventos
                 embedded = data.get('_embedded', {})
                 eventos_raw = embedded.get('events', [])
                 page_info = data.get('page', {})
@@ -362,12 +375,10 @@ class EventosScraper:
 
                 for evento_data in eventos_raw:
                     try:
-                        # Nombre
                         nombre = self.limpiar_texto(evento_data.get('name', ''))
                         if not nombre:
                             continue
 
-                        # Fechas
                         dates = evento_data.get('dates', {})
                         start = dates.get('start', {})
                         fecha_inicio = self.parsear_fecha(
@@ -377,7 +388,6 @@ class EventosScraper:
                         if not fecha_inicio or not self.es_fecha_futura(fecha_inicio):
                             continue
 
-                        # Venue
                         venues = evento_data.get('_embedded', {}).get('venues', [])
                         lat, lng = 40.4168, -3.7038
                         lugar = 'Madrid'
@@ -386,14 +396,12 @@ class EventosScraper:
                             venue = venues[0]
                             nombre_venue = self.limpiar_texto(venue.get('name', ''))
                             ciudad = venue.get('city', {}).get('name', 'Madrid')
-                            
+
                             lugar = nombre_venue if nombre_venue else ciudad
 
-                            # Añadir ciudad si no está en el nombre
                             if ciudad and ciudad.lower() not in lugar.lower():
                                 lugar = f"{lugar} ({ciudad})"
 
-                            # Coordenadas
                             location = venue.get('location', {})
                             lat_raw = location.get('latitude')
                             lng_raw = location.get('longitude')
@@ -405,17 +413,14 @@ class EventosScraper:
                                 except (ValueError, TypeError):
                                     pass
 
-                        # Descripción
                         descripcion = self.limpiar_texto(
                             evento_data.get('info', '') or
                             evento_data.get('pleaseNote', ''),
                             300
                         )
 
-                        # URL
                         url = evento_data.get('url', '')
 
-                        # Precio
                         price_ranges = evento_data.get('priceRanges', [])
                         if price_ranges:
                             precio_min = price_ranges[0].get('min', 0)
@@ -426,7 +431,6 @@ class EventosScraper:
                             precio = 'pago'
                             precio_desde = None
 
-                        # Clasificación → tipo
                         classifications = evento_data.get('classifications', [])
                         segment = ''
                         genre = ''
@@ -461,7 +465,6 @@ class EventosScraper:
                         self.stats['errores'] += 1
                         continue
 
-                # Paginación
                 page += 1
                 has_more = page < total_pages and page < 10
                 time.sleep(DELAY_BETWEEN_REQUESTS)
