@@ -32,14 +32,14 @@ function initMap() {
         attribution: '© OpenStreetMap'
     }).addTo(map);
     markersLayer = L.markerClusterGroup({
-        chunkedLoading: true,        // Carga por chunks, no bloquea el navegador
-        chunkInterval: 100,          // Ms entre chunks
-        maxClusterRadius: 60,        // Radio en px para agrupar
-        spiderfyOnMaxZoom: true,     // Al hacer zoom máximo, separa los markers
-        showCoverageOnHover: false,  // No mostrar área del cluster al pasar el ratón
-        zoomToBoundsOnClick: true,   // Click en cluster → zoom a sus markers
-        animate: true,               // Animación al expandir clusters
-        animateAddingMarkers: false, // Sin animación al añadir (más rápido)
+        chunkedLoading: true,
+        chunkInterval: 100,
+        maxClusterRadius: 60,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        animate: true,
+        animateAddingMarkers: false,
     }).addTo(map);
 }
 
@@ -63,7 +63,7 @@ async function loadEvents() {
         displayEvents(allEvents);
         actualizarEstadisticas(allEvents);
         iniciarBannerHoy();
-        ocultarLoader(allEvents.length); // ← AÑADIR ESTA LÍNEA
+        ocultarLoader(allEvents.length);
 
     } catch (error) {
         console.error('Error cargando eventos:', error);
@@ -112,14 +112,27 @@ function displayEvents(events) {
             riseOnHover: true
         });
 
-        // Guardar id en el marker para verEnMapa()
         marker.eventoId = event.id;
 
         const dateText = formatearFechaSafe(event.fecha, event.fecha_fin);
         const descripcionLimpia = limpiarDescripcion(event.descripcion, 150);
+
+        // FIX 1: Validación del link también en el popup
         const linkHTML = esLinkUtil(event.url)
-            ? `<a href="${event.url}" target="_blank" class="popup-link">Ver más información →</a>`
-            : `<p style="color: #6B7280; font-size: 12px; font-style: italic;">ℹ️ Más información en el ayuntamiento local</p>`;
+            ? `<a href="${event.url}" target="_blank" class="popup-link">
+                 Ver más información →
+               </a>`
+            : `<p style="color:#6B7280;font-size:12px;font-style:italic;">
+                 ℹ️ Más información en el ayuntamiento local
+               </p>`;
+
+        // FIX 2: Link a Google Calendar integrado en popup
+        const calendarLink = generarLinkCalendar(event);
+        const calendarHTML = calendarLink
+            ? `<a href="${calendarLink}" target="_blank" class="popup-link popup-link-calendar">
+                 📅 Añadir al calendario
+               </a>`
+            : '';
 
         const distanciaHTML = userLocation
             ? `<p><strong>🚶</strong> ${getDistanciaHTML(event)}</p>`
@@ -130,14 +143,19 @@ function displayEvents(events) {
                 <h3>${event.nombre}</h3>
                 <p><strong>📅</strong> ${dateText}</p>
                 <p><strong>📍</strong> ${event.lugar}</p>
-                <p><strong>💰</strong> ${event.precio === 'gratis' 
-                    ? '<strong style="color: #059669;">Gratis</strong>' 
+                <p><strong>💰</strong> ${event.precio === 'gratis'
+                    ? '<strong style="color:#059669;">Gratis</strong>'
                     : event.precio_desde || 'De pago'}</p>
                 ${distanciaHTML}
-                ${descripcionLimpia 
-                    ? `<p style="color: #6B7280; font-size: 13px; margin-top: 8px; line-height: 1.4;">${descripcionLimpia}</p>` 
+                ${descripcionLimpia
+                    ? `<p style="color:#6B7280;font-size:13px;margin-top:8px;line-height:1.4;">
+                         ${descripcionLimpia}
+                       </p>`
                     : ''}
-                ${linkHTML}
+                <div class="popup-actions">
+                    ${linkHTML}
+                    ${calendarHTML}
+                </div>
             </div>
         `);
 
@@ -145,7 +163,7 @@ function displayEvents(events) {
     });
 
     currentFilteredEvents = events;
-    // Sincronizar con vista lista si está activa
+
     if (currentView === 'list') {
         renderListView(events);
     }
@@ -185,15 +203,19 @@ function renderListView(events) {
 
     const sortedEvents = [...events].sort((a, b) => {
         switch (currentSort) {
-            case 'date': return new Date(a.fecha) - new Date(b.fecha);
-            case 'name': return a.nombre.localeCompare(b.nombre);
-            case 'type': return a.tipo.localeCompare(b.tipo);
+            case 'date':
+                return new Date(a.fecha) - new Date(b.fecha);
+            case 'name':
+                return a.nombre.localeCompare(b.nombre);
+            case 'type':
+                return a.tipo.localeCompare(b.tipo);
             case 'distance':
                 if (!userLocation) return 0;
                 const dA = calcularDistancia(userLocation.lat, userLocation.lng, a.lat, a.lng);
                 const dB = calcularDistancia(userLocation.lat, userLocation.lng, b.lat, b.lng);
                 return dA - dB;
-            default: return 0;
+            default:
+                return 0;
         }
     });
 
@@ -222,6 +244,24 @@ function renderListView(events) {
                 ${getDistanciaHTML(evento)}
             </div>
         ` : '';
+
+        // FIX 3: Validar URL antes de mostrar el botón "Más info"
+        const urlValida = esLinkUtil(evento.url);
+        const botonMasInfo = urlValida
+            ? `<a href="${evento.url}" target="_blank" class="event-btn event-btn-secondary">
+                 <i class="fas fa-external-link-alt"></i> Más info
+               </a>`
+            : `<span class="event-btn event-btn-disabled" title="Sin enlace disponible">
+                 <i class="fas fa-external-link-alt"></i> Sin enlace
+               </span>`;
+
+        // Botón Google Calendar
+        const calendarLink = generarLinkCalendar(evento);
+        const botonCalendar = calendarLink
+            ? `<a href="${calendarLink}" target="_blank" class="event-btn event-btn-calendar">
+                 <i class="fas fa-calendar-plus"></i>
+               </a>`
+            : '';
 
         return `
             <div class="event-card">
@@ -257,27 +297,32 @@ function renderListView(events) {
                     <button class="event-btn event-btn-primary" onclick="verEnMapa(${evento.id})">
                         <i class="fas fa-map-marked-alt"></i> Ver en mapa
                     </button>
-                    <a href="${evento.url}" target="_blank" class="event-btn event-btn-secondary">
-                        <i class="fas fa-external-link-alt"></i> Más info
-                    </a>
+                    ${botonMasInfo}
+                    ${botonCalendar}
                 </div>
             </div>
         `;
     }).join('');
 }
 
+// FIX 4: verEnMapa() con soporte correcto para clusters
 function verEnMapa(eventoId) {
     switchView('map');
 
     const evento = allEvents.find(e => e.id === eventoId);
     if (!evento) return;
 
+    // Primero hacemos zoom al punto
     map.setView([evento.lat, evento.lng], 15);
 
-    // Usar el id guardado en el marker (más robusto)
+    // Buscamos el marker y forzamos que el cluster lo exponga
     markersLayer.eachLayer(marker => {
         if (marker.eventoId === eventoId) {
-            marker.openPopup();
+            // zoomToShowLayer expande el cluster si es necesario
+            // y llama al callback cuando el marker ya es visible
+            markersLayer.zoomToShowLayer(marker, () => {
+                marker.openPopup();
+            });
         }
     });
 }
@@ -289,7 +334,9 @@ function applyFilters() {
     const dateFilter = document.getElementById('filtro-fecha').value;
 
     const types = Array.from(document.querySelectorAll(
-        '.chip input[value="concierto"], .chip input[value="fiesta"], .chip input[value="mercado"], .chip input[value="cultural"], .chip input[value="gastronomia"]'
+        '.chip input[value="concierto"], .chip input[value="fiesta"], ' +
+        '.chip input[value="mercado"], .chip input[value="cultural"], ' +
+        '.chip input[value="gastronomia"]'
     )).filter(cb => cb.checked).map(cb => cb.value);
 
     const prices = Array.from(document.querySelectorAll(
@@ -313,6 +360,7 @@ function applyFilters() {
             switch (dateFilter) {
                 case 'hoy':
                     return fecha.toDateString() === hoy.toDateString();
+
                 case 'finde':
                     const dia = hoy.getDay();
                     let ini, fin;
@@ -330,14 +378,17 @@ function applyFilters() {
                         fin.setDate(ini.getDate() + 1);
                     }
                     return fecha >= ini && fecha <= fin;
+
                 case 'semana':
                     const semanaFin = new Date(hoy);
                     semanaFin.setDate(hoy.getDate() + 7);
                     return fecha >= hoy && fecha <= semanaFin;
+
                 case 'mes':
                     const mesFin = new Date(hoy);
                     mesFin.setDate(hoy.getDate() + 30);
                     return fecha >= hoy && fecha <= mesFin;
+
                 default:
                     return true;
             }
@@ -374,7 +425,10 @@ function formatearFechaSafe(fechaInicio, fechaFin) {
     if (fechaFin) {
         const fecha2 = parsearFecha(fechaFin);
         if (fecha2) {
-            if (fecha1.getMonth() === fecha2.getMonth() && fecha1.getFullYear() === fecha2.getFullYear()) {
+            if (
+                fecha1.getMonth() === fecha2.getMonth() &&
+                fecha1.getFullYear() === fecha2.getFullYear()
+            ) {
                 return `${fecha1.getDate()}-${fecha2.getDate()} ${fecha2.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })}`;
             }
             return `${textoFecha1} - ${fecha2.toLocaleDateString('es-ES', opciones)}`;
@@ -387,7 +441,7 @@ function formatearFechaSafe(fechaInicio, fechaFin) {
 function parsearFecha(fechaStr) {
     if (!fechaStr) return null;
     try {
-        const s = String(fechaStr).split(' ')[0]; // quitar timestamp si existe
+        const s = String(fechaStr).split(' ')[0];
         const fecha = new Date(s + 'T00:00:00');
         if (isNaN(fecha.getTime())) return null;
         return fecha;
@@ -423,7 +477,11 @@ function limpiarDescripcion(descripcion, maxLength = 150) {
 }
 
 function esLinkUtil(url) {
-    if (!url) return false;
+    if (!url || typeof url !== 'string' || url.trim() === '') return false;
+
+    // Verificar que es una URL mínimamente válida
+    if (!url.startsWith('http://') && !url.startsWith('https://')) return false;
+
     const urlLower = url.toLowerCase();
     const urlsGenericas = ['madrid.es', 'esmadrid.com', 'timeout.es/madrid', 'datos.madrid.es'];
 
@@ -470,7 +528,7 @@ function getDistanciaHTML(evento) {
     const texto = formatearDistancia(distancia);
     const color = distancia < 1 ? '#059669' : distancia < 5 ? '#D97706' : '#DC2626';
 
-    return `<span class="distancia-badge" style="color: ${color}">
+    return `<span class="distancia-badge" style="color:${color}">
         <i class="fas fa-walking"></i> ${texto}
     </span>`;
 }
@@ -493,7 +551,7 @@ function initGeolocate() {
         }
 
         btn.classList.add('loading');
-        btn.innerHTML = '<i class="fas fa-circle-notch"></i>';
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
         mostrarToast('📍 Buscando tu ubicación...');
 
         navigator.geolocation.getCurrentPosition(
@@ -516,7 +574,9 @@ function onGeoSuccess(position) {
 
     map.setView([latitude, longitude], 14);
     colocarMarkerUsuario(latitude, longitude);
-    displayEvents(allEvents);
+
+    // Re-renderizar para mostrar distancias
+    displayEvents(currentFilteredEvents.length ? currentFilteredEvents : allEvents);
 
     mostrarToast(accuracy < 100 ? '✅ Ubicación encontrada' : '📍 Ubicación aproximada');
 }
@@ -644,6 +704,92 @@ function toggleTheme() {
 }
 
 
+// ===== BANNER HOY =====
+function iniciarBannerHoy() {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const eventosHoy = allEvents.filter(e => {
+        const fecha = new Date(e.fecha + 'T00:00:00');
+        return fecha.toDateString() === hoy.toDateString();
+    });
+
+    const banner = document.getElementById('banner-hoy');
+    const count = document.getElementById('banner-hoy-count');
+    const btn = document.getElementById('banner-hoy-btn');
+
+    if (eventosHoy.length === 0) {
+        banner.style.display = 'none';
+        return;
+    }
+
+    count.textContent = eventosHoy.length;
+    banner.style.display = 'flex';
+    document.body.classList.add('banner-visible');
+
+    btn.addEventListener('click', () => {
+        document.getElementById('filtro-fecha').value = 'hoy';
+        applyFilters();
+        document.getElementById('filters-panel').classList.remove('active');
+        mostrarToast(`🔥 ${eventosHoy.length} eventos hoy en Madrid`);
+    });
+}
+
+
+// ===== GOOGLE CALENDAR =====
+function generarLinkCalendar(evento) {
+    const formatearFechaCalendar = (fechaStr) => {
+        if (!fechaStr) return null;
+        const fecha = new Date(fechaStr + 'T00:00:00');
+        if (isNaN(fecha.getTime())) return null;
+        return fecha.toISOString().replace(/-|:|\.\d{3}/g, '').slice(0, 8);
+    };
+
+    const inicio = formatearFechaCalendar(evento.fecha);
+    if (!inicio) return null;
+
+    const fin = formatearFechaCalendar(evento.fecha_fin) || inicio;
+
+    const params = new URLSearchParams({
+        action: 'TEMPLATE',
+        text: evento.nombre,
+        dates: `${inicio}/${fin}`,
+        details: `${evento.descripcion || ''}\n\nMás info: ${evento.url || ''}`,
+        location: evento.lugar || 'Madrid'
+    });
+
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+
+// ===== LOADER =====
+function ocultarLoader(numEventos) {
+    const loader = document.getElementById('loader');
+    const count = document.getElementById('loader-count');
+
+    if (count) {
+        count.textContent = `✅ ${numEventos} eventos cargados`;
+    }
+
+    setTimeout(() => {
+        if (loader) {
+            loader.classList.add('oculto');
+        }
+    }, 600);
+}
+
+
+// ===== PWA - SERVICE WORKER =====
+// FIX: Bloque único, correctamente cerrado
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/eventos-madrid/sw.js')
+            .then(reg => console.log('✅ SW registrado:', reg.scope))
+            .catch(err => console.log('❌ SW error:', err));
+    });
+}
+
+
 // ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
@@ -674,17 +820,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-clear').addEventListener('click', clearFilters);
     document.getElementById('view-map-btn').addEventListener('click', () => switchView('map'));
     document.getElementById('view-list-btn').addEventListener('click', () => switchView('list'));
+
     document.getElementById('sort-by').addEventListener('change', (e) => {
         currentSort = e.target.value;
 
         if (currentSort === 'distance' && !userLocation) {
             mostrarToast('📍 Activa tu ubicación primero', 'error');
-            // Volver a fecha
             e.target.value = 'date';
             currentSort = 'date';
+            return;
         }
 
-        renderListView(allEvents);
+        renderListView(currentFilteredEvents);
     });
 
     // Filtros
@@ -694,64 +841,3 @@ document.addEventListener('DOMContentLoaded', () => {
         cb.addEventListener('change', applyFilters);
     });
 });
-// ===== BANNER HOY =====
-function iniciarBannerHoy() {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-
-    const eventosHoy = allEvents.filter(e => {
-        const fecha = new Date(e.fecha + 'T00:00:00');
-        return fecha.toDateString() === hoy.toDateString();
-    });
-
-    const banner = document.getElementById('banner-hoy');
-    const count = document.getElementById('banner-hoy-count');
-    const btn = document.getElementById('banner-hoy-btn');
-
-    if (eventosHoy.length === 0) {
-        banner.style.display = 'none';
-        return;
-    }
-
-    // Mostrar banner
-    count.textContent = eventosHoy.length;
-    banner.style.display = 'flex';
-    document.body.classList.add('banner-visible');
-
-    // Click en "Ver todos"
-    btn.addEventListener('click', () => {
-        // Marcar filtro de hoy
-        document.getElementById('filtro-fecha').value = 'hoy';
-        applyFilters();
-
-        // Cerrar panel si está abierto
-        document.getElementById('filters-panel').classList.remove('active');
-
-        // Toast informativo
-        mostrarToast(`🔥 ${eventosHoy.length} eventos hoy en Madrid`);
-    });
-}
-// ===== PWA - SERVICE WORKER =====
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/eventos-madrid/sw.js')
-            .then(reg => console.log('✅ SW registrado:', reg.scope))
-            .catch(err => console.log('❌ SW error:', err));
-    });
-}
-// ===== LOADER =====
-function ocultarLoader(numEventos) {
-    const loader = document.getElementById('loader');
-    const count = document.getElementById('loader-count');
-
-    if (count) {
-        count.textContent = `✅ ${numEventos} eventos cargados`;
-    }
-
-    // Esperar un momento para que se vea el mensaje
-    setTimeout(() => {
-        if (loader) {
-            loader.classList.add('oculto');
-        }
-    }, 600);
-}

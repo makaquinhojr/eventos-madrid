@@ -731,7 +731,7 @@ body.dark-mode .popup-evento a {
     color: white;
     animation: pulse 2s infinite;
 }
-
+-webkit-line-clamp
 .event-meta {
     display: flex;
     flex-wrap: wrap;
@@ -1219,4 +1219,99 @@ body.dark-mode .popup-link {
     color: var(--text-light);
     font-weight: 500;
     min-height: 20px;
+}
+/* ===== CALENDARIO & POPUP ACTIONS ===== */
+
+/* Contenedor de acciones en el popup (más info + calendario) */
+.popup-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+/* El .popup-link ya existe, pero dentro de .popup-actions
+   necesita anular el margin-top que tiene en solitario */
+.popup-actions .popup-link {
+    margin-top: 0;
+}
+
+/* Botón calendario en popup — mismo estilo que popup-link
+   pero color secundario para diferenciarlo */
+.popup-link-calendar {
+    display: block;
+    padding: 10px 20px;
+    background: transparent;
+    color: var(--primary) !important;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    border: 2px solid var(--primary);
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.popup-link-calendar:hover {
+    background: var(--primary);
+    color: white !important;
+    transform: translateY(-2px);
+}
+
+body.dark-mode .popup-link-calendar {
+    color: #FF6B6B !important;
+    border-color: #FF6B6B;
+}
+
+body.dark-mode .popup-link-calendar:hover {
+    background: #FF6B6B;
+    color: white !important;
+}
+
+/* ===== BOTÓN CALENDARIO EN TARJETA DE LISTA ===== */
+
+/* Botón cuadrado pequeño, solo icono */
+.event-btn-calendar {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    padding: 10px;
+    min-width: 42px;
+    width: 42px;
+    flex-shrink: 0;
+    text-decoration: none;
+}
+
+.event-btn-calendar:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.05);
+}
+
+/* ===== BOTÓN DESHABILITADO (sin enlace) ===== */
+.event-btn-disabled {
+    background: var(--bg-alt);
+    color: var(--text-light);
+    border: 1px solid var(--border);
+    opacity: 0.5;
+    cursor: not-allowed;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+/* ===== AJUSTE RESPONSIVE para el botón calendario ===== */
+@media (max-width: 768px) {
+    .event-btn-calendar {
+        /* En móvil se expande como el resto */
+        flex: 0;
+        width: 42px;
+    }
 }
