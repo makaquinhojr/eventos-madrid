@@ -5,7 +5,7 @@ import requests
 import json
 import time
 import re
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from pathlib import Path
 import sys
 import os
@@ -34,6 +34,7 @@ class EventosScraper:
         self.stats = {
             'esmadrid': 0,
             'ticketmaster': 0,
+            'football': 0,
             'duplicados': 0,
             'errores': 0
         }
@@ -268,7 +269,6 @@ class EventosScraper:
                         evento_data.get('description', ''), 300
                     )
 
-                    # Guardar URL tal como viene, son específicas por evento
                     url_evento = evento_data.get('link', '') or evento_data.get('@id', '')
 
                     precio_raw = self.limpiar_texto(
@@ -466,6 +466,168 @@ class EventosScraper:
         self.stats['ticketmaster'] = total
         print(f"   📊 Total extraídos de Ticketmaster: {total}")
 
+    # ===== FUENTE 3: API-FOOTBALL =====
+
+    def scrape_football(self):
+        print("\n🔍 Scrapeando API-Football...")
+
+        api_key = os.environ.get('API_FOOTBALL_KEY', '')
+        if not api_key:
+            print("   ⚠️ No hay API key configurada")
+            return
+
+        # Equipos de Madrid con sus IDs en API-Football y venues
+        equipos_madrid = [
+            {
+                'id': 541,
+                'nombre': 'Real Madrid',
+                'estadio': 'Santiago Bernabéu',
+                'lat': 40.4531,
+                'lng': -3.6883
+            },
+            {
+                'id': 530,
+                'nombre': 'Atlético de Madrid',
+                'estadio': 'Wanda Metropolitano',
+                'lat': 40.4361,
+                'lng': -3.5995
+            },
+            {
+                'id': 728,
+                'nombre': 'Rayo Vallecano',
+                'estadio': 'Estadio de Vallecas',
+                'lat': 40.3919,
+                'lng': -3.6546
+            },
+            {
+                'id': 547,
+                'nombre': 'Getafe CF',
+                'estadio': 'Coliseum Alfonso Pérez',
+                'lat': 40.3058,
+                'lng': -3.7326
+            },
+            {
+                'id': 724,
+                'nombre': 'Leganés',
+                'estadio': 'Estadio Municipal de Butarque',
+                'lat': 40.3281,
+                'lng': -3.7638
+            },
+        ]
+
+        headers = {
+            'x-rapidapi-host': 'v3.football.api-sports.io',
+            'x-rapidapi-key': api_key
+        }
+
+        total = 0
+        hoy = date.today()
+        # Traer partidos de los próximos 30 días
+        fecha_fin = (hoy + timedelta(days=30)).isoformat()
+
+        for equipo in equipos_madrid:
+            try:
+                print(f"   ⚽ Buscando partidos de {equipo['nombre']}...")
+
+                response = requests.get(
+                    'https://v3.football.api-sports.io/fixtures',
+                    headers=headers,
+                    params={
+                        'team': equipo['id'],
+                        'from': hoy.isoformat(),
+                        'to': fecha_fin,
+                        'timezone': 'Europe/Madrid'
+                    },
+                    timeout=15
+                )
+
+                if response.status_code != 200:
+                    print(f"   ❌ Error {response.status_code}")
+                    continue
+
+                data = response.json()
+                partidos = data.get('response', [])
+                print(f"   📄 {len(partidos)} partidos encontrados")
+
+                for partido in partidos:
+                    try:
+                        fixture = partido.get('fixture', {})
+                        teams = partido.get('teams', {})
+                        league = partido.get('league', {})
+
+                        home = teams.get('home', {})
+                        away = teams.get('away', {})
+
+                        nombre_home = home.get('name', '')
+                        nombre_away = away.get('name', '')
+
+                        # Nombre del partido
+                        nombre = f"{nombre_home} vs {nombre_away}"
+
+                        # Fecha
+                        fecha_raw = fixture.get('date', '')
+                        fecha = self.parsear_fecha(fecha_raw)
+                        if not fecha:
+                            continue
+
+                        # Competición
+                        competicion = league.get('name', 'Fútbol')
+                        ronda = league.get('round', '')
+
+                        descripcion = f"{competicion}"
+                        if ronda:
+                            descripcion += f" · {ronda}"
+
+                        # Si es partido en casa → usar estadio del equipo
+                        es_local = home.get('id') == equipo['id']
+
+                        if es_local:
+                            lat = equipo['lat']
+                            lng = equipo['lng']
+                            lugar = equipo['estadio']
+                        else:
+                            # Partido fuera → coordenadas genéricas
+                            venue = fixture.get('venue', {})
+                            lugar = venue.get('name', 'Estadio visitante')
+                            ciudad = venue.get('city', '')
+                            if ciudad:
+                                lugar = f"{lugar} ({ciudad})"
+                            lat, lng = 40.4168, -3.7038
+
+                        # URL — construir link a flashscore o similar
+                        fixture_id = fixture.get('id', '')
+                        url = f"https://www.flashscore.es/partido/{fixture_id}/" if fixture_id else ''
+
+                        evento = {
+                            'nombre': nombre,
+                            'fecha': fecha,
+                            'tipo': 'deporte',
+                            'lat': lat,
+                            'lng': lng,
+                            'lugar': lugar,
+                            'precio': 'pago',
+                            'descripcion': descripcion,
+                            'url': url,
+                            'fuente': 'football'
+                        }
+
+                        self.eventos.append(evento)
+                        total += 1
+
+                    except Exception as e:
+                        self.stats['errores'] += 1
+                        continue
+
+                # Respetar límite de la API gratuita
+                time.sleep(2)
+
+            except Exception as e:
+                print(f"   ❌ Error con {equipo['nombre']}: {e}")
+                continue
+
+        self.stats['football'] = total
+        print(f"   📊 Total partidos extraídos: {total}")
+
     # ===== ELIMINAR DUPLICADOS =====
 
     def eliminar_duplicados(self):
@@ -500,6 +662,7 @@ class EventosScraper:
 
         self.scrape_esmadrid()
         self.scrape_ticketmaster()
+        self.scrape_football()
         self.eliminar_duplicados()
 
         total = self.guardar_eventos()
@@ -510,6 +673,7 @@ class EventosScraper:
         print("=" * 60)
         print(f"🏛️  ES Madrid:      {self.stats['esmadrid']} eventos")
         print(f"🎟️  Ticketmaster:   {self.stats.get('ticketmaster', 0)} eventos")
+        print(f"⚽  Football:       {self.stats.get('football', 0)} eventos")
         print(f"🔄  Duplicados:     {self.stats['duplicados']}")
         print(f"⚠️   Errores:        {self.stats['errores']}")
         print(f"📊  Total:          {total}")
