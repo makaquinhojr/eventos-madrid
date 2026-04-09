@@ -72,6 +72,64 @@ async function loadEvents() {
 }
 
 
+// ===== HELPERS DE LINK =====
+function esLinkUtil(url) {
+    if (!url || typeof url !== 'string' || url.trim() === '') return false;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) return false;
+
+    const urlLower = url.toLowerCase();
+
+    if (urlLower.includes('madrid.es') && urlLower.includes('index.jsp')) {
+        return false;
+    }
+
+    const urlsGenericas = [
+        'madrid.es', 'esmadrid.com',
+        'timeout.es/madrid', 'datos.madrid.es'
+    ];
+
+    for (const generica of urlsGenericas) {
+        if (urlLower.includes(generica)) {
+            if (
+                url.endsWith(generica) ||
+                url.endsWith(generica + '/') ||
+                url.includes('/agenda-eventos-madrid') ||
+                (url.includes('/agenda') && url.split('/').length <= 4)
+            ) return false;
+        }
+    }
+
+    if (url.match(/\/(evento|event|actividad|show)\/[\w-]+/i)) return true;
+    return !urlLower.includes('madrid.es') || url.length > 50;
+}
+
+function getLinkHTML(evento) {
+    if (esLinkUtil(evento.url)) {
+        return `<a href="${evento.url}" target="_blank" class="popup-link">
+                    Ver más información →
+                </a>`;
+    }
+    const busqueda = encodeURIComponent(`${evento.nombre} Madrid`);
+    return `<a href="https://www.google.com/search?q=${busqueda}"
+               target="_blank"
+               class="popup-link popup-link-google">
+                🔍 Buscar en Google
+            </a>`;
+}
+
+function getBotonMasInfo(evento) {
+    const busqueda = encodeURIComponent(`${evento.nombre} Madrid`);
+    if (esLinkUtil(evento.url)) {
+        return `<a href="${evento.url}" target="_blank" class="event-btn event-btn-secondary">
+                    <i class="fas fa-external-link-alt"></i> Más info
+                </a>`;
+    }
+    return `<a href="https://www.google.com/search?q=${busqueda}" target="_blank" class="event-btn event-btn-google">
+                <i class="fas fa-search"></i> Buscar
+            </a>`;
+}
+
+
 // ===== MOSTRAR EVENTOS EN MAPA =====
 function displayEvents(events) {
     markersLayer.clearLayers();
@@ -116,17 +174,8 @@ function displayEvents(events) {
 
         const dateText = formatearFechaSafe(event.fecha, event.fecha_fin);
         const descripcionLimpia = limpiarDescripcion(event.descripcion, 150);
+        const linkHTML = getLinkHTML(event);
 
-        // FIX 1: Validación del link también en el popup
-        const linkHTML = esLinkUtil(event.url)
-            ? `<a href="${event.url}" target="_blank" class="popup-link">
-                 Ver más información →
-               </a>`
-            : `<p style="color:#6B7280;font-size:12px;font-style:italic;">
-                 ℹ️ Más información en el ayuntamiento local
-               </p>`;
-
-        // FIX 2: Link a Google Calendar integrado en popup
         const calendarLink = generarLinkCalendar(event);
         const calendarHTML = calendarLink
             ? `<a href="${calendarLink}" target="_blank" class="popup-link popup-link-calendar">
@@ -245,23 +294,16 @@ function renderListView(events) {
             </div>
         ` : '';
 
-        // FIX 3: Validar URL antes de mostrar el botón "Más info"
-        const urlValida = esLinkUtil(evento.url);
-        const botonMasInfo = urlValida
-            ? `<a href="${evento.url}" target="_blank" class="event-btn event-btn-secondary">
-                 <i class="fas fa-external-link-alt"></i> Más info
-               </a>`
-            : `<span class="event-btn event-btn-disabled" title="Sin enlace disponible">
-                 <i class="fas fa-external-link-alt"></i> Sin enlace
-               </span>`;
+        const botonMasInfo = getBotonMasInfo(evento);
 
-        // Botón Google Calendar
         const calendarLink = generarLinkCalendar(evento);
         const botonCalendar = calendarLink
             ? `<a href="${calendarLink}" target="_blank" class="event-btn event-btn-calendar">
                  <i class="fas fa-calendar-plus"></i>
                </a>`
             : '';
+
+        const descripcion = limpiarDescripcion(evento.descripcion, 200);
 
         return `
             <div class="event-card">
@@ -288,15 +330,13 @@ function renderListView(events) {
                         ${distanciaItem}
                     </div>
 
-                ${limpiarDescripcion(evento.descripcion, 200)
-    ? `<div class="event-description">
-           ${limpiarDescripcion(evento.descripcion, 200)}
-       </div>`
-    : `<div class="event-description sin-descripcion">
-           📍 ${evento.lugar} · 
-           ${evento.precio === 'gratis' ? 'Entrada gratuita' : evento.precio_desde || 'De pago'}
-       </div>`
-}
+                    ${descripcion
+                        ? `<div class="event-description">${descripcion}</div>`
+                        : `<div class="event-description sin-descripcion">
+                               📍 ${evento.lugar} · 
+                               ${evento.precio === 'gratis' ? 'Entrada gratuita' : evento.precio_desde || 'De pago'}
+                           </div>`
+                    }
                 </div>
 
                 <div class="event-actions">
@@ -311,21 +351,16 @@ function renderListView(events) {
     }).join('');
 }
 
-// FIX 4: verEnMapa() con soporte correcto para clusters
 function verEnMapa(eventoId) {
     switchView('map');
 
     const evento = allEvents.find(e => e.id === eventoId);
     if (!evento) return;
 
-    // Primero hacemos zoom al punto
     map.setView([evento.lat, evento.lng], 15);
 
-    // Buscamos el marker y forzamos que el cluster lo exponga
     markersLayer.eachLayer(marker => {
         if (marker.eventoId === eventoId) {
-            // zoomToShowLayer expande el cluster si es necesario
-            // y llama al callback cuando el marker ya es visible
             markersLayer.zoomToShowLayer(marker, () => {
                 marker.openPopup();
             });
@@ -355,58 +390,54 @@ function applyFilters() {
         if (search && !`${e.nombre} ${e.descripcion} ${e.lugar}`.toLowerCase().includes(search)) return false;
         return true;
     });
-if (dateFilter !== 'todos') {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
 
-    filtered = filtered.filter(e => {
-        // Miramos TANTO la fecha de inicio COMO la de fin
-        const fechaInicio = new Date(e.fecha + 'T00:00:00');
-        const fechaFin = e.fecha_fin
-            ? new Date(e.fecha_fin + 'T00:00:00')
-            : fechaInicio;
+    if (dateFilter !== 'todos') {
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
 
-        switch (dateFilter) {
-            case 'hoy':
-                // ¿El evento ya empezó Y todavía no ha terminado?
-                return fechaInicio <= hoy && fechaFin >= hoy;
+        filtered = filtered.filter(e => {
+            const fechaInicio = new Date(e.fecha + 'T00:00:00');
+            const fechaFin = e.fecha_fin
+                ? new Date(e.fecha_fin + 'T00:00:00')
+                : fechaInicio;
 
-            case 'finde':
-                const dia = hoy.getDay();
-                let ini, fin;
-                if (dia === 6) {
-                    ini = new Date(hoy);
-                    fin = new Date(hoy);
-                    fin.setDate(hoy.getDate() + 1);
-                } else if (dia === 0) {
-                    ini = fin = new Date(hoy);
-                } else {
-                    const diasHastaSabado = 6 - dia;
-                    ini = new Date(hoy);
-                    ini.setDate(hoy.getDate() + diasHastaSabado);
-                    fin = new Date(ini);
-                    fin.setDate(ini.getDate() + 1);
-                }
-                // ¿El evento está activo en algún momento del finde?
-                return fechaInicio <= fin && fechaFin >= ini;
+            switch (dateFilter) {
+                case 'hoy':
+                    return fechaInicio <= hoy && fechaFin >= hoy;
 
-            case 'semana':
-                const semanaFin = new Date(hoy);
-                semanaFin.setDate(hoy.getDate() + 7);
-                // ¿El evento está activo en algún momento de los próximos 7 días?
-                return fechaInicio <= semanaFin && fechaFin >= hoy;
+                case 'finde':
+                    const dia = hoy.getDay();
+                    let ini, fin;
+                    if (dia === 6) {
+                        ini = new Date(hoy);
+                        fin = new Date(hoy);
+                        fin.setDate(hoy.getDate() + 1);
+                    } else if (dia === 0) {
+                        ini = fin = new Date(hoy);
+                    } else {
+                        const diasHastaSabado = 6 - dia;
+                        ini = new Date(hoy);
+                        ini.setDate(hoy.getDate() + diasHastaSabado);
+                        fin = new Date(ini);
+                        fin.setDate(ini.getDate() + 1);
+                    }
+                    return fechaInicio <= fin && fechaFin >= ini;
 
-            case 'mes':
-                const mesFin = new Date(hoy);
-                mesFin.setDate(hoy.getDate() + 30);
-                // ¿El evento está activo en algún momento del próximo mes?
-                return fechaInicio <= mesFin && fechaFin >= hoy;
+                case 'semana':
+                    const semanaFin = new Date(hoy);
+                    semanaFin.setDate(hoy.getDate() + 7);
+                    return fechaInicio <= semanaFin && fechaFin >= hoy;
 
-            default:
-                return true;
-        }
-    });
-}
+                case 'mes':
+                    const mesFin = new Date(hoy);
+                    mesFin.setDate(hoy.getDate() + 30);
+                    return fechaInicio <= mesFin && fechaFin >= hoy;
+
+                default:
+                    return true;
+            }
+        });
+    }
 
     currentFilteredEvents = filtered;
     displayEvents(filtered);
@@ -489,37 +520,6 @@ function limpiarDescripcion(descripcion, maxLength = 150) {
     return texto;
 }
 
-function esLinkUtil(url) {
-    if (!url || typeof url !== 'string' || url.trim() === '') return false;
-    if (!url.startsWith('http://') && !url.startsWith('https://')) return false;
-
-    const urlLower = url.toLowerCase();
-
-    // NUEVO: URLs con index.jsp son del sistema interno del Ayuntamiento → inútiles
-    if (urlLower.includes('madrid.es') && urlLower.includes('index.jsp')) {
-        return false;
-    }
-
-    const urlsGenericas = [
-        'madrid.es', 'esmadrid.com',
-        'timeout.es/madrid', 'datos.madrid.es'
-    ];
-
-    for (const generica of urlsGenericas) {
-        if (urlLower.includes(generica)) {
-            if (
-                url.endsWith(generica) ||
-                url.endsWith(generica + '/') ||
-                url.includes('/agenda-eventos-madrid') ||
-                (url.includes('/agenda') && url.split('/').length <= 4)
-            ) return false;
-        }
-    }
-
-    if (url.match(/\/(evento|event|actividad|show)\/[\w-]+/i)) return true;
-    return !urlLower.includes('madrid.es') || url.length > 50;
-}
-
 
 // ===== DISTANCIAS =====
 function calcularDistancia(lat1, lng1, lat2, lng2) {
@@ -595,7 +595,6 @@ function onGeoSuccess(position) {
     map.setView([latitude, longitude], 14);
     colocarMarkerUsuario(latitude, longitude);
 
-    // Re-renderizar para mostrar distancias
     displayEvents(currentFilteredEvents.length ? currentFilteredEvents : allEvents);
 
     mostrarToast(accuracy < 100 ? '✅ Ubicación encontrada' : '📍 Ubicación aproximada');
@@ -800,7 +799,6 @@ function ocultarLoader(numEventos) {
 
 
 // ===== PWA - SERVICE WORKER =====
-// FIX: Bloque único, correctamente cerrado
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/eventos-madrid/sw.js')
@@ -821,7 +819,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.theme-toggle i').className = 'fas fa-sun';
     }
 
-    // Panels
     document.getElementById('fab-filters').addEventListener('click', () => {
         document.getElementById('filters-panel').classList.add('active');
     });
@@ -835,7 +832,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('stats-panel').classList.remove('active');
     });
 
-    // Botones
     document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
     document.getElementById('btn-clear').addEventListener('click', clearFilters);
     document.getElementById('view-map-btn').addEventListener('click', () => switchView('map'));
@@ -854,7 +850,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderListView(currentFilteredEvents);
     });
 
-    // Filtros
     document.getElementById('search').addEventListener('input', applyFilters);
     document.getElementById('filtro-fecha').addEventListener('change', applyFilters);
     document.querySelectorAll('.chip input').forEach(cb => {
