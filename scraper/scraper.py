@@ -248,10 +248,8 @@ class EventosScraper:
 
                         org = location.get('organization', {})
 
-                        # ===== CAMBIO 1: Extraer lugar real =====
                         if isinstance(org, dict) and org.get('organization-name'):
                             lugar = org['organization-name']
-                            # Añadir calle si existe y aporta info extra
                             direccion = location.get('address', {})
                             if isinstance(direccion, dict):
                                 calle = direccion.get('street-address', '')
@@ -270,12 +268,8 @@ class EventosScraper:
                         evento_data.get('description', ''), 300
                     )
 
-                    # ===== CAMBIO 2: Vaciar URLs inútiles de madrid.es =====
-                    url_raw = evento_data.get('link', '') or evento_data.get('@id', '')
-                    if url_raw and 'index.jsp' in url_raw.lower():
-                        url_evento = ''
-                    else:
-                        url_evento = url_raw
+                    # Guardar URL tal como viene, son específicas por evento
+                    url_evento = evento_data.get('link', '') or evento_data.get('@id', '')
 
                     precio_raw = self.limpiar_texto(
                         str(evento_data.get('price', ''))
@@ -324,10 +318,6 @@ class EventosScraper:
     # ===== FUENTE 2: TICKETMASTER =====
 
     def scrape_ticketmaster(self):
-        """
-        API oficial de Ticketmaster
-        Gratuita, cubre Madrid y toda la Comunidad
-        """
         print("\n🔍 Scrapeando Ticketmaster...")
 
         api_key = os.environ.get('TICKETMASTER_KEY', '')
