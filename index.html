@@ -134,31 +134,39 @@
                 </select>
             </div>
 
-            <div class="filter-section">
-                <label class="filter-label">🎭 Tipo</label>
-                <div class="filter-chips">
-                    <label class="chip">
-                        <input type="checkbox" value="concierto" checked>
-                        <span class="chip-content concierto">🎵 Conciertos</span>
-                    </label>
-                    <label class="chip">
-                        <input type="checkbox" value="fiesta" checked>
-                        <span class="chip-content fiesta">🎪 Fiestas</span>
-                    </label>
-                    <label class="chip">
-                        <input type="checkbox" value="mercado" checked>
-                        <span class="chip-content mercado">🛍️ Mercados</span>
-                    </label>
-                    <label class="chip">
-                        <input type="checkbox" value="cultural" checked>
-                        <span class="chip-content cultural">🎭 Cultural</span>
-                    </label>
-                    <label class="chip">
-                        <input type="checkbox" value="gastronomia" checked>
-                        <span class="chip-content gastronomia">🍽️ Gastro</span>
-                    </label>
-                </div>
-            </div>
+           <div class="filter-section">
+    <label class="filter-label">🎭 Tipo</label>
+    <div class="filter-chips">
+        <label class="chip">
+            <input type="checkbox" value="concierto" checked>
+            <span class="chip-content concierto">🎵 Conciertos</span>
+        </label>
+        <label class="chip">
+            <input type="checkbox" value="fiesta" checked>
+            <span class="chip-content fiesta">🎪 Fiestas</span>
+        </label>
+        <label class="chip">
+            <input type="checkbox" value="mercado" checked>
+            <span class="chip-content mercado">🛍️ Mercados</span>
+        </label>
+        <label class="chip">
+            <input type="checkbox" value="cultural" checked>
+            <span class="chip-content cultural">🎭 Cultural</span>
+        </label>
+        <label class="chip">
+            <input type="checkbox" value="gastronomia" checked>
+            <span class="chip-content gastronomia">🍽️ Gastro</span>
+        </label>
+        <label class="chip">
+            <input type="checkbox" value="deporte" checked>
+            <span class="chip-content deporte">⚽ Deportes</span>
+        </label>
+        <label class="chip">
+            <input type="checkbox" value="infantil" checked>
+            <span class="chip-content infantil">👶 Infantil</span>
+        </label>
+    </div>
+</div>
 
             <div class="filter-section">
                 <label class="filter-label">💰 Precio</label>
@@ -190,40 +198,48 @@
         </div>
 
         <div class="panel-content">
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <div class="stat-icon">🎵</div>
-                    <div class="stat-value" id="stat-conciertos">0</div>
-                    <div class="stat-name">Conciertos</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-icon">🎪</div>
-                    <div class="stat-value" id="stat-fiestas">0</div>
-                    <div class="stat-name">Fiestas</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-icon">🛍️</div>
-                    <div class="stat-value" id="stat-mercados">0</div>
-                    <div class="stat-name">Mercados</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-icon">🎭</div>
-                    <div class="stat-value" id="stat-cultural">0</div>
-                    <div class="stat-name">Cultural</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-icon">🍽️</div>
-                    <div class="stat-value" id="stat-gastronomia">0</div>
-                    <div class="stat-name">Gastro</div>
-                </div>
-                <div class="stat-box highlight">
-                    <div class="stat-icon">💚</div>
-                    <div class="stat-value" id="stat-gratis">0</div>
-                    <div class="stat-name">Gratis</div>
-                </div>
-            </div>
-        </div>
-    </aside>
+<div class="stats-grid">
+    <div class="stat-box">
+        <div class="stat-icon">🎵</div>
+        <div class="stat-value" id="stat-conciertos">0</div>
+        <div class="stat-name">Conciertos</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-icon">🎪</div>
+        <div class="stat-value" id="stat-fiestas">0</div>
+        <div class="stat-name">Fiestas</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-icon">🛍️</div>
+        <div class="stat-value" id="stat-mercados">0</div>
+        <div class="stat-name">Mercados</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-icon">🎭</div>
+        <div class="stat-value" id="stat-cultural">0</div>
+        <div class="stat-name">Cultural</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-icon">🍽️</div>
+        <div class="stat-value" id="stat-gastronomia">0</div>
+        <div class="stat-name">Gastro</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-icon">⚽</div>
+        <div class="stat-value" id="stat-deporte">0</div>
+        <div class="stat-name">Deportes</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-icon">👶</div>
+        <div class="stat-value" id="stat-infantil">0</div>
+        <div class="stat-name">Infantil</div>
+    </div>
+    <div class="stat-box highlight">
+        <div class="stat-icon">💚</div>
+        <div class="stat-value" id="stat-gratis">0</div>
+        <div class="stat-name">Gratis</div>
+    </div>
+</div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>

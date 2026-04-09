@@ -13,7 +13,9 @@ const icons = {
     fiesta: '🎪',
     mercado: '🛍️',
     cultural: '🎭',
-    gastronomia: '🍽️'
+    gastronomia: '🍽️',
+    deporte: '⚽',
+    infantil: '👶'
 };
 
 const colors = {
@@ -21,7 +23,9 @@ const colors = {
     fiesta: '#DC2626',
     mercado: '#059669',
     cultural: '#2563EB',
-    gastronomia: '#D97706'
+    gastronomia: '#D97706',
+    deporte: '#16A34A',
+    infantil: '#F59E0B'
 };
 
 
@@ -80,8 +84,8 @@ function esLinkUtil(url) {
     const urlLower = url.toLowerCase();
 
     if (urlLower.includes('madrid.es/portales/munimadrid')) {
-    return true;
-}
+        return true;
+    }
 
     const urlsGenericas = [
         'madrid.es', 'esmadrid.com',
@@ -377,7 +381,8 @@ function applyFilters() {
     const types = Array.from(document.querySelectorAll(
         '.chip input[value="concierto"], .chip input[value="fiesta"], ' +
         '.chip input[value="mercado"], .chip input[value="cultural"], ' +
-        '.chip input[value="gastronomia"]'
+        '.chip input[value="gastronomia"], .chip input[value="deporte"], ' +
+        '.chip input[value="infantil"]'
     )).filter(cb => cb.checked).map(cb => cb.value);
 
     const prices = Array.from(document.querySelectorAll(
@@ -673,7 +678,8 @@ function mostrarToast(mensaje, tipo = 'normal') {
 function actualizarEstadisticas(eventos) {
     const stats = {
         concierto: 0, fiesta: 0, mercado: 0,
-        cultural: 0, gastronomia: 0, gratis: 0
+        cultural: 0, gastronomia: 0,
+        deporte: 0, infantil: 0, gratis: 0
     };
 
     eventos.forEach(evento => {
@@ -686,6 +692,8 @@ function actualizarEstadisticas(eventos) {
     animarContador('stat-mercados', stats.mercado);
     animarContador('stat-cultural', stats.cultural);
     animarContador('stat-gastronomia', stats.gastronomia);
+    animarContador('stat-deporte', stats.deporte);
+    animarContador('stat-infantil', stats.infantil);
     animarContador('stat-gratis', stats.gratis);
 }
 

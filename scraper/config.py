@@ -1,16 +1,12 @@
 """
 Configuración del scraper
 """
+import os
 
 # URLs de las webs a scrapear
 URLS = {
-    # API oficial Ayuntamiento Madrid - funciona bien
     'esmadrid_api': 'https://datos.madrid.es/egob/catalogo/206974-0-agenda-eventos-culturales-100.json',
-    
-    # Comunidad de Madrid - nueva URL correcta
     'comunidad_madrid': 'https://www.comunidad.madrid/agenda',
-
-    # APIs municipios del sur de Madrid
     'mostoles': 'https://www.mostoles.es/es/agenda',
     'alcorcon': 'https://www.alcorcon.es/agenda',
     'leganes': 'https://www.leganes.org/agenda',
@@ -35,33 +31,96 @@ GEOCODING_DELAY = 1
 # Path
 EVENTOS_JSON_PATH = '../data/eventos.json'
 
-# Categorización
+# Categorización — ORDEN IMPORTANTE: se aplica la primera que coincida
 KEYWORDS = {
+    # Deportes va primero para que no se confunda con cultural
+    'deporte': [
+        # Fútbol
+        'fútbol', 'futbol', 'partido', 'liga', 'champions', 'uefa',
+        'laliga', 'copa del rey', 'rayo vallecano', 'atlético de madrid',
+        'atletico de madrid', 'real madrid', 'getafe cf', 'leganés cf',
+        'estadio', 'wanda metropolitano', 'bernabéu', 'vallecas',
+        # Baloncesto
+        'baloncesto', 'basket', 'nba', 'acb', 'euroliga',
+        'real madrid basket', 'estudiantes',
+        # Otros deportes
+        'tenis', 'pádel', 'padel', 'atletismo', 'natación', 'natacion',
+        'ciclismo', 'maratón', 'maraton', 'carrera popular',
+        'triatlón', 'triatlon', 'rugby', 'balonmano', 'voleibol',
+        'boxeo', 'artes marciales', 'judo', 'karate',
+        'escalada', 'senderismo', 'running', 'deporte', 'deportivo',
+        'campeonato', 'torneo', 'competición', 'competicion',
+        'semifinal', 'final copa', 'supercopa',
+        # Venues deportivos
+        'palacio de los deportes', 'polideportivo', 'piscina municipal',
+        'pista de atletismo', 'campo de fútbol', 'pabellón'
+    ],
+
+    # Infantil va segundo para separarlo de cultural
+    'infantil': [
+        'infantil', 'niños', 'ninos', 'familia', 'familiar',
+        'bebés', 'bebes', 'títeres', 'titeres', 'cuentacuentos',
+        'cuento', 'teatro infantil', 'show infantil',
+        'taller infantil', 'taller para niños', 'actividad infantil',
+        'animación infantil', 'payaso', 'magia infantil',
+        'circo infantil', 'marionetas', 'juegos infantiles',
+        'ludoteca', 'parque infantil', '0-3 años', '3-6 años',
+        '6-12 años', 'todas las edades', 'apto para niños'
+    ],
+
     'concierto': [
-        'concierto', 'festival', 'música', 'show', 'actuación',
-        'directo', 'live', 'banda', 'orquesta', 'recital', 'dj set',
-        'jazz', 'rock', 'pop', 'flamenco', 'clásica', 'sinfonía'
+        'concierto', 'festival', 'música', 'musica', 'show', 'actuación',
+        'actuacion', 'directo', 'live', 'banda', 'orquesta', 'recital',
+        'dj set', 'dj', 'jazz', 'rock', 'pop', 'flamenco', 'clásica',
+        'clasica', 'sinfonía', 'sinfonia', 'electrónica', 'electronica',
+        'reggaeton', 'hip hop', 'rap', 'indie', 'metal', 'punk',
+        'blues', 'soul', 'r&b', 'folk', 'country', 'gospel',
+        'ópera', 'opera', 'zarzuela', 'coral', 'coro',
+        'música en vivo', 'musica en vivo', 'open air', 'al aire libre'
     ],
+
     'fiesta': [
-        'fiesta', 'verbena', 'celebración', 'romería', 'carnaval',
-        'feria', 'san isidro', 'orgullo', 'nochevieja', 'festividad',
-        'patron', 'patrona', 'fiestas populares'
+        'fiesta', 'verbena', 'celebración', 'celebracion', 'romería',
+        'romeria', 'carnaval', 'feria', 'san isidro', 'orgullo',
+        'nochevieja', 'festividad', 'patron', 'patrona',
+        'fiestas populares', 'fiestas de', 'fiestas del',
+        'procesión', 'procesion', 'cabalgata', 'desfile',
+        'halloween', 'navidad', 'reyes', 'nochebuena',
+        'año nuevo', 'semana santa', 'corpus', 'verbenas'
     ],
+
     'mercado': [
-        'mercado', 'mercadillo', 'rastro', 'artesanía', 'flea market',
-        'vintage', 'segunda mano', 'coleccionismo', 'feria artesanal'
+        'mercado', 'mercadillo', 'rastro', 'artesanía', 'artesania',
+        'flea market', 'vintage', 'segunda mano', 'coleccionismo',
+        'feria artesanal', 'feria de', 'feria del libro',
+        'mercado navideño', 'mercado medieval', 'bazar',
+        'feria de muestras', 'exposición comercial', 'feria gastronómica'
     ],
+
     'gastronomia': [
         'gastro', 'comida', 'tapas', 'restaurante', 'cocina',
-        'gastronóm', 'maridaje', 'cata', 'vino', 'cerveza', 'food',
-        'degustación', 'enología', 'gastronomía'
+        'gastronóm', 'gastronomia', 'gastronomía', 'maridaje',
+        'cata', 'vino', 'cerveza', 'food', 'degustación', 'degustacion',
+        'enología', 'enologia', 'vermut', 'vermú', 'brunch',
+        'street food', 'food truck', 'ruta gastronómica',
+        'ruta de la tapa', 'concurso de cocina', 'showcooking',
+        'chef', 'michelin', 'bar de tapas', 'taberna'
     ],
+
     'cultural': [
-        'museo', 'exposición', 'teatro', 'obra', 'arte', 'cultura',
-        'danza', 'ballet', 'cine', 'literatura', 'conferencia',
-        'taller', 'visita', 'tour', 'ópera', 'títeres', 'magia',
-        'circo', 'monólogo', 'humor', 'fotografía', 'escultura',
-        'pintura', 'lectura', 'poesía', 'infantil', 'familiar'
+        'museo', 'exposición', 'exposicion', 'teatro', 'obra', 'arte',
+        'cultura', 'danza', 'ballet', 'cine', 'literatura',
+        'conferencia', 'taller', 'visita', 'tour', 'magia',
+        'circo', 'monólogo', 'monologo', 'humor', 'comedia',
+        'fotografía', 'fotografia', 'escultura', 'pintura',
+        'lectura', 'poesía', 'poesia', 'performance', 'instalación',
+        'instalacion', 'videoarte', 'arquitectura', 'diseño',
+        'moda', 'cómic', 'comic', 'manga', 'animación', 'animacion',
+        'documental', 'cortometraje', 'largometraje', 'estreno',
+        'presentación', 'presentacion', 'charla', 'debate',
+        'mesa redonda', 'coloquio', 'seminario', 'congreso',
+        'workshop', 'masterclass', 'visita guiada', 'ruta cultural',
+        'patrimonio', 'historia', 'arqueología', 'arqueologia'
     ],
 }
 
@@ -88,10 +147,17 @@ MUNICIPIOS = {
     'collado villalba': {'lat': 40.6346, 'lng': -4.0076},
     'coslada': {'lat': 40.4233, 'lng': -3.5645},
     'san sebastián de los reyes': {'lat': 40.5487, 'lng': -3.6271},
+    'san sebastian de los reyes': {'lat': 40.5487, 'lng': -3.6271},
     'arganda del rey': {'lat': 40.3008, 'lng': -3.4394},
     'rivas vaciamadrid': {'lat': 40.3561, 'lng': -3.5234},
     'valdemoro': {'lat': 40.1908, 'lng': -3.6742},
     'aranjuez': {'lat': 40.0319, 'lng': -3.6010},
+    'torrelodones': {'lat': 40.5756, 'lng': -3.9287},
+    'boadilla del monte': {'lat': 40.4067, 'lng': -3.8760},
+    'villalba': {'lat': 40.6346, 'lng': -4.0076},
+    'tres cantos': {'lat': 40.5927, 'lng': -3.7090},
+    'alcobendas': {'lat': 40.5469, 'lng': -3.6398},
+    'san fernando de henares': {'lat': 40.4264, 'lng': -3.5311},
 }
 
 # Lugares conocidos en Madrid capital
@@ -103,11 +169,31 @@ KNOWN_VENUES = {
     'palacio vistalegre': {'lat': 40.3864, 'lng': -3.7196},
     'la riviera': {'lat': 40.4077, 'lng': -3.7218},
     'movistar arena': {'lat': 40.4225, 'lng': -3.6703},
+    'sala sol': {'lat': 40.4193, 'lng': -3.7019},
+    'sala caracol': {'lat': 40.3994, 'lng': -3.7064},
+    'joy eslava': {'lat': 40.4168, 'lng': -3.7043},
+    'teatro joy eslava': {'lat': 40.4168, 'lng': -3.7043},
+
+    # Deportes
+    'wanda metropolitano': {'lat': 40.4361, 'lng': -3.5995},
+    'estadio wanda metropolitano': {'lat': 40.4361, 'lng': -3.5995},
+    'santiago bernabéu': {'lat': 40.4531, 'lng': -3.6883},
+    'bernabéu': {'lat': 40.4531, 'lng': -3.6883},
+    'estadio de vallecas': {'lat': 40.3919, 'lng': -3.6546},
+    'campo de fútbol de vallecas': {'lat': 40.3919, 'lng': -3.6546},
+    'coliseum alfonso pérez': {'lat': 40.3058, 'lng': -3.7326},
+    'estadio municipal de butarque': {'lat': 40.3281, 'lng': -3.7638},
+    'palacio de los deportes': {'lat': 40.4225, 'lng': -3.6703},
+    'pabellón magariños': {'lat': 40.4394, 'lng': -3.6808},
+    'caja mágica': {'lat': 40.3747, 'lng': -3.6897},
 
     # Cultura
     'teatro real': {'lat': 40.4179, 'lng': -3.7106},
     'teatro español': {'lat': 40.4147, 'lng': -3.6991},
     'teatro fernán gómez': {'lat': 40.4192, 'lng': -3.6933},
+    'teatro la abadía': {'lat': 40.4289, 'lng': -3.7108},
+    'teatro lara': {'lat': 40.4228, 'lng': -3.7022},
+    'teatro calderón': {'lat': 40.4136, 'lng': -3.7024},
     'círculo de bellas artes': {'lat': 40.4189, 'lng': -3.6973},
     'conde duque': {'lat': 40.4275, 'lng': -3.7134},
     'centro conde duque': {'lat': 40.4275, 'lng': -3.7134},
@@ -119,6 +205,10 @@ KNOWN_VENUES = {
     'museo thyssen': {'lat': 40.4159, 'lng': -3.6941},
     'thyssen': {'lat': 40.4159, 'lng': -3.6941},
     'caixaforum': {'lat': 40.4083, 'lng': -3.6939},
+    'museo arqueológico': {'lat': 40.4233, 'lng': -3.6886},
+    'museo nacional de antropología': {'lat': 40.4072, 'lng': -3.6933},
+    'casa encendida': {'lat': 40.4061, 'lng': -3.7005},
+    'fundación mapfre': {'lat': 40.4192, 'lng': -3.6933},
 
     # Parques y espacios
     'parque del retiro': {'lat': 40.4153, 'lng': -3.6844},
@@ -129,6 +219,8 @@ KNOWN_VENUES = {
     'matadero madrid': {'lat': 40.3936, 'lng': -3.7006},
     'jardín botánico': {'lat': 40.4112, 'lng': -3.6899},
     'templo de debod': {'lat': 40.4241, 'lng': -3.7178},
+    'parque el capricho': {'lat': 40.4647, 'lng': -3.6281},
+    'parque de berlín': {'lat': 40.4558, 'lng': -3.6789},
 
     # Plazas y barrios
     'plaza mayor': {'lat': 40.4192, 'lng': -3.7025},
@@ -140,14 +232,21 @@ KNOWN_VENUES = {
     'la latina': {'lat': 40.4106, 'lng': -3.7088},
     'lavapiés': {'lat': 40.4098, 'lng': -3.7082},
     'chamberí': {'lat': 40.4294, 'lng': -3.7023},
+    'salamanca': {'lat': 40.4286, 'lng': -3.6824},
+    'arganzuela': {'lat': 40.3964, 'lng': -3.7006},
+    'usera': {'lat': 40.3897, 'lng': -3.7108},
+    'carabanchel': {'lat': 40.3828, 'lng': -3.7364},
 
     # Mercados
     'mercado de san miguel': {'lat': 40.4155, 'lng': -3.7092},
     'mercado de motores': {'lat': 40.3985, 'lng': -3.6904},
     'el rastro': {'lat': 40.4089, 'lng': -3.7077},
+    'mercado de maravillas': {'lat': 40.4394, 'lng': -3.7031},
+    'mercado de antón martín': {'lat': 40.4128, 'lng': -3.6994},
 }
-import os
 
-# Eventbrite
-EVENTBRITE_TOKEN = os.environ.get('EVENTBRITE_TOKEN', '')
-EVENTBRITE_URL = 'https://www.eventbriteapi.com/v3/events/search/'
+# Ticketmaster
+TICKETMASTER_KEY = os.environ.get('TICKETMASTER_KEY', '')
+
+# Meetup (se añadirá cuando tengamos API key)
+MEETUP_KEY = os.environ.get('MEETUP_KEY', '')

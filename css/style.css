@@ -107,6 +107,45 @@ body.dark-mode {
     text-align: center;
 }
 
+/* ===== BANNER HOY ===== */
+.banner-hoy {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #C60B1E 0%, #A00918 100%);
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 999;
+    box-shadow: var(--shadow);
+}
+
+.banner-hoy-texto {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.banner-hoy-btn {
+    background: white;
+    color: var(--primary);
+    border: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.banner-hoy-btn:hover {
+    background: var(--accent);
+    color: var(--text);
+}
+
 /* ===== MAPA ===== */
 #map {
     position: fixed;
@@ -320,6 +359,12 @@ body.dark-mode {
 .chip-content.pago { color: #6B7280; }
 .chip input:checked + .chip-content.pago { background: #F3F4F6; }
 
+.chip-content.deporte { color: #16A34A; }
+.chip input:checked + .chip-content.deporte { background: #DCFCE7; }
+
+.chip-content.infantil { color: #F59E0B; }
+.chip input:checked + .chip-content.infantil { background: #FEF3C7; }
+
 .chip:hover .chip-content {
     transform: scale(1.05);
 }
@@ -408,151 +453,6 @@ body.dark-mode .stat-box.highlight .stat-value {
     letter-spacing: 0.5px;
 }
 
-/* ===== POPUP ===== */
-.leaflet-popup-content-wrapper {
-    border-radius: 12px;
-    box-shadow: var(--shadow-lg);
-}
-
-.leaflet-popup-content {
-    margin: 16px;
-    min-width: 250px;
-}
-
-.popup-evento h3 {
-    color: var(--primary);
-    margin-bottom: 12px;
-    font-size: 16px;
-}
-
-.popup-evento p {
-    margin: 6px 0;
-    font-size: 14px;
-    color: var(--text);
-}
-
-.popup-evento a {
-    display: inline-block;
-    margin-top: 12px;
-    padding: 10px 16px;
-    background: var(--primary);
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-.popup-link-calendar,
-.popup-link-calendar:link,
-.popup-link-calendar:visited {
-    background: transparent !important;
-    color: var(--primary) !important;
-    border: 2px solid var(--primary) !important;
-    margin-top: 0 !important;
-    box-shadow: none !important;
-}
-
-.popup-link-calendar:hover {
-    background: var(--primary) !important;
-    color: white !important;
-}
-
-.popup-link-calendar:hover {
-    background: var(--primary) !important;
-    color: white !important;
-}
-.popup-evento a:hover {
-    background: var(--primary-dark);
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 640px) {
-    .top-bar {
-        padding: 0 15px;
-    }
-    
-    .logo {
-        font-size: 18px;
-    }
-    
-    .event-counter {
-        font-size: 13px;
-        padding: 6px 12px;
-    }
-    
-    .filters-panel,
-    .stats-panel {
-        max-width: 100%;
-    }
-}
-
-/* ===== TRANSICIONES ===== */
-* {
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-}
-
-/* ===== CUSTOM MARKERS ===== */
-.custom-marker {
-    transition: all 0.3s ease !important;
-}
-
-.leaflet-marker-icon {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Hover effect en markers */
-.leaflet-marker-icon:hover .custom-marker {
-    transform: translate(-50%, -50%) scale(1.15) !important;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.4) !important;
-    z-index: 1000 !important;
-}
-
-/* Animación de entrada de markers */
-@keyframes markerPop {
-    0% {
-        transform: translate(-50%, -50%) scale(0);
-        opacity: 0;
-    }
-    50% {
-        transform: translate(-50%, -50%) scale(1.1);
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-}
-
-.custom-marker {
-    animation: markerPop 0.4s ease-out;
-}
-
-/* Mejorar popup */
-body.dark-mode .leaflet-popup-content-wrapper {
-    background: var(--bg-alt);
-    color: var(--text);
-}
-
-body.dark-mode .popup-evento h3 {
-    color: #FF6B6B;
-}
-
-body.dark-mode .popup-evento p {
-    color: var(--text);
-}
-
-body.dark-mode .popup-evento a {
-    background: var(--primary);
-}
-
-.leaflet-popup-content {
-    margin: 0 !important;
-}
-
-.popup-evento {
-    padding: 16px;
-}
 /* ===== TOGGLE DE VISTAS ===== */
 .view-toggle {
     position: fixed;
@@ -625,7 +525,6 @@ body.dark-mode .popup-evento a {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    padding-left: 360px;
 }
 
 .list-header {
@@ -709,6 +608,8 @@ body.dark-mode .popup-evento a {
 .event-icon.mercado { background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%); }
 .event-icon.cultural { background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%); }
 .event-icon.gastronomia { background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); }
+.event-icon.deporte { background: linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%); }
+.event-icon.infantil { background: linear-gradient(135deg, #FEF9C3 0%, #FDE68A 100%); }
 
 .event-info {
     flex: 1;
@@ -723,6 +624,7 @@ body.dark-mode .popup-evento a {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .event-badge {
@@ -749,7 +651,12 @@ body.dark-mode .popup-evento a {
     color: white;
     animation: pulse 2s infinite;
 }
--webkit-line-clamp
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
 .event-meta {
     display: flex;
     flex-wrap: wrap;
@@ -780,6 +687,11 @@ body.dark-mode .popup-evento a {
     -webkit-box-orient: vertical;
 }
 
+.event-description.sin-descripcion {
+    font-style: italic;
+    font-size: 13px;
+}
+
 .event-actions {
     display: flex;
     flex-direction: column;
@@ -800,6 +712,7 @@ body.dark-mode .popup-evento a {
     align-items: center;
     justify-content: center;
     gap: 6px;
+    text-decoration: none;
 }
 
 .event-btn-primary {
@@ -820,6 +733,41 @@ body.dark-mode .popup-evento a {
 
 .event-btn-secondary:hover {
     background: var(--border);
+}
+
+.event-btn-calendar {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    padding: 10px;
+    min-width: 42px;
+    width: 42px;
+    flex-shrink: 0;
+}
+
+.event-btn-calendar:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.05);
+}
+
+.event-btn-google {
+    background: #F8F9FA;
+    color: #4285F4;
+    border: 1px solid #DADCE0;
+}
+
+.event-btn-google:hover {
+    background: #E8F0FE;
+    border-color: #4285F4;
+}
+
+.event-btn-disabled {
+    background: var(--bg-alt);
+    color: var(--text-light);
+    border: 1px solid var(--border);
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* ===== EMPTY STATE ===== */
@@ -845,77 +793,7 @@ body.dark-mode .popup-evento a {
     font-size: 14px;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-    .view-toggle {
-        top: 65px;
-        right: 10px;
-        left: 10px;
-        width: auto;
-    }
-    
-    .view-btn {
-        flex: 1;
-        justify-content: center;
-        padding: 10px 12px;
-        font-size: 13px;
-    }
-    
-    .list-container {
-        padding: 10px;
-        padding-top: 70px;
-    }
-    
-    .list-header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: flex-start;
-    }
-    
-    .event-card {
-        grid-template-columns: auto 1fr;
-        gap: 12px;
-    }
-    
-    .event-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 24px;
-    }
-    
-    .event-actions {
-        grid-column: 1 / -1;
-        flex-direction: row;
-    }
-    
-    .event-btn {
-        flex: 1;
-    }
-}
-
-/* ===== ANIMACIONES ===== */
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.event-card {
-    animation: slideInRight 0.3s ease-out;
-}
-
-.event-card:nth-child(1) { animation-delay: 0.05s; }
-.event-card:nth-child(2) { animation-delay: 0.1s; }
-.event-card:nth-child(3) { animation-delay: 0.15s; }
-.event-card:nth-child(4) { animation-delay: 0.2s; }
-.event-card:nth-child(5) { animation-delay: 0.25s; }
-
-/* ===== POPUP MEJORADO ===== */
+/* ===== POPUP ===== */
 .leaflet-popup-content-wrapper {
     border-radius: 12px;
     box-shadow: var(--shadow-lg);
@@ -956,9 +834,19 @@ body.dark-mode .popup-evento a {
     min-width: 20px;
 }
 
-.popup-link {
-    display: inline-block;
+.popup-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     margin-top: 15px;
+}
+
+.popup-actions .popup-link {
+    margin-top: 0;
+}
+
+.popup-link {
+    display: block;
     padding: 12px 20px;
     background: var(--primary);
     color: white !important;
@@ -970,7 +858,6 @@ body.dark-mode .popup-evento a {
     box-shadow: 0 4px 12px rgba(198, 11, 30, 0.3);
     text-align: center;
     width: 100%;
-    display: block;
 }
 
 .popup-link:hover {
@@ -979,7 +866,46 @@ body.dark-mode .popup-evento a {
     background: var(--primary-dark);
 }
 
-/* Modo oscuro */
+.popup-link-calendar,
+.popup-link-calendar:link,
+.popup-link-calendar:visited {
+    background: transparent !important;
+    color: var(--primary) !important;
+    border: 2px solid var(--primary) !important;
+    box-shadow: none !important;
+    margin-top: 0 !important;
+}
+
+.popup-link-calendar:hover {
+    background: var(--primary) !important;
+    color: white !important;
+    transform: translateY(-2px);
+}
+
+.popup-link-google,
+.popup-link-google:link,
+.popup-link-google:visited {
+    background: #F8F9FA !important;
+    color: #4285F4 !important;
+    border: 2px solid #DADCE0 !important;
+    box-shadow: none !important;
+}
+
+.popup-link-google:hover {
+    background: #E8F0FE !important;
+    border-color: #4285F4 !important;
+}
+
+body.dark-mode .popup-link-calendar {
+    color: #FF6B6B !important;
+    border-color: #FF6B6B !important;
+}
+
+body.dark-mode .popup-link-calendar:hover {
+    background: #FF6B6B !important;
+    color: white !important;
+}
+
 body.dark-mode .leaflet-popup-content-wrapper {
     background: var(--bg-alt);
     color: var(--text);
@@ -994,9 +920,6 @@ body.dark-mode .popup-evento p {
     color: var(--text);
 }
 
-body.dark-mode .popup-link {
-    background: var(--primary);
-}
 /* ===== GEOLOCALIZACIÓN ===== */
 .btn-geolocate {
     position: fixed;
@@ -1025,28 +948,19 @@ body.dark-mode .popup-link {
     transform: scale(1.1);
 }
 
-/* Estado: buscando */
 .btn-geolocate.loading {
     background: var(--bg-alt);
     color: var(--primary);
     border-color: var(--primary);
-    animation: spin 1s linear infinite;
     pointer-events: none;
 }
 
-/* Estado: activo (ya localizado) */
 .btn-geolocate.active {
     background: var(--primary);
     color: white;
     border-color: var(--primary);
 }
 
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* Toast de notificación */
 .geo-toast {
     position: fixed;
     bottom: 85px;
@@ -1077,7 +991,6 @@ body.dark-mode .popup-link {
     color: white;
 }
 
-/* Marker de posición del usuario */
 .user-marker {
     width: 20px;
     height: 20px;
@@ -1157,6 +1070,30 @@ body.dark-mode .popup-link {
 .marker-cluster span {
     line-height: 30px;
 }
+
+/* ===== CUSTOM MARKERS ===== */
+.custom-marker {
+    transition: all 0.3s ease !important;
+    animation: markerPop 0.4s ease-out;
+}
+
+.leaflet-marker-icon {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.leaflet-marker-icon:hover .custom-marker {
+    transform: translate(-50%, -50%) scale(1.15) !important;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4) !important;
+    z-index: 1000 !important;
+}
+
+@keyframes markerPop {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
 /* ===== LOADER ===== */
 .loader-overlay {
     position: fixed;
@@ -1219,8 +1156,6 @@ body.dark-mode .popup-link {
     height: 100%;
     background: var(--primary);
     border-radius: 3px;
-    width: 0%;
-    transition: width 0.3s ease;
     animation: progreso 2s ease forwards;
 }
 
@@ -1238,103 +1173,96 @@ body.dark-mode .popup-link {
     font-weight: 500;
     min-height: 20px;
 }
-/* ===== CALENDARIO & POPUP ACTIONS ===== */
 
-/* Contenedor de acciones en el popup (más info + calendario) */
-.popup-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 15px;
-}
-
-/* El .popup-link ya existe, pero dentro de .popup-actions
-   necesita anular el margin-top que tiene en solitario */
-.popup-actions .popup-link {
-    margin-top: 0;
-}
-
-/* Botón calendario en popup — mismo estilo que popup-link
-   pero color secundario para diferenciarlo */
-.popup-link-calendar {
-    display: block;
-    padding: 10px 20px;
-    background: transparent;
-    color: var(--primary) !important;
-    text-decoration: none;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    text-align: center;
-    border: 2px solid var(--primary);
-    transition: all 0.3s ease;
-    width: 100%;
-}
-
-.popup-link-calendar:hover {
-    background: var(--primary);
-    color: white !important;
-    transform: translateY(-2px);
-}
-
-body.dark-mode .popup-link-calendar {
-    color: #FF6B6B !important;
-    border-color: #FF6B6B;
-}
-
-body.dark-mode .popup-link-calendar:hover {
-    background: #FF6B6B;
-    color: white !important;
-}
-
-/* ===== BOTÓN CALENDARIO EN TARJETA DE LISTA ===== */
-
-/* Botón cuadrado pequeño, solo icono */
-.event-btn-calendar {
-    background: transparent;
-    color: var(--primary);
-    border: 2px solid var(--primary);
-    padding: 10px;
-    min-width: 42px;
-    width: 42px;
-    flex-shrink: 0;
-    text-decoration: none;
-}
-
-.event-btn-calendar:hover {
-    background: var(--primary);
-    color: white;
-    transform: scale(1.05);
-}
-
-/* ===== BOTÓN DESHABILITADO (sin enlace) ===== */
-.event-btn-disabled {
-    background: var(--bg-alt);
-    color: var(--text-light);
-    border: 1px solid var(--border);
-    opacity: 0.5;
-    cursor: not-allowed;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    white-space: nowrap;
-}
-
-/* ===== AJUSTE RESPONSIVE para el botón calendario ===== */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
+    .view-toggle {
+        top: 65px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+    }
+
+    .view-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .list-container {
+        padding: 10px;
+        padding-top: 70px;
+    }
+
+    .list-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .event-card {
+        grid-template-columns: auto 1fr;
+        gap: 12px;
+    }
+
+    .event-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+
+    .event-actions {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .event-btn {
+        flex: 1;
+    }
+
     .event-btn-calendar {
-        /* En móvil se expande como el resto */
         flex: 0;
         width: 42px;
     }
+
+    .filters-panel,
+    .stats-panel {
+        max-width: 100%;
+    }
+
+    .top-bar {
+        padding: 0 15px;
+    }
+
+    .logo {
+        font-size: 18px;
+    }
+
+    .event-counter {
+        font-size: 13px;
+        padding: 6px 12px;
+    }
 }
-.event-description.sin-descripcion {
-    color: var(--text-light);
-    font-style: italic;
-    font-size: 13px;
+
+/* ===== ANIMACIONES ===== */
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.event-card {
+    animation: slideInRight 0.3s ease-out;
+}
+
+.event-card:nth-child(1) { animation-delay: 0.05s; }
+.event-card:nth-child(2) { animation-delay: 0.1s; }
+.event-card:nth-child(3) { animation-delay: 0.15s; }
+.event-card:nth-child(4) { animation-delay: 0.2s; }
+.event-card:nth-child(5) { animation-delay: 0.25s; }
+
+/* ===== TRANSICIONES GLOBALES ===== */
+* {
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
