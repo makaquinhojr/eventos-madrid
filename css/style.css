@@ -443,7 +443,17 @@ body.dark-mode .stat-box.highlight .stat-value {
     font-weight: 600;
     transition: all 0.2s;
 }
+.popup-link-calendar {
+    background: transparent !important;
+    color: var(--primary) !important;
+    border: 2px solid var(--primary);
+    margin-top: 0;
+}
 
+.popup-link-calendar:hover {
+    background: var(--primary) !important;
+    color: white !important;
+}
 .popup-evento a:hover {
     background: var(--primary-dark);
 }
