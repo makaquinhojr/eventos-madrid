@@ -134,7 +134,7 @@ async function loadEvents() {
         iniciarBannerHoy();
         ocultarLoader(allEvents.length);
 
-        // ✅ NUEVO: si hay ?evento=ID en la URL, abrimos ese evento
+        // Procesar URL con ?evento=ID después de cargar
         procesarUrlEvento();
 
     } catch (error) {
@@ -199,43 +199,27 @@ function getBotonMasInfo(evento) {
             </a>`;
 }
 
-// ===== ✅ NUEVO: COMPARTIR =====
-
-/**
- * Genera la URL de tu app con el parámetro ?evento=ID
- * Es el link que se comparte en WhatsApp, Twitter, etc.
- */
+// ===== COMPARTIR =====
 function generarUrlCompartir(evento) {
     const base = window.location.origin + window.location.pathname;
     return `${base}?evento=${evento.id}`;
 }
 
-/**
- * Genera el texto del mensaje para compartir.
- * Se usa en WhatsApp y Twitter.
- */
 function generarTextoCompartir(evento) {
     const fecha  = formatDate(evento.fecha);
     const precio = evento.precio === 'gratis' ? '¡GRATIS!' : (evento.precio_desde || 'De pago');
     const emoji  = icons[evento.tipo] || '📍';
-
     return `${emoji} *${evento.nombre}*\n📅 ${fecha}\n📍 ${evento.lugar}\n💰 ${precio}`;
 }
 
-/**
- * Abre el modal de compartir con las opciones:
- * WhatsApp, Twitter y Copiar link.
- * Se llama desde los botones del popup y de la tarjeta.
- */
 function compartirEvento(eventoId) {
     const evento = allEvents.find(e => e.id === eventoId);
     if (!evento) return;
 
-    const url    = generarUrlCompartir(evento);
-    const texto  = generarTextoCompartir(evento);
-    const emoji  = icons[evento.tipo] || '📍';
+    const url   = generarUrlCompartir(evento);
+    const texto = generarTextoCompartir(evento);
+    const emoji = icons[evento.tipo] || '📍';
 
-    // Eliminar modal anterior si existe
     document.getElementById('modal-compartir')?.remove();
 
     const modal = document.createElement('div');
@@ -276,13 +260,11 @@ function compartirEvento(eventoId) {
         </div>
     `;
 
-    // Cerrar al hacer click en el fondo
     modal.addEventListener('click', e => {
         if (e.target === modal) cerrarModalCompartir();
     });
 
     document.body.appendChild(modal);
-    // Trigger animación
     requestAnimationFrame(() => modal.classList.add('visible'));
 }
 
@@ -293,9 +275,6 @@ function cerrarModalCompartir() {
     setTimeout(() => modal.remove(), 200);
 }
 
-/**
- * Copia el link al portapapeles y muestra feedback en el botón.
- */
 async function copiarLinkEvento(url, btn) {
     try {
         await navigator.clipboard.writeText(url);
@@ -307,40 +286,26 @@ async function copiarLinkEvento(url, btn) {
             btn.classList.remove('copiado');
         }, 2000);
     } catch {
-        // Fallback para navegadores sin Clipboard API
         mostrarToast('❌ No se pudo copiar', 'error');
     }
 }
 
-// ===== ✅ NUEVO: CÓMO LLEGAR =====
-
-/**
- * Abre Google Maps con las coords del evento como destino.
- * Si el usuario tiene geolocalización activa, incluye el origen.
- */
+// ===== CÓMO LLEGAR =====
 function comoLlegar(eventoId) {
     const evento = allEvents.find(e => e.id === eventoId);
     if (!evento) return;
 
     let url;
     if (userLocation) {
-        // Con origen (ubicación del usuario)
         url = `https://www.google.com/maps/dir/${userLocation.lat},${userLocation.lng}/${evento.lat},${evento.lng}`;
     } else {
-        // Sin origen → Google Maps pide la ubicación al usuario
         url = `https://www.google.com/maps/dir/?api=1&destination=${evento.lat},${evento.lng}&destination_place_id=${encodeURIComponent(evento.lugar)}`;
     }
 
     window.open(url, '_blank');
 }
 
-// ===== ✅ NUEVO: PROCESAR URL CON ?evento=ID =====
-
-/**
- * Al cargar la app, mira si hay ?evento=ID en la URL.
- * Si lo hay, espera a que el mapa esté listo y abre ese evento.
- */
-// ===== ✅ PROCESARURLEVENTO CORREGIDO =====
+// ===== PROCESAR URL CON ?evento=ID =====
 function procesarUrlEvento() {
     const params   = new URLSearchParams(window.location.search);
     const eventoId = parseInt(params.get('evento'));
@@ -352,49 +317,44 @@ function procesarUrlEvento() {
         return;
     }
 
-    // Función que busca y abre el marker
-    // Se llama en cuanto los clusters están listos
-    function abrirEvento() {
-        let encontrado = false;
+    mostrarToast(`🔍 ${evento.nombre.substring(0, 35)}...`);
+
+    // Centramos el mapa inmediatamente en las coords del evento
+    map.setView([evento.lat, evento.lng], 15, { animate: false });
+
+    // Sistema de reintentos: busca el marker cada 200ms
+    // hasta encontrarlo o agotar los intentos (4 segundos max)
+    let intentos = 0;
+    const maxIntentos = 20;
+
+    const intervalo = setInterval(() => {
+        intentos++;
+        let markerEncontrado = null;
 
         markersLayer.eachLayer(marker => {
             if (marker.eventoId === eventoId) {
-                encontrado = true;
-                markersLayer.zoomToShowLayer(marker, () => {
-                    // Pequeño delay para que el popup se posicione bien
-                    setTimeout(() => marker.openPopup(), 100);
-                });
+                markerEncontrado = marker;
             }
         });
 
-        if (!encontrado) {
-            // El marker no está visible aún (dentro de un cluster)
-            // Hacemos zoom a las coords directamente y reintentamos
-            map.setView([evento.lat, evento.lng], 16, { animate: false });
-            setTimeout(() => {
-                markersLayer.eachLayer(marker => {
-                    if (marker.eventoId === eventoId) {
-                        markersLayer.zoomToShowLayer(marker, () => {
-                            setTimeout(() => marker.openPopup(), 100);
-                        });
-                    }
-                });
-            }, 400);
+        if (markerEncontrado) {
+            // ✅ Marker encontrado → limpiamos y abrimos
+            clearInterval(intervalo);
+            markersLayer.zoomToShowLayer(markerEncontrado, () => {
+                setTimeout(() => {
+                    markerEncontrado.openPopup();
+                    mostrarToast(`📍 ${evento.nombre.substring(0, 35)}`);
+                }, 150);
+            });
+
+        } else if (intentos >= maxIntentos) {
+            // Agotamos intentos → al menos el mapa está centrado
+            clearInterval(intervalo);
+            console.warn('⚠️ No se encontró el marker tras varios intentos');
+            mostrarToast(`📍 ${evento.lugar}`);
         }
-    }
 
-    // Esperamos al evento 'animationend' del cluster
-    // que se dispara cuando Leaflet termina de procesar los markers
-    markersLayer.once('animationend', () => {
-        // Primero centramos el mapa en el evento
-        map.setView([evento.lat, evento.lng], 15, { animate: false });
-
-        // Luego buscamos y abrimos el marker
-        setTimeout(abrirEvento, 300);
-    });
-
-    // Toast informativo mientras carga
-    mostrarToast(`🔍 Buscando: ${evento.nombre.substring(0, 30)}...`);
+    }, 200);
 }
 
 // ===== MOSTRAR EVENTOS EN MAPA =====
@@ -454,7 +414,6 @@ function displayEvents(events) {
             ? `<p><strong>🚶</strong> ${getDistanciaHTML(event)}</p>`
             : '';
 
-        // ✅ NUEVO: botones Cómo llegar y Compartir en el popup
         const popupAccionesExtra = `
             <div class="popup-acciones-extra">
                 <button class="popup-btn-extra"
@@ -569,14 +528,14 @@ function renderListView(events) {
             new Date(hoy.getTime() + 86400000).toDateString();
 
         let proximidadBadge = '';
-        if (esHoy)     proximidadBadge = '<span class="event-badge hoy">🔥 HOY</span>';
+        if (esHoy)         proximidadBadge = '<span class="event-badge hoy">🔥 HOY</span>';
         else if (esMañana) proximidadBadge = '<span class="event-badge hoy">⚡ MAÑANA</span>';
 
         const precioBadge = evento.precio === 'gratis'
             ? '<span class="event-badge gratis">💚 GRATIS</span>'
             : `<span class="event-badge pago">💰 ${evento.precio_desde || 'Pago'}</span>`;
 
-        const zona = getZonaEvento(evento);
+        const zona     = getZonaEvento(evento);
         const zonaBadge = `<span class="event-badge zona">📍 ${zona}</span>`;
 
         const fechaTexto = evento.fecha_fin
@@ -601,7 +560,6 @@ function renderListView(events) {
 
         const descripcion = limpiarDescripcion(evento.descripcion, 200);
 
-        // ✅ NUEVO: botones Cómo llegar y Compartir en la tarjeta
         const botonComoLlegar = `
             <button class="event-btn event-btn-llegar"
                     onclick="comoLlegar(${evento.id})"
@@ -1334,7 +1292,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cb.addEventListener('change', applyFilters);
     });
 
-    // ✅ NUEVO: cerrar modal compartir con Escape
+    // Cerrar modal compartir con Escape
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') cerrarModalCompartir();
     });
