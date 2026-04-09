@@ -288,9 +288,15 @@ function renderListView(events) {
                         ${distanciaItem}
                     </div>
 
-                    <div class="event-description">
-                        ${limpiarDescripcion(evento.descripcion, 200)}
-                    </div>
+                ${limpiarDescripcion(evento.descripcion, 200)
+    ? `<div class="event-description">
+           ${limpiarDescripcion(evento.descripcion, 200)}
+       </div>`
+    : `<div class="event-description sin-descripcion">
+           📍 ${evento.lugar} · 
+           ${evento.precio === 'gratis' ? 'Entrada gratuita' : evento.precio_desde || 'De pago'}
+       </div>`
+}
                 </div>
 
                 <div class="event-actions">
@@ -349,51 +355,58 @@ function applyFilters() {
         if (search && !`${e.nombre} ${e.descripcion} ${e.lugar}`.toLowerCase().includes(search)) return false;
         return true;
     });
+if (dateFilter !== 'todos') {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
 
-    if (dateFilter !== 'todos') {
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
+    filtered = filtered.filter(e => {
+        // Miramos TANTO la fecha de inicio COMO la de fin
+        const fechaInicio = new Date(e.fecha + 'T00:00:00');
+        const fechaFin = e.fecha_fin
+            ? new Date(e.fecha_fin + 'T00:00:00')
+            : fechaInicio;
 
-        filtered = filtered.filter(e => {
-            const fecha = new Date(e.fecha);
+        switch (dateFilter) {
+            case 'hoy':
+                // ¿El evento ya empezó Y todavía no ha terminado?
+                return fechaInicio <= hoy && fechaFin >= hoy;
 
-            switch (dateFilter) {
-                case 'hoy':
-                    return fecha.toDateString() === hoy.toDateString();
+            case 'finde':
+                const dia = hoy.getDay();
+                let ini, fin;
+                if (dia === 6) {
+                    ini = new Date(hoy);
+                    fin = new Date(hoy);
+                    fin.setDate(hoy.getDate() + 1);
+                } else if (dia === 0) {
+                    ini = fin = new Date(hoy);
+                } else {
+                    const diasHastaSabado = 6 - dia;
+                    ini = new Date(hoy);
+                    ini.setDate(hoy.getDate() + diasHastaSabado);
+                    fin = new Date(ini);
+                    fin.setDate(ini.getDate() + 1);
+                }
+                // ¿El evento está activo en algún momento del finde?
+                return fechaInicio <= fin && fechaFin >= ini;
 
-                case 'finde':
-                    const dia = hoy.getDay();
-                    let ini, fin;
-                    if (dia === 6) {
-                        ini = new Date(hoy);
-                        fin = new Date(hoy);
-                        fin.setDate(hoy.getDate() + 1);
-                    } else if (dia === 0) {
-                        ini = fin = new Date(hoy);
-                    } else {
-                        const diasHastaSabado = 6 - dia;
-                        ini = new Date(hoy);
-                        ini.setDate(hoy.getDate() + diasHastaSabado);
-                        fin = new Date(ini);
-                        fin.setDate(ini.getDate() + 1);
-                    }
-                    return fecha >= ini && fecha <= fin;
+            case 'semana':
+                const semanaFin = new Date(hoy);
+                semanaFin.setDate(hoy.getDate() + 7);
+                // ¿El evento está activo en algún momento de los próximos 7 días?
+                return fechaInicio <= semanaFin && fechaFin >= hoy;
 
-                case 'semana':
-                    const semanaFin = new Date(hoy);
-                    semanaFin.setDate(hoy.getDate() + 7);
-                    return fecha >= hoy && fecha <= semanaFin;
+            case 'mes':
+                const mesFin = new Date(hoy);
+                mesFin.setDate(hoy.getDate() + 30);
+                // ¿El evento está activo en algún momento del próximo mes?
+                return fechaInicio <= mesFin && fechaFin >= hoy;
 
-                case 'mes':
-                    const mesFin = new Date(hoy);
-                    mesFin.setDate(hoy.getDate() + 30);
-                    return fecha >= hoy && fecha <= mesFin;
-
-                default:
-                    return true;
-            }
-        });
-    }
+            default:
+                return true;
+        }
+    });
+}
 
     currentFilteredEvents = filtered;
     displayEvents(filtered);
@@ -478,12 +491,19 @@ function limpiarDescripcion(descripcion, maxLength = 150) {
 
 function esLinkUtil(url) {
     if (!url || typeof url !== 'string' || url.trim() === '') return false;
-
-    // Verificar que es una URL mínimamente válida
     if (!url.startsWith('http://') && !url.startsWith('https://')) return false;
 
     const urlLower = url.toLowerCase();
-    const urlsGenericas = ['madrid.es', 'esmadrid.com', 'timeout.es/madrid', 'datos.madrid.es'];
+
+    // NUEVO: URLs con index.jsp son del sistema interno del Ayuntamiento → inútiles
+    if (urlLower.includes('madrid.es') && urlLower.includes('index.jsp')) {
+        return false;
+    }
+
+    const urlsGenericas = [
+        'madrid.es', 'esmadrid.com',
+        'timeout.es/madrid', 'datos.madrid.es'
+    ];
 
     for (const generica of urlsGenericas) {
         if (urlLower.includes(generica)) {

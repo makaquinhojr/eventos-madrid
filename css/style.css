@@ -1315,3 +1315,8 @@ body.dark-mode .popup-link-calendar:hover {
         width: 42px;
     }
 }
+.event-description.sin-descripcion {
+    color: var(--text-light);
+    font-style: italic;
+    font-size: 13px;
+}
