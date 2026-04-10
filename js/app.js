@@ -1310,33 +1310,6 @@ function updateCounter(count) {
     document.getElementById('event-count').textContent = count;
 }
 
-function toggleTheme(force = null) {
-    const isDark = force !== null ? force : !document.body.classList.contains('dark-mode');
-    
-    if (isDark) {
-        document.body.classList.add('dark-mode');
-    } else {
-        document.body.classList.remove('dark-mode');
-    }
-    
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    
-    // Actualizar toggle en panel
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-        themeToggle.checked = isDark;
-    }
-    
-    // Actualizar icono en botón ajustes
-    const settingsToggle = document.getElementById('settings-toggle');
-    if (settingsToggle) {
-        const icon = settingsToggle.querySelector('i');
-        if (icon) {
-            icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
-        }
-    }
-}
-
 function iniciarBannerHoy() {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
@@ -1461,28 +1434,7 @@ function initLugaresListToggle() {
     });
 }
 
-// ===== SELECTOR DE IDIOMA =====
-function initLanguageSelector() {
-    const selector = document.getElementById('lang-select');
-    
-    if (!selector) {
-        console.log('⚠️ Selector de idioma no encontrado');
-        return;
-    }
-    
-    // Establecer idioma actual
-    if (typeof i18n !== 'undefined') {
-        selector.value = i18n.getLanguage();
-    }
-
-    selector.addEventListener('change', (e) => {
-        const newLang = e.target.value;
-        if (typeof i18n !== 'undefined') {
-            i18n.setLanguage(newLang);
-            mostrarToast(`🌐 ${i18n.t('lang.' + newLang)} seleccionado`);
-        }
-    });
-}
+// ===== PANEL DE AJUSTES =====
 function initSettingsPanel() {
     const settingsToggle = document.getElementById('settings-toggle');
     const settingsPanel = document.getElementById('settings-panel');
@@ -1509,8 +1461,32 @@ function initSettingsPanel() {
         
         // Escuchar cambios
         themeToggle.addEventListener('change', (e) => {
-            toggleTheme(e.target.checked);
+            const isDarkMode = e.target.checked;
+            
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+            
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            mostrarToast(isDarkMode ? '🌙 Modo oscuro activado' : '☀️ Modo claro activado');
         });
+    }
+    
+    // Idioma
+    const langSelect = document.getElementById('lang-select');
+    if (langSelect && typeof i18n !== 'undefined') {
+        langSelect.value = i18n.getLanguage();
+        console.log('✅ Idioma actual:', i18n.getLanguage());
+        
+        langSelect.addEventListener('change', (e) => {
+            const newLang = e.target.value;
+            console.log('🔄 Cambiando a:', newLang);
+            i18n.setLanguage(newLang);
+        });
+    } else {
+        console.error('❌ i18n no disponible');
     }
     
     // Notificaciones toggle
@@ -1554,9 +1530,6 @@ function initSettingsPanel() {
             }
         });
     }
-    
-    // Idioma
-    initLanguageSelector();
 }
 
 // ===== DOMContentLoaded =====
@@ -1582,15 +1555,22 @@ document.addEventListener('DOMContentLoaded', () => {
     initCollapseGroups();
     initLugaresSelectAll();
     initLugaresListToggle();
-    initLanguageSelector();
 
     // Tema
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
-        toggleTheme(true);
+        document.body.classList.add('dark-mode');
     } else {
-        toggleTheme(false);
+        document.body.classList.remove('dark-mode');
     }
+    
+    // Actualizar toggle del panel cuando esté listo
+    setTimeout(() => {
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            themeToggle.checked = document.body.classList.contains('dark-mode');
+        }
+    }, 100);
 
     // Panels
     document.getElementById('fab-filters').addEventListener('click', () => {
@@ -1607,13 +1587,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Eventos
-    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
     document.getElementById('btn-clear').addEventListener('click', clearFilters);
     document.getElementById('view-map-btn').addEventListener('click', () => switchView('map'));
     document.getElementById('view-list-btn').addEventListener('click', () => switchView('list'));
     document.getElementById('btn-toggle-lugares')?.addEventListener('click', toggleLugares);
-        // Panel de ajustes
-    initSettingsPanel();
 
     document.getElementById('sort-by').addEventListener('change', e => {
         currentSort = e.target.value;
@@ -1638,6 +1615,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape') cerrarModalCompartir();
     });
 
+    // Panel de ajustes
+    initSettingsPanel();
+
     console.log('✅ App lista!');
 });
 
@@ -1648,38 +1628,3 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.log('❌ SW error:', err));
     });
 }
-// ===== NOTIFICACIONES =====
-function initNotifications() {
-    const notificationsToggle = document.getElementById('notifications-toggle');
-    if (!notificationsToggle) return;
-
-    const saved = localStorage.getItem('notifications');
-    notificationsToggle.checked = saved !== 'false';
-
-    notificationsToggle.addEventListener('change', (e) => {
-        const enabled = e.target.checked;
-        localStorage.setItem('notifications', enabled);
-        
-        if (enabled) {
-            requestNotificationPermission();
-            mostrarToast('🔔 Notificaciones activadas');
-        } else {
-            mostrarToast('🔔 Notificaciones desactivadas');
-        }
-    });
-}
-
-async function requestNotificationPermission() {
-    if ('Notification' in window) {
-        const permission = await Notification.requestPermission();
-        if (permission !== 'granted') {
-            mostrarToast('❌ Permiso de notificaciones denegado', 'error');
-        }
-    }
-}
-
-// Llamar en DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-    // ... resto del código ...
-    initNotifications();
-});
