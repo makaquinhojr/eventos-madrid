@@ -97,6 +97,12 @@ const translations = {
         'settings.about.app': 'EventosMadrid',
         'settings.about.version': 'v1.0.0',
         'settings.about.desc': 'Mapa de eventos culturales y de ocio en Madrid',
+        'settings.contrast': 'Alto contraste',
+'settings.contrast.desc': 'Mejora la legibilidad para baja visión',
+'settings.large_text': 'Textos grandes',
+'settings.large_text.desc': 'Aumenta el tamaño de la fuente',
+'settings.reduce_motion': 'Reducir animaciones',
+'settings.reduce_motion.desc': 'Para sensibilidad al movimiento',
         
         // ===== TOAST =====
         'toast.theme_dark': '🌙 Modo oscuro activado',
@@ -222,6 +228,12 @@ const translations = {
         'settings.about.app': 'EventosMadrid',
         'settings.about.version': 'v1.0.0',
         'settings.about.desc': 'Cultural and leisure events map in Madrid',
+        'settings.contrast': 'High contrast',
+'settings.contrast.desc': 'Improves readability for low vision',
+'settings.large_text': 'Large text',
+'settings.large_text.desc': 'Increase font size',
+'settings.reduce_motion': 'Reduce animations',
+'settings.reduce_motion.desc': 'For motion sensitivity',
         
         'toast.theme_dark': '🌙 Dark mode enabled',
         'toast.theme_light': '☀️ Light mode enabled',
@@ -341,6 +353,12 @@ const translations = {
         'settings.about.app': 'EventosMadrid',
         'settings.about.version': 'v1.0.0',
         'settings.about.desc': 'Carte des événements culturels et de loisirs à Madrid',
+        'settings.contrast': 'Contraste élevé',
+'settings.contrast.desc': 'Améliore la lisibilité pour malvoyants',
+'settings.large_text': 'Grands textes',
+'settings.large_text.desc': 'Augmenter la taille de police',
+'settings.reduce_motion': 'Réduire les animations',
+'settings.reduce_motion.desc': 'Pour sensibilité au mouvement',
         
         'toast.theme_dark': '🌙 Mode sombre activé',
         'toast.theme_light': '☀️ Mode clair activé',

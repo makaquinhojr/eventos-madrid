@@ -1896,12 +1896,10 @@ function initSettingsPanel() {
     // ===== TEMA (DARK/LIGHT) =====
     const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
-        // Cargar tema guardado
         const savedTheme = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
         themeToggle.checked = (savedTheme === 'dark');
         
-        // Cambiar tema
         themeToggle.addEventListener('change', (e) => {
             const newTheme = e.target.checked ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', newTheme);
@@ -1910,10 +1908,69 @@ function initSettingsPanel() {
             const mensaje = i18n.t(newTheme === 'dark' ? 'toast.theme_dark' : 'toast.theme_light');
             mostrarToast(mensaje);
             
-            // Reiniciar gráficos con nuevo tema
             if (document.getElementById('stats-panel').classList.contains('active')) {
                 initCharts();
             }
+        });
+    }
+    
+    // ===== ✅ NUEVO: ALTO CONTRASTE =====
+    const contrastToggle = document.getElementById('contrast-toggle');
+    if (contrastToggle) {
+        const savedContrast = localStorage.getItem('contrast') || 'normal';
+        document.documentElement.setAttribute('data-contrast', savedContrast);
+        contrastToggle.checked = (savedContrast === 'high');
+        
+        contrastToggle.addEventListener('change', (e) => {
+            const newContrast = e.target.checked ? 'high' : 'normal';
+            document.documentElement.setAttribute('data-contrast', newContrast);
+            localStorage.setItem('contrast', newContrast);
+            
+            const mensaje = e.target.checked 
+                ? '♿ Alto contraste activado' 
+                : '♿ Alto contraste desactivado';
+            mostrarToast(mensaje);
+            
+            // Reiniciar gráficos con nuevo contraste
+            if (document.getElementById('stats-panel').classList.contains('active')) {
+                initCharts();
+            }
+        });
+    }
+    
+    // ===== ✅ NUEVO: TEXTOS GRANDES =====
+    const largeTextToggle = document.getElementById('large-text-toggle');
+    if (largeTextToggle) {
+        const savedLargeText = localStorage.getItem('largeText') === 'true';
+        document.documentElement.setAttribute('data-large-text', savedLargeText);
+        largeTextToggle.checked = savedLargeText;
+        
+        largeTextToggle.addEventListener('change', (e) => {
+            document.documentElement.setAttribute('data-large-text', e.target.checked);
+            localStorage.setItem('largeText', e.target.checked);
+            
+            const mensaje = e.target.checked 
+                ? '🔍 Textos grandes activados' 
+                : '🔍 Textos normales';
+            mostrarToast(mensaje);
+        });
+    }
+    
+    // ===== ✅ NUEVO: REDUCIR ANIMACIONES =====
+    const reduceMotionToggle = document.getElementById('reduce-motion-toggle');
+    if (reduceMotionToggle) {
+        const savedReduceMotion = localStorage.getItem('reduceMotion') === 'true';
+        document.documentElement.setAttribute('data-reduce-motion', savedReduceMotion);
+        reduceMotionToggle.checked = savedReduceMotion;
+        
+        reduceMotionToggle.addEventListener('change', (e) => {
+            document.documentElement.setAttribute('data-reduce-motion', e.target.checked);
+            localStorage.setItem('reduceMotion', e.target.checked);
+            
+            const mensaje = e.target.checked 
+                ? '🎬 Animaciones reducidas' 
+                : '✨ Animaciones normales';
+            mostrarToast(mensaje);
         });
     }
     
@@ -1979,6 +2036,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // ✅ Aplicar tema guardado ANTES de inicializar
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
+        // ✅ NUEVO: Aplicar preferencias de accesibilidad
+    const savedContrast = localStorage.getItem('contrast') || 'normal';
+    document.documentElement.setAttribute('data-contrast', savedContrast);
+    
+    const savedLargeText = localStorage.getItem('largeText') === 'true';
+    document.documentElement.setAttribute('data-large-text', savedLargeText);
+    
+    const savedReduceMotion = localStorage.getItem('reduceMotion') === 'true';
+    document.documentElement.setAttribute('data-reduce-motion', savedReduceMotion);
+
     
     // Inicializar app
     initMap();

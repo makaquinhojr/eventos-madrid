@@ -2176,3 +2176,104 @@ body {
         font-size: 10px;
     }
 }
+/* ===== MODO ALTO CONTRASTE ===== */
+[data-contrast="high"] {
+    /* Colores extremos */
+    --bg: #000000 !important;
+    --bg-1: #000000 !important;
+    --bg-2: #0a0a0a !important;
+    --bg-3: #1a1a1a !important;
+    --bg-4: #222222 !important;
+    
+    --text: #FFFFFF !important;
+    --text-2: #FFFFFF !important;
+    --text-3: #CCCCCC !important;
+    
+    /* Bordes y separadores visibles */
+    --border: #FFFF00 !important;
+    --border-light: #FFFF00 !important;
+    
+    /* Acentos brillantes */
+    --accent: #00FFFF !important;
+    --accent-hover: #00FFFF !important;
+    --green: #00FF00 !important;
+    --blue: #0099FF !important;
+    --yellow: #FFFF00 !important;
+    
+    /* Sin sombras */
+    --shadow: none !important;
+    --shadow-lg: none !important;
+}
+
+[data-contrast="high"] * {
+    /* Bordes más gruesos */
+    border-width: 2px !important;
+    
+    /* Sin sombras ni efectos */
+    box-shadow: none !important;
+    text-shadow: none !important;
+    
+    /* Sin transparencias */
+    opacity: 1 !important;
+}
+
+[data-contrast="high"] button,
+[data-contrast="high"] .event-btn,
+[data-contrast="high"] .chip-content {
+    border: 2px solid #FFFF00 !important;
+    font-weight: 600 !important;
+}
+
+[data-contrast="high"] .event-card,
+[data-contrast="high"] .stat-box,
+[data-contrast="high"] .calendar-day {
+    border: 3px solid #FFFF00 !important;
+}
+
+[data-contrast="high"] a,
+[data-contrast="high"] .popup-link {
+    color: #00FFFF !important;
+    text-decoration: underline !important;
+    font-weight: 600 !important;
+}
+
+/* ===== TEXTOS GRANDES ===== */
+[data-large-text="true"] {
+    font-size: 115% !important;
+}
+
+[data-large-text="true"] .event-title {
+    font-size: 16px !important;
+}
+
+[data-large-text="true"] .event-meta {
+    font-size: 14px !important;
+}
+
+[data-large-text="true"] .filter-label {
+    font-size: 13px !important;
+}
+
+/* ===== REDUCIR ANIMACIONES ===== */
+[data-reduce-motion="true"] *,
+[data-reduce-motion="true"] *::before,
+[data-reduce-motion="true"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+}
+
+/* ===== DETECCIÓN AUTOMÁTICA DEL SO ===== */
+@media (prefers-contrast: high) {
+    :root:not([data-contrast]) {
+        --border: #FFFF00;
+        --accent: #00FFFF;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root:not([data-reduce-motion]) * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
