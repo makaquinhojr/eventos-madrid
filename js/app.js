@@ -11,7 +11,7 @@ let currentSort = 'date';
 let userMarker = null;
 let userLocation = null;
 let mostrarLugares = true;
-let mostrarLugaresEnLista = true; // ✅ NUEVO
+let mostrarLugaresEnLista = true;
 
 const icons = {
     concierto:   '🎵',
@@ -126,7 +126,6 @@ function initMap() {
         attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // Capa de eventos — con clustering
     markersLayer = L.markerClusterGroup({
         chunkedLoading: true,
         chunkInterval: 100,
@@ -138,14 +137,12 @@ function initMap() {
         animateAddingMarkers: false,
     }).addTo(map);
 
-    // Capa de lugares — SIN clustering para que siempre sean visibles
     lugaresLayer = L.layerGroup().addTo(map);
 }
 
 // ===== CARGAR EVENTOS Y LUGARES =====
 async function loadEvents() {
     try {
-        // Cargamos los dos ficheros en paralelo
         const [eventosRes, lugaresRes] = await Promise.all([
             fetch('data/eventos.json'),
             fetch('data/lugares.json')
@@ -189,7 +186,6 @@ function displayLugares(lugares) {
         const color = lugaresColors[lugar.categoria] || '#6B7280';
         const emoji = lugaresIcons[lugar.categoria] || '📍';
 
-        // Marker cuadrado redondeado para distinguirlo de los eventos
         const icon = L.divIcon({
             html: `
                 <div class="lugar-marker" style="background:${color};">
@@ -254,7 +250,6 @@ function displayLugares(lugares) {
         lugaresLayer.addLayer(marker);
     });
 
-    // ✅ NUEVO: Actualizamos también la vista lista
     currentFilteredLugares = lugares;
     if (currentView === 'list') {
         renderLugaresList(lugares);
@@ -267,7 +262,7 @@ function toggleLugares() {
 
     const btn = document.getElementById('btn-toggle-lugares');
     if (mostrarLugares) {
-        displayLugares(allLugares);
+        displayLugares(currentFilteredLugares.length ? currentFilteredLugares : allLugares);
         btn.classList.add('active');
         mostrarToast('🏛️ Lugares de interés visibles');
     } else {
@@ -509,7 +504,6 @@ function comoLlegarCoords(lat, lng, nombre) {
 function procesarUrlEvento() {
     const params = new URLSearchParams(window.location.search);
 
-    // ¿Es un lugar?
     const lugarId = params.get('lugar');
     if (lugarId) {
         const lugar = allLugares.find(l => l.id === lugarId);
@@ -517,7 +511,6 @@ function procesarUrlEvento() {
             mostrarToast(`🏛️ ${lugar.nombre.substring(0, 35)}`);
             map.setView([lugar.lat, lugar.lng], 16, { animate: false });
 
-            // Buscamos el marker del lugar
             setTimeout(() => {
                 lugaresLayer.eachLayer(marker => {
                     if (marker.lugarId === lugarId) {
@@ -529,7 +522,6 @@ function procesarUrlEvento() {
         return;
     }
 
-    // ¿Es un evento?
     const eventoId = parseInt(params.get('evento'));
     if (!eventoId) return;
 
@@ -837,7 +829,6 @@ function renderListView(events) {
     }).join('');
 }
 
-// ===== ✅ NUEVA FUNCIÓN: RENDERIZAR LISTA DE LUGARES =====
 function renderLugaresList(lugares) {
     const lugaresSection = document.getElementById('lugares-section');
     const lugaresList = document.getElementById('lugares-list');
@@ -953,7 +944,6 @@ function verEnMapa(eventoId) {
     });
 }
 
-// ===== ✅ NUEVA FUNCIÓN: VER LUGAR EN MAPA =====
 function verLugarEnMapa(lugarId) {
     switchView('map');
     const lugar = allLugares.find(l => l.id === lugarId);
@@ -989,12 +979,10 @@ function applyFilters() {
         '.chip input[value="gratis"], .chip input[value="pago"]'
     )).filter(cb => cb.checked).map(cb => cb.value);
 
-    // ✅ NUEVO: Filtro de categorías de lugares
     const lugarCategorias = Array.from(document.querySelectorAll('.lugar-categoria-cb'))
         .filter(cb => cb.checked)
         .map(cb => cb.value);
 
-    // ========== FILTRAR EVENTOS ==========
     let filtered = allEvents.filter(e => {
         if (types.length && !types.includes(e.tipo)) return false;
         if (prices.length && !prices.includes(e.precio)) return false;
@@ -1070,14 +1058,11 @@ function applyFilters() {
         });
     }
 
-    // ========== ✅ FILTRAR LUGARES ==========
     let filteredLugares = allLugares.filter(l => {
-        // Filtro de categoría
         if (lugarCategorias.length && !lugarCategorias.includes(l.categoria)) {
             return false;
         }
 
-        // Filtro de búsqueda
         if (search) {
             const zona = l.zona || inferirZona(l.lat, l.lng);
             const haystack = [
@@ -1090,7 +1075,6 @@ function applyFilters() {
             if (!haystack.includes(search)) return false;
         }
 
-        // Filtro de zona
         if (zonaFilter !== 'todas') {
             const zonaLugar = l.zona || inferirZona(l.lat, l.lng);
             if (zonaLugar !== zonaFilter) return false;
@@ -1157,7 +1141,6 @@ function actualizarContadorFiltros() {
     const search = document.getElementById('search')?.value;
     if (search && search.trim()) count++;
 
-    // ✅ NUEVO: Contar filtros de lugares
     const lugaresDesactivados = Array.from(
         document.querySelectorAll('.lugar-categoria-cb')
     ).filter(cb => !cb.checked).length;
@@ -1190,16 +1173,12 @@ function clearFilters() {
     }
 
     document.querySelectorAll('.chip input').forEach(cb => cb.checked = true);
-    
-    // ✅ NUEVO: Resetear filtros de lugares
     document.querySelectorAll('.lugar-categoria-cb').forEach(cb => cb.checked = true);
     document.getElementById('lugares-select-all').checked = true;
     
     applyFilters();
 }
 
-// Continúa en el siguiente mensaje...
-// ===== SLIDER PRECIO =====
 function initSliderPrecio() {
     const slider = document.getElementById('filtro-precio-max');
     const label  = document.getElementById('precio-valor-label');
@@ -1226,7 +1205,6 @@ function initSliderPrecio() {
     actualizarSlider();
 }
 
-// ===== HELPERS DE FECHA =====
 function formatDate(dateStr) {
     const date = new Date(dateStr + 'T00:00:00');
     return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
@@ -1266,7 +1244,6 @@ function parsearFecha(fechaStr) {
     }
 }
 
-// ===== HELPERS DE TEXTO =====
 function limpiarDescripcion(descripcion, maxLength = 150) {
     if (!descripcion) return '';
     let texto = descripcion
@@ -1287,7 +1264,6 @@ function limpiarDescripcion(descripcion, maxLength = 150) {
     return texto;
 }
 
-// ===== DISTANCIAS =====
 function calcularDistancia(lat1, lng1, lat2, lng2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -1318,7 +1294,6 @@ function getDistanciaHTMLCoords(lat, lng) {
     </span>`;
 }
 
-// ===== GEOLOCALIZACIÓN =====
 function initGeolocate() {
     const btn = document.getElementById('btn-geolocate');
     if (!btn) return;
@@ -1401,7 +1376,6 @@ function desactivarGeolocalizacion() {
     mostrarToast('📍 Geolocalización desactivada');
 }
 
-// ===== TOAST =====
 function mostrarToast(mensaje, tipo = 'normal') {
     document.querySelector('.geo-toast')?.remove();
     const toast = document.createElement('div');
@@ -1415,7 +1389,6 @@ function mostrarToast(mensaje, tipo = 'normal') {
     }, 3000);
 }
 
-// ===== ESTADÍSTICAS =====
 function actualizarEstadisticas(eventos) {
     const stats = {
         concierto: 0, fiesta: 0, mercado: 0,
@@ -1458,16 +1431,15 @@ function updateCounter(count) {
     document.getElementById('event-count').textContent = count;
 }
 
-// ===== TEMA =====
+// ===== TEMA ===== ✅ CORREGIDO
 function toggleTheme() {
-    document.body.classList.toggle('light-mode');
-    const isLight = document.body.classList.contains('light-mode');
-    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
     document.querySelector('.theme-toggle i').className =
-        isLight ? 'fas fa-moon' : 'fas fa-sun';
+        isDark ? 'fas fa-moon' : 'fas fa-sun';
 }
 
-// ===== BANNER HOY =====
 function iniciarBannerHoy() {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
@@ -1493,7 +1465,6 @@ function iniciarBannerHoy() {
     });
 }
 
-// ===== GOOGLE CALENDAR =====
 function generarLinkCalendar(evento) {
     const formatearFechaCalendar = (fechaStr) => {
         if (!fechaStr) return null;
@@ -1514,7 +1485,6 @@ function generarLinkCalendar(evento) {
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
-// ===== LOADER =====
 function ocultarLoader(numEventos) {
     const loader = document.getElementById('loader');
     const count  = document.getElementById('loader-count');
@@ -1524,7 +1494,6 @@ function ocultarLoader(numEventos) {
     }, 600);
 }
 
-// ===== PWA =====
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/eventos-madrid/sw.js')
@@ -1533,7 +1502,6 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// ===== ✅ COLLAPSE CATEGORÍAS DE LUGARES =====
 function initLugaresCollapse() {
     const collapseBtn = document.getElementById('lugares-collapse-btn');
     const categoriasDiv = document.getElementById('lugares-categorias');
@@ -1559,7 +1527,6 @@ function initLugaresCollapse() {
     });
 }
 
-// ===== ✅ SELECT ALL LUGARES =====
 function initLugaresSelectAll() {
     const selectAllCb = document.getElementById('lugares-select-all');
     const categoriaCbs = document.querySelectorAll('.lugar-categoria-cb');
@@ -1592,41 +1559,42 @@ function initLugaresSelectAll() {
     });
 }
 
-// ===== ✅ TOGGLE LUGARES EN LISTA =====
 function initLugaresListToggle() {
     const toggleBtn = document.getElementById('lugares-toggle-btn');
-    const lugaresSection = document.getElementById('lugares-section');
+    const lugaresHeader = document.getElementById('lugares-header');
     
-    if (!toggleBtn || !lugaresSection) return;
+    if (!toggleBtn || !lugaresHeader) return;
     
-    toggleBtn.addEventListener('click', () => {
+    lugaresHeader.addEventListener('click', () => {
         mostrarLugaresEnLista = !mostrarLugaresEnLista;
         
         if (mostrarLugaresEnLista) {
-            lugaresSection.classList.remove('collapsed');
             toggleBtn.querySelector('i').className = 'fas fa-chevron-up';
             renderLugaresList(currentFilteredLugares);
         } else {
-            lugaresSection.classList.add('collapsed');
             toggleBtn.querySelector('i').className = 'fas fa-chevron-down';
+            document.getElementById('lugares-list').innerHTML = '';
         }
     });
 }
 
-// ===== INICIALIZACIÓN =====
+// ===== INICIALIZACIÓN ===== ✅ CORREGIDO
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
     loadEvents();
     initGeolocate();
     initSliderPrecio();
-    initLugaresCollapse();       // ✅ NUEVO
-    initLugaresSelectAll();      // ✅ NUEVO
-    initLugaresListToggle();     // ✅ NUEVO
+    initLugaresCollapse();
+    initLugaresSelectAll();
+    initLugaresListToggle();
 
+    // ✅ CORREGIDO: Cargar tema
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-        document.body.classList.add('light-mode');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
         document.querySelector('.theme-toggle i').className = 'fas fa-moon';
+    } else {
+        document.querySelector('.theme-toggle i').className = 'fas fa-sun';
     }
 
     document.getElementById('fab-filters').addEventListener('click', () => {
@@ -1647,7 +1615,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('view-map-btn').addEventListener('click', () => switchView('map'));
     document.getElementById('view-list-btn').addEventListener('click', () => switchView('list'));
 
-    // Toggle lugares
     document.getElementById('btn-toggle-lugares')
         ?.addEventListener('click', toggleLugares);
 
@@ -1660,7 +1627,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         renderListView(currentFilteredEvents);
-        renderLugaresList(currentFilteredLugares); // ✅ NUEVO
+        renderLugaresList(currentFilteredLugares);
     });
 
     document.getElementById('search').addEventListener('input', applyFilters);

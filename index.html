@@ -44,11 +44,11 @@
         <button class="btn-lugares active" id="btn-toggle-lugares"
                 title="Mostrar/ocultar lugares de interés">
             <i class="fas fa-landmark"></i>
-            <span>Lugares</span>
+            <span class="desktop-only">Lugares</span>
         </button>
         <button class="stats-toggle" id="stats-toggle">
             <i class="fas fa-chart-bar"></i>
-            <span>Stats</span>
+            <span class="desktop-only">Stats</span>
         </button>
         <button class="theme-toggle" id="theme-toggle">
             <i class="fas fa-sun"></i>
@@ -94,7 +94,7 @@
 
         <!-- NUEVA SECCIÓN: Lugares de interés -->
         <div class="lugares-section" id="lugares-section">
-            <div class="lugares-header">
+            <div class="lugares-header" id="lugares-header">
                 <h2>🏛️ Lugares de Interés</h2>
                 <button class="lugares-toggle-btn" id="lugares-toggle-btn">
                     <i class="fas fa-chevron-up"></i>
@@ -276,7 +276,7 @@
             <label class="filter-label lugares-label">
                 <span>🏛️ Lugares de Interés</span>
                 <button class="lugares-collapse-btn" id="lugares-collapse-btn">
-                    <i class="fas fa-chevron-down"></i>
+                    <i class="fas fa-chevron-up"></i>
                 </button>
             </label>
             

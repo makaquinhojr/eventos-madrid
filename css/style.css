@@ -56,6 +56,13 @@ body.dark-mode {
     font-size: 20px;
     font-weight: 700;
     color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo-icon {
+    font-size: 24px;
 }
 
 .top-bar-actions {
@@ -166,7 +173,7 @@ body.dark-mode {
     z-index: 1;
 }
 
-/* ===== BOTÓN FLOTANTE FILTROS ===== */
+/* ===== BOTÓN FLOTANTE FILTROS ===== ✅ CORREGIDO */
 .fab-filters {
     position: fixed;
     bottom: 20px;
@@ -179,13 +186,13 @@ body.dark-mode {
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    display: flex;
+    display: flex !important; /* ✅ Forzado */
     align-items: center;
     gap: 8px;
     box-shadow: var(--shadow-lg);
     z-index: 900;
     transition: all 0.3s;
-    position: relative;
+    pointer-events: auto !important; /* ✅ Forzado */
 }
 
 .fab-filters:hover {
@@ -198,7 +205,6 @@ body.dark-mode {
     font-size: 16px;
 }
 
-/* ✅ NUEVO: Badge contador de filtros activos */
 .filtros-count {
     position: absolute;
     top: -8px;
@@ -405,7 +411,7 @@ body.dark-mode {
     transform: scale(1.05);
 }
 
-/* ===== ✅ NUEVO: FILTRO LUGARES DE INTERÉS ===== */
+/* ===== FILTRO LUGARES DE INTERÉS ===== */
 .filter-section-lugares {
     background: var(--bg-alt);
     padding: 16px;
@@ -469,13 +475,6 @@ body.dark-mode {
     transition: all 0.3s ease;
 }
 
-.lugares-categorias.collapsed {
-    max-height: 0;
-    opacity: 0;
-    margin-top: 0;
-}
-
-/* Estilos para cada categoría de lugar */
 .chip-content.lugar-museo { color: #0891B2; }
 .chip input:checked + .chip-content.lugar-museo { background: #CFFAFE; }
 
@@ -713,7 +712,7 @@ body.dark-mode .stat-box.highlight .stat-value {
     display: block;
 }
 
-/* ===== VISTA LISTA ===== */
+/* ===== VISTA LISTA ===== ✅ CORREGIDO */
 #list-view {
     position: fixed;
     top: 60px;
@@ -728,7 +727,7 @@ body.dark-mode .stat-box.highlight .stat-value {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    padding-left: 360px;
+    /* ✅ ELIMINADO: padding-left: 360px; */
 }
 
 .list-header {
@@ -776,7 +775,7 @@ body.dark-mode .stat-box.highlight .stat-value {
     gap: 16px;
 }
 
-/* ===== ✅ NUEVA SECCIÓN: LUGARES EN LISTA ===== */
+/* ===== SECCIÓN LUGARES EN LISTA ===== */
 .lugares-section {
     margin-top: 40px;
     display: none;
@@ -823,21 +822,13 @@ body.dark-mode .stat-box.highlight .stat-value {
     transition: transform 0.3s;
 }
 
-.lugares-section.collapsed .lugares-list {
-    display: none;
-}
-
-.lugares-section.collapsed .lugares-toggle-btn i {
-    transform: rotate(180deg);
-}
-
 .lugares-list {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
-/* ===== CARD DE EVENTO ===== */
+/* ===== CARDS DE EVENTO Y LUGAR ===== */
 .event-card,
 .lugar-card {
     background: var(--bg);
@@ -926,7 +917,6 @@ body.dark-mode .stat-box.highlight .stat-value {
     border: 1px solid var(--border);
 }
 
-/* ✅ NUEVO: Badge de categoría de lugar */
 .lugar-categoria-badge {
     padding: 4px 10px;
     border-radius: 12px;
@@ -1107,7 +1097,6 @@ body.dark-mode .stat-box.highlight .stat-value {
     animation: markerPop 0.4s ease-out;
 }
 
-/* ===== ✅ NUEVO: MARKER DE LUGAR ===== */
 .lugar-marker {
     width: 36px;
     height: 36px;
@@ -1168,7 +1157,6 @@ body.dark-mode .stat-box.highlight .stat-value {
     min-width: 20px;
 }
 
-/* ✅ NUEVO: Badge de categoría en popup de lugar */
 .popup-lugar-badge {
     display: inline-block;
     padding: 6px 12px;
@@ -1288,7 +1276,6 @@ body.dark-mode .stat-box.highlight .stat-value {
     color: white;
 }
 
-/* Modo oscuro */
 body.dark-mode .leaflet-popup-content-wrapper {
     background: var(--bg-alt);
     color: var(--text);
@@ -1761,11 +1748,6 @@ body.dark-mode .popup-link-calendar:hover {
     .stats-panel {
         max-width: 100%;
     }
-}
-
-/* ===== TRANSICIONES ===== */
-* {
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
 
 /* ===== ANIMACIONES DE ENTRADA ===== */
