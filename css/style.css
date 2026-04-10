@@ -173,7 +173,7 @@ body.dark-mode {
     z-index: 1;
 }
 
-/* ===== BOTÓN FLOTANTE FILTROS ===== ✅ CORREGIDO */
+/* ===== BOTÓN FLOTANTE FILTROS ===== */
 .fab-filters {
     position: fixed;
     bottom: 20px;
@@ -186,13 +186,13 @@ body.dark-mode {
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    display: flex !important; /* ✅ Forzado */
+    display: flex !important;
     align-items: center;
     gap: 8px;
     box-shadow: var(--shadow-lg);
     z-index: 900;
     transition: all 0.3s;
-    pointer-events: auto !important; /* ✅ Forzado */
+    pointer-events: auto !important;
 }
 
 .fab-filters:hover {
@@ -423,7 +423,7 @@ body.dark-mode {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    cursor: pointer;
+    cursor: default;
     margin-bottom: 0 !important;
 }
 
@@ -655,7 +655,7 @@ body.dark-mode .stat-box.highlight .stat-value {
     letter-spacing: 0.5px;
 }
 
-/* ===== TOGGLE DE VISTAS ===== */
+/* ===== TOGGLE DE VISTAS ===== ✅ AJUSTADO */
 .view-toggle {
     position: fixed;
     top: 70px;
@@ -712,7 +712,7 @@ body.dark-mode .stat-box.highlight .stat-value {
     display: block;
 }
 
-/* ===== VISTA LISTA ===== ✅ CORREGIDO */
+/* ===== VISTA LISTA ===== ✅ AJUSTADO */
 #list-view {
     position: fixed;
     top: 60px;
@@ -727,7 +727,6 @@ body.dark-mode .stat-box.highlight .stat-value {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    /* ✅ ELIMINADO: padding-left: 360px; */
 }
 
 .list-header {
@@ -828,7 +827,7 @@ body.dark-mode .stat-box.highlight .stat-value {
     gap: 16px;
 }
 
-/* ===== CARDS DE EVENTO Y LUGAR ===== */
+/* ===== CARDS ===== */
 .event-card,
 .lugar-card {
     background: var(--bg);
@@ -1039,7 +1038,6 @@ body.dark-mode .stat-box.highlight .stat-value {
     background: #E8F0FE;
     border-color: #4285F4;
 }
-
 /* ===== EMPTY STATE ===== */
 .empty-state {
     text-align: center;
@@ -1673,10 +1671,10 @@ body.dark-mode .popup-link-calendar:hover {
     border-color: #059669;
 }
 
-/* ===== RESPONSIVE ===== */
+/* ===== RESPONSIVE ===== ✅ AJUSTADO */
 @media (max-width: 768px) {
     .view-toggle {
-        top: 65px;
+        top: 70px;
         right: 10px;
         left: 10px;
         width: auto;
@@ -1691,7 +1689,7 @@ body.dark-mode .popup-link-calendar:hover {
     
     .list-container {
         padding: 10px;
-        padding-top: 70px;
+        padding-top: 120px; /* ✅ Más espacio para evitar superposición */
     }
     
     .list-header {
@@ -1748,6 +1746,20 @@ body.dark-mode .popup-link-calendar:hover {
     .stats-panel {
         max-width: 100%;
     }
+    
+    .fab-filters {
+        bottom: 15px;
+        left: 15px;
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+    
+    .btn-geolocate {
+        bottom: 15px;
+        right: 15px;
+        width: 48px;
+        height: 48px;
+    }
 }
 
 /* ===== ANIMACIONES DE ENTRADA ===== */
@@ -1772,3 +1784,45 @@ body.dark-mode .popup-link-calendar:hover {
 .event-card:nth-child(3), .lugar-card:nth-child(3) { animation-delay: 0.15s; }
 .event-card:nth-child(4), .lugar-card:nth-child(4) { animation-delay: 0.2s; }
 .event-card:nth-child(5), .lugar-card:nth-child(5) { animation-delay: 0.25s; }
+
+/* ===== SCROLLBAR CUSTOM ===== */
+.panel-content::-webkit-scrollbar,
+#list-view::-webkit-scrollbar {
+    width: 8px;
+}
+
+.panel-content::-webkit-scrollbar-track,
+#list-view::-webkit-scrollbar-track {
+    background: var(--bg-alt);
+}
+
+.panel-content::-webkit-scrollbar-thumb,
+#list-view::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+.panel-content::-webkit-scrollbar-thumb:hover,
+#list-view::-webkit-scrollbar-thumb:hover {
+    background: var(--text-light);
+}
+
+/* ===== ACCESIBILIDAD ===== */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===== FOCUS VISIBLE ===== */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ===== FIN ===== */

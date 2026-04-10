@@ -101,7 +101,6 @@ const ZONAS_COORDS = {
     'Arganda del Rey':            { lat: 40.3008, lng: -3.4394, radio: 4.0 },
 };
 
-// ===== INFERIR ZONA =====
 function inferirZona(lat, lng) {
     let mejorZona = null;
     let mejorDistancia = Infinity;
@@ -119,7 +118,6 @@ function getZonaEvento(evento) {
     return evento.zona || inferirZona(evento.lat, evento.lng);
 }
 
-// ===== MAPA =====
 function initMap() {
     map = L.map('map').setView([40.4168, -3.7038], 12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -140,7 +138,6 @@ function initMap() {
     lugaresLayer = L.layerGroup().addTo(map);
 }
 
-// ===== CARGAR EVENTOS Y LUGARES =====
 async function loadEvents() {
     try {
         const [eventosRes, lugaresRes] = await Promise.all([
@@ -176,7 +173,6 @@ async function loadEvents() {
     }
 }
 
-// ===== MOSTRAR LUGARES EN EL MAPA =====
 function displayLugares(lugares) {
     lugaresLayer.clearLayers();
 
@@ -256,7 +252,6 @@ function displayLugares(lugares) {
     }
 }
 
-// ===== TOGGLE LUGARES =====
 function toggleLugares() {
     mostrarLugares = !mostrarLugares;
 
@@ -272,7 +267,6 @@ function toggleLugares() {
     }
 }
 
-// ===== HELPERS DE LUGARES =====
 function categoriaNombre(categoria) {
     const nombres = {
         museo:     'Museo',
@@ -340,7 +334,6 @@ function compartirLugar(lugarId) {
     requestAnimationFrame(() => modal.classList.add('visible'));
 }
 
-// ===== HELPERS DE LINK =====
 function esLinkUtil(url) {
     if (!url || typeof url !== 'string' || url.trim() === '') return false;
     if (!url.startsWith('http://') && !url.startsWith('https://')) return false;
@@ -395,7 +388,6 @@ function getBotonMasInfo(evento) {
             </a>`;
 }
 
-// ===== COMPARTIR EVENTOS =====
 function generarUrlCompartir(evento) {
     const base = window.location.origin + window.location.pathname;
     return `${base}?evento=${evento.id}`;
@@ -484,7 +476,6 @@ async function copiarLinkEvento(url, btn) {
     }
 }
 
-// ===== CÓMO LLEGAR =====
 function comoLlegar(eventoId) {
     const evento = allEvents.find(e => e.id === eventoId);
     if (!evento) return;
@@ -500,7 +491,6 @@ function comoLlegarCoords(lat, lng, nombre) {
     }
     window.open(url, '_blank');
 }
-// ===== PROCESAR URL =====
 function procesarUrlEvento() {
     const params = new URLSearchParams(window.location.search);
 
@@ -559,7 +549,6 @@ function procesarUrlEvento() {
     }, 200);
 }
 
-// ===== MOSTRAR EVENTOS EN MAPA =====
 function displayEvents(events) {
     markersLayer.clearLayers();
 
@@ -665,7 +654,6 @@ function displayEvents(events) {
     actualizarEstadisticas(events);
 }
 
-// ===== VISTA LISTA =====
 function switchView(view) {
     currentView = view;
 
@@ -959,7 +947,6 @@ function verLugarEnMapa(lugarId) {
     }, 300);
 }
 
-// ===== FILTROS =====
 function applyFilters() {
     const search     = document.getElementById('search').value.toLowerCase().trim();
     const dateFilter = document.getElementById('filtro-fecha').value;
@@ -1431,7 +1418,6 @@ function updateCounter(count) {
     document.getElementById('event-count').textContent = count;
 }
 
-// ===== TEMA ===== ✅ CORREGIDO
 function toggleTheme() {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
@@ -1502,16 +1488,25 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// ===== ✅ CORREGIDO: COLLAPSE LUGARES =====
 function initLugaresCollapse() {
     const collapseBtn = document.getElementById('lugares-collapse-btn');
     const categoriasDiv = document.getElementById('lugares-categorias');
     
-    if (!collapseBtn || !categoriasDiv) return;
+    if (!collapseBtn || !categoriasDiv) {
+        console.log('⚠️ No se encontró botón o div de categorías');
+        return;
+    }
     
+    console.log('✅ Collapse de lugares inicializado');
     let isCollapsed = false;
     
-    collapseBtn.addEventListener('click', () => {
+    collapseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
         isCollapsed = !isCollapsed;
+        console.log(`Collapse: ${isCollapsed ? 'cerrado' : 'abierto'}`);
         
         if (isCollapsed) {
             categoriasDiv.style.maxHeight = '0';
@@ -1527,15 +1522,24 @@ function initLugaresCollapse() {
     });
 }
 
+// ===== ✅ CORREGIDO: SELECT ALL LUGARES =====
 function initLugaresSelectAll() {
     const selectAllCb = document.getElementById('lugares-select-all');
     const categoriaCbs = document.querySelectorAll('.lugar-categoria-cb');
     
-    if (!selectAllCb) return;
+    if (!selectAllCb) {
+        console.log('⚠️ No se encontró checkbox select-all');
+        return;
+    }
+    
+    console.log(`✅ Select All inicializado con ${categoriaCbs.length} checkboxes`);
     
     selectAllCb.addEventListener('change', () => {
         const checked = selectAllCb.checked;
-        categoriaCbs.forEach(cb => cb.checked = checked);
+        console.log(`✅ Select all: ${checked}`);
+        categoriaCbs.forEach(cb => {
+            cb.checked = checked;
+        });
         applyFilters();
     });
     
@@ -1554,6 +1558,7 @@ function initLugaresSelectAll() {
                 selectAllCb.indeterminate = true;
             }
             
+            console.log('✅ Categoría cambiada, aplicando filtros...');
             applyFilters();
         });
     });
@@ -1578,7 +1583,6 @@ function initLugaresListToggle() {
     });
 }
 
-// ===== INICIALIZACIÓN ===== ✅ CORREGIDO
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
     loadEvents();
@@ -1588,7 +1592,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initLugaresSelectAll();
     initLugaresListToggle();
 
-    // ✅ CORREGIDO: Cargar tema
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-mode');

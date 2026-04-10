@@ -199,9 +199,9 @@
             </select>
         </div>
 
-        <!-- TIPO -->
+        <!-- TIPO DE EVENTO -->
         <div class="filter-section">
-            <label class="filter-label">Tipo</label>
+            <label class="filter-label">Tipo de Evento</label>
             <div class="filter-chips">
                 <label class="chip">
                     <input type="checkbox" value="concierto" checked>
@@ -234,48 +234,11 @@
             </div>
         </div>
 
-        <!-- PRECIO CHIPS -->
-        <div class="filter-section">
-            <label class="filter-label">Precio</label>
-            <div class="filter-chips">
-                <label class="chip">
-                    <input type="checkbox" value="gratis" checked>
-                    <span class="chip-content gratis">✓ Gratis</span>
-                </label>
-                <label class="chip">
-                    <input type="checkbox" value="pago" checked>
-                    <span class="chip-content pago">€ De pago</span>
-                </label>
-            </div>
-        </div>
-
-        <!-- PRECIO MÁXIMO SLIDER -->
-        <div class="filter-section">
-            <label class="filter-label">
-                Precio máximo
-                <span class="precio-valor" id="precio-valor-label">Cualquiera</span>
-            </label>
-            <input
-                type="range"
-                id="filtro-precio-max"
-                class="precio-slider"
-                min="0"
-                max="100"
-                value="100"
-                step="5"
-            >
-            <div class="precio-marks">
-                <span>Gratis</span>
-                <span>50€</span>
-                <span>100€+</span>
-            </div>
-        </div>
-
-        <!-- ✅ NUEVO: LUGARES DE INTERÉS -->
+        <!-- ✅ LUGARES DE INTERÉS (MOVIDO AQUÍ - DEBAJO DE TIPO) -->
         <div class="filter-section filter-section-lugares">
             <label class="filter-label lugares-label">
                 <span>🏛️ Lugares de Interés</span>
-                <button class="lugares-collapse-btn" id="lugares-collapse-btn">
+                <button class="lugares-collapse-btn" id="lugares-collapse-btn" type="button">
                     <i class="fas fa-chevron-up"></i>
                 </button>
             </label>
@@ -320,6 +283,43 @@
                         <span class="chip-content lugar-mercado">🛍️ Mercados</span>
                     </label>
                 </div>
+            </div>
+        </div>
+
+        <!-- PRECIO CHIPS -->
+        <div class="filter-section">
+            <label class="filter-label">Precio</label>
+            <div class="filter-chips">
+                <label class="chip">
+                    <input type="checkbox" value="gratis" checked>
+                    <span class="chip-content gratis">✓ Gratis</span>
+                </label>
+                <label class="chip">
+                    <input type="checkbox" value="pago" checked>
+                    <span class="chip-content pago">€ De pago</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- PRECIO MÁXIMO SLIDER -->
+        <div class="filter-section">
+            <label class="filter-label">
+                Precio máximo
+                <span class="precio-valor" id="precio-valor-label">Cualquiera</span>
+            </label>
+            <input
+                type="range"
+                id="filtro-precio-max"
+                class="precio-slider"
+                min="0"
+                max="100"
+                value="100"
+                step="5"
+            >
+            <div class="precio-marks">
+                <span>Gratis</span>
+                <span>50€</span>
+                <span>100€+</span>
             </div>
         </div>
 
