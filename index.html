@@ -91,6 +91,17 @@
             </div>
         </div>
         <div id="events-list" class="events-list"></div>
+
+        <!-- NUEVA SECCIÓN: Lugares de interés -->
+        <div class="lugares-section" id="lugares-section">
+            <div class="lugares-header">
+                <h2>🏛️ Lugares de Interés</h2>
+                <button class="lugares-toggle-btn" id="lugares-toggle-btn">
+                    <i class="fas fa-chevron-up"></i>
+                </button>
+            </div>
+            <div id="lugares-list" class="lugares-list"></div>
+        </div>
     </div>
 </div>
 
@@ -186,7 +197,6 @@
                     <option value="Arganda del Rey">Arganda del Rey</option>
                 </optgroup>
             </select>
-            <!-- Badge zona activa — se inserta desde JS -->
         </div>
 
         <!-- TIPO -->
@@ -258,6 +268,58 @@
                 <span>Gratis</span>
                 <span>50€</span>
                 <span>100€+</span>
+            </div>
+        </div>
+
+        <!-- ✅ NUEVO: LUGARES DE INTERÉS -->
+        <div class="filter-section filter-section-lugares">
+            <label class="filter-label lugares-label">
+                <span>🏛️ Lugares de Interés</span>
+                <button class="lugares-collapse-btn" id="lugares-collapse-btn">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </label>
+            
+            <!-- Checkbox "Seleccionar todos" -->
+            <div class="lugares-select-all">
+                <label class="chip">
+                    <input type="checkbox" id="lugares-select-all" checked>
+                    <span class="chip-content lugares-all">✓ Todos los lugares</span>
+                </label>
+            </div>
+
+            <!-- Contenedor colapsable de categorías -->
+            <div class="lugares-categorias" id="lugares-categorias">
+                <div class="filter-chips">
+                    <label class="chip">
+                        <input type="checkbox" class="lugar-categoria-cb" value="museo" checked>
+                        <span class="chip-content lugar-museo">🏛️ Museos</span>
+                    </label>
+                    <label class="chip">
+                        <input type="checkbox" class="lugar-categoria-cb" value="monumento" checked>
+                        <span class="chip-content lugar-monumento">🗿 Monumentos</span>
+                    </label>
+                    <label class="chip">
+                        <input type="checkbox" class="lugar-categoria-cb" value="teatro" checked>
+                        <span class="chip-content lugar-teatro">🎭 Teatros</span>
+                    </label>
+                    <label class="chip">
+                        <input type="checkbox" class="lugar-categoria-cb" value="sala" checked>
+                        <span class="chip-content lugar-sala">🎵 Salas</span>
+                    </label>
+                    <label class="chip">
+                        <input type="checkbox" class="lugar-categoria-cb" value="parque" checked>
+                        <span class="chip-content lugar-parque">🌳 Parques</span>
+                    </label>
+                    <label class="chip">
+                        <input type="checkbox" class="lugar-categoria-cb" value="galeria" checked>
+                        <span class="chip-content lugar-galeria">🖼️ Galerías</span>
+                    </label>
+                    <label class="chip">
+                        <input type="checkbox" class="lugar-categoria-cb" value="mercado" checked>
+                        <span class="chip-content lugar-mercado">🛍️ Mercados</span>
+                    </label>
+                </div>
             </div>
         </div>
 
