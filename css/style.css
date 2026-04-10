@@ -1663,10 +1663,17 @@ body {
 
 .setting-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
     padding: 12px 0;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.setting-item:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
 }
 
 .setting-info {

@@ -1326,6 +1326,15 @@ function toggleTheme(force = null) {
     if (themeToggle) {
         themeToggle.checked = isDark;
     }
+    
+    // Actualizar icono en botón ajustes
+    const settingsToggle = document.getElementById('settings-toggle');
+    if (settingsToggle) {
+        const icon = settingsToggle.querySelector('i');
+        if (icon) {
+            icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+        }
+    }
 }
 
 function iniciarBannerHoy() {
@@ -1470,10 +1479,10 @@ function initLanguageSelector() {
         const newLang = e.target.value;
         if (typeof i18n !== 'undefined') {
             i18n.setLanguage(newLang);
+            mostrarToast(`🌐 ${i18n.t('lang.' + newLang)} seleccionado`);
         }
     });
 }
-
 function initSettingsPanel() {
     const settingsToggle = document.getElementById('settings-toggle');
     const settingsPanel = document.getElementById('settings-panel');
@@ -1639,3 +1648,38 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.log('❌ SW error:', err));
     });
 }
+// ===== NOTIFICACIONES =====
+function initNotifications() {
+    const notificationsToggle = document.getElementById('notifications-toggle');
+    if (!notificationsToggle) return;
+
+    const saved = localStorage.getItem('notifications');
+    notificationsToggle.checked = saved !== 'false';
+
+    notificationsToggle.addEventListener('change', (e) => {
+        const enabled = e.target.checked;
+        localStorage.setItem('notifications', enabled);
+        
+        if (enabled) {
+            requestNotificationPermission();
+            mostrarToast('🔔 Notificaciones activadas');
+        } else {
+            mostrarToast('🔔 Notificaciones desactivadas');
+        }
+    });
+}
+
+async function requestNotificationPermission() {
+    if ('Notification' in window) {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+            mostrarToast('❌ Permiso de notificaciones denegado', 'error');
+        }
+    }
+}
+
+// Llamar en DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    // ... resto del código ...
+    initNotifications();
+});
