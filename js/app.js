@@ -1729,18 +1729,36 @@ function isEventInDistance(evento) {
 function onGeoSuccess(position) {
     const { latitude, longitude } = position.coords;
     const btn = document.getElementById('btn-geolocate');
+    
+    // ✅ Guardar ubicación
     userLocation = { lat: latitude, lng: longitude };
+    
+    // ✅ Actualizar botón
     btn.classList.remove('loading');
     btn.classList.add('active');
     btn.innerHTML = '<i class="fas fa-location-arrow"></i>';
+    
+    // ✅ Centrar mapa
     map.setView([latitude, longitude], 14);
+    
+    // ✅ Colocar marcador del usuario
     colocarMarkerUsuario(latitude, longitude);
+    
+    // ✅ NUEVO: Crear círculo de distancia
+    updateDistanceCircle();
+    
+    // ✅ NUEVO: Disparar evento para que el filtro aparezca
+    window.dispatchEvent(new Event('geolocationChanged'));
+    
+    // ✅ Actualizar eventos (recalcular distancias)
     displayEvents(currentFilteredEvents.length ? currentFilteredEvents : allEvents);
     displayLugares(currentFilteredLugares.length ? currentFilteredLugares : allLugares);
+    
+    // ✅ Aplicar filtros (incluye el de distancia)
+    applyFilters();
+    
+    // ✅ Mostrar toast
     mostrarToast('✅ Ubicación encontrada');
-        // ✅ NUEVO: Mostrar filtro de distancia y círculo
-    updateDistanceCircle();
-    window.dispatchEvent(new Event('geolocationChanged'));
 }
 
 function onGeoError(error) {
@@ -1772,23 +1790,41 @@ function colocarMarkerUsuario(lat, lng) {
 
 function desactivarGeolocalizacion() {
     const btn = document.getElementById('btn-geolocate');
+    
+    // ✅ Resetear botón
     btn.classList.remove('active');
     btn.innerHTML = '<i class="fas fa-location-arrow"></i>';
+    
+    // ✅ Eliminar marcador del usuario
     if (userMarker) {
         map.removeLayer(userMarker);
         userMarker = null;
-        userLocation = null;
     }
-    map.setView([40.4168, -3.7038], 12);
-    displayEvents(allEvents);
-    displayLugares(allLugares);
-    mostrarToast('📍 Geolocalización desactivada');
-        // ✅ NUEVO: Ocultar círculo y filtro de distancia
+    
+    // ✅ Eliminar círculo de distancia
     if (distanceCircle) {
         map.removeLayer(distanceCircle);
         distanceCircle = null;
     }
+    
+    // ✅ Resetear ubicación
+    userLocation = null;
+    
+    // ✅ Disparar evento para que el filtro se oculte
     window.dispatchEvent(new Event('geolocationChanged'));
+    
+    // ✅ Volver a la vista por defecto
+    map.setView([40.4168, -3.7038], 12);
+    
+    // ✅ Recargar eventos sin distancias
+    displayEvents(allEvents);
+    displayLugares(allLugares);
+    
+    // ✅ Aplicar filtros
+    applyFilters();
+    
+    // ✅ Toast
+    mostrarToast('📍 Geolocalización desactivada');
 }
 
 function mostrarToast(mensaje, tipo = 'normal') {
