@@ -1452,25 +1452,22 @@ function initSettingsPanel() {
         settingsPanel.classList.remove('active');
     });
     
-    // Tema toggle
+    // Tema toggle - DIRECTO Y SIMPLE
     const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
-        // Establecer estado inicial
         const isDark = document.body.classList.contains('dark-mode');
         themeToggle.checked = isDark;
         
-        // Escuchar cambios
         themeToggle.addEventListener('change', (e) => {
-            const isDarkMode = e.target.checked;
-            
-            if (isDarkMode) {
+            if (e.target.checked) {
                 document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+                mostrarToast('🌙 Modo oscuro');
             } else {
                 document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+                mostrarToast('☀️ Modo claro');
             }
-            
-            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-            mostrarToast(isDarkMode ? '🌙 Modo oscuro activado' : '☀️ Modo claro activado');
         });
     }
     
@@ -1478,24 +1475,18 @@ function initSettingsPanel() {
     const langSelect = document.getElementById('lang-select');
     if (langSelect && typeof i18n !== 'undefined') {
         langSelect.value = i18n.getLanguage();
-        console.log('✅ Idioma actual:', i18n.getLanguage());
         
         langSelect.addEventListener('change', (e) => {
             const newLang = e.target.value;
-            console.log('🔄 Cambiando a:', newLang);
             i18n.setLanguage(newLang);
         });
-    } else {
-        console.error('❌ i18n no disponible');
     }
     
     // Notificaciones toggle
     const notificationsToggle = document.getElementById('notifications-toggle');
     if (notificationsToggle) {
-        const savedNotifications = localStorage.getItem('notifications');
-        if (savedNotifications !== null) {
-            notificationsToggle.checked = savedNotifications === 'true';
-        }
+        const saved = localStorage.getItem('notifications');
+        notificationsToggle.checked = saved !== 'false';
         
         notificationsToggle.addEventListener('change', (e) => {
             localStorage.setItem('notifications', e.target.checked);
@@ -1506,10 +1497,8 @@ function initSettingsPanel() {
     // Guardar búsquedas toggle
     const saveSearchesToggle = document.getElementById('save-searches-toggle');
     if (saveSearchesToggle) {
-        const savedSearches = localStorage.getItem('saveSearches');
-        if (savedSearches !== null) {
-            saveSearchesToggle.checked = savedSearches === 'true';
-        }
+        const saved = localStorage.getItem('saveSearches');
+        saveSearchesToggle.checked = saved !== 'false';
         
         saveSearchesToggle.addEventListener('change', (e) => {
             localStorage.setItem('saveSearches', e.target.checked);
@@ -1534,27 +1523,15 @@ function initSettingsPanel() {
 
 // ===== DOMContentLoaded =====
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('✅ DOM cargado, iniciando app...');
-    
-    // Verificar que i18n existe
-    if (typeof i18n === 'undefined') {
-        console.error('❌ i18n no está definido');
-    } else {
-        console.log('✅ i18n disponible, idioma:', i18n.getLanguage());
-    }
-    
     // Inicializar app
     initMap();
-    console.log('✅ Mapa inicializado');
-    
     loadEvents();
-    console.log('✅ Cargando eventos...');
-    
     initGeolocate();
     initSliderPrecio();
     initCollapseGroups();
     initLugaresSelectAll();
     initLugaresListToggle();
+    initSettingsPanel();
 
     // Tema
     const savedTheme = localStorage.getItem('theme');
@@ -1564,7 +1541,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('dark-mode');
     }
     
-    // Actualizar toggle del panel cuando esté listo
+    // Actualizar toggle del panel
     setTimeout(() => {
         const themeToggle = document.getElementById('theme-toggle');
         if (themeToggle) {
@@ -1614,11 +1591,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') cerrarModalCompartir();
     });
-
-    // Panel de ajustes
-    initSettingsPanel();
-
-    console.log('✅ App lista!');
 });
 
 if ('serviceWorker' in navigator) {
