@@ -315,7 +315,25 @@
             </div>
         </div>
 
-        <!-- ZONA -->
+        <!-- FILTRO DE DISTANCIA -->
+<div class="filter-section" id="distance-filter-section" style="display:none;">
+    <label class="filter-label">
+        <span>📍 Distancia máxima</span>
+        <span class="distancia-valor" id="distancia-valor-label">5 km</span>
+    </label>
+    <input type="range" id="filtro-distancia" class="precio-slider"
+           min="1" max="20" value="5" step="1">
+    <div class="precio-marks">
+        <span>1 km</span>
+        <span>10 km</span>
+        <span>20 km</span>
+    </div>
+    <div class="distancia-info" id="distancia-info" style="margin-top: 8px; font-size: 12px; color: var(--text-3); text-align: center;">
+        <i class="fas fa-info-circle"></i> Activa tu ubicación para usar este filtro
+    </div>
+</div>
+      
+<!-- ZONA -->
         <div class="filter-section">
             <label class="filter-label" data-i18n="filters.zone">📍 Zona</label>
             <select id="filtro-zona" class="filter-select">

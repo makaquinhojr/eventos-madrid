@@ -10,6 +10,8 @@ let currentView = 'map';
 let currentSort = 'date';
 let userMarker = null;
 let userLocation = null;
+let distanceCircle = null; // Círculo de distancia en el mapa
+let maxDistance = 20; // Distancia máxima por defecto (km)
 let mostrarLugares = true;
 let mostrarLugaresEnLista = true;
 let favorites = [];
@@ -1335,6 +1337,8 @@ function applyFilters() {
     let filtered = allEvents.filter(e => {
         if (types.length && !types.includes(e.tipo)) return false;
         if (prices.length && !prices.includes(e.precio)) return false;
+            // ✅ NUEVO: Filtro de distancia
+    if (userLocation && !isEventInDistance(e)) return false;
 
         if (search) {
             const zona = getZonaEvento(e);
@@ -1639,6 +1643,88 @@ function initGeolocate() {
         });
     });
 }
+// ===== FILTRO DE DISTANCIA =====
+function initDistanceFilter() {
+    const slider = document.getElementById('filtro-distancia');
+    const label = document.getElementById('distancia-valor-label');
+    const section = document.getElementById('distance-filter-section');
+    const info = document.getElementById('distancia-info');
+    
+    if (!slider || !label || !section) return;
+
+    // Mostrar/ocultar según geolocalización
+    function updateDistanceFilterVisibility() {
+        if (userLocation) {
+            section.style.display = 'block';
+            info.classList.add('success');
+            info.innerHTML = '<i class="fas fa-check-circle"></i> Filtrando eventos cercanos';
+        } else {
+            section.style.display = 'none';
+        }
+    }
+
+    // Actualizar slider
+    function actualizarSlider() {
+        const val = parseInt(slider.value);
+        maxDistance = val;
+        slider.style.setProperty('--pct', ((val - 1) / 19 * 100) + '%');
+        label.textContent = `${val} km`;
+        
+        // Actualizar círculo en el mapa
+        if (userLocation) {
+            updateDistanceCircle();
+            applyFilters();
+            
+            // Actualizar info
+            const count = currentFilteredEvents.length;
+            info.innerHTML = `<i class="fas fa-check-circle"></i> ${count} ${count === 1 ? 'evento' : 'eventos'} a menos de ${val} km`;
+        }
+    }
+
+    slider.addEventListener('input', actualizarSlider);
+    
+    // Inicializar
+    updateDistanceFilterVisibility();
+    actualizarSlider();
+    
+    // Actualizar cuando cambie la geolocalización
+    window.addEventListener('geolocationChanged', updateDistanceFilterVisibility);
+}
+
+function updateDistanceCircle() {
+    // Eliminar círculo anterior
+    if (distanceCircle) {
+        map.removeLayer(distanceCircle);
+        distanceCircle = null;
+    }
+    
+    // Si no hay ubicación, salir
+    if (!userLocation) return;
+    
+    // Crear nuevo círculo
+    distanceCircle = L.circle([userLocation.lat, userLocation.lng], {
+        color: '#3b82f6',
+        fillColor: '#3b82f6',
+        fillOpacity: 0.1,
+        radius: maxDistance * 1000, // Convertir km a metros
+        weight: 2,
+        dashArray: '5, 5',
+        className: 'distance-circle'
+    }).addTo(map);
+}
+
+function isEventInDistance(evento) {
+    if (!userLocation) return true; // Si no hay ubicación, mostrar todos
+    
+    const distancia = calcularDistancia(
+        userLocation.lat, 
+        userLocation.lng, 
+        evento.lat, 
+        evento.lng
+    );
+    
+    return distancia <= maxDistance;
+}
 
 function onGeoSuccess(position) {
     const { latitude, longitude } = position.coords;
@@ -1652,6 +1738,9 @@ function onGeoSuccess(position) {
     displayEvents(currentFilteredEvents.length ? currentFilteredEvents : allEvents);
     displayLugares(currentFilteredLugares.length ? currentFilteredLugares : allLugares);
     mostrarToast('✅ Ubicación encontrada');
+        // ✅ NUEVO: Mostrar filtro de distancia y círculo
+    updateDistanceCircle();
+    window.dispatchEvent(new Event('geolocationChanged'));
 }
 
 function onGeoError(error) {
@@ -1694,6 +1783,12 @@ function desactivarGeolocalizacion() {
     displayEvents(allEvents);
     displayLugares(allLugares);
     mostrarToast('📍 Geolocalización desactivada');
+        // ✅ NUEVO: Ocultar círculo y filtro de distancia
+    if (distanceCircle) {
+        map.removeLayer(distanceCircle);
+        distanceCircle = null;
+    }
+    window.dispatchEvent(new Event('geolocationChanged'));
 }
 
 function mostrarToast(mensaje, tipo = 'normal') {
@@ -2052,6 +2147,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadEvents();
     initGeolocate();
     initSliderPrecio();
+        initDistanceFilter();
     initCollapseGroups();
     initLugaresSelectAll();
     initLugaresListToggle();
