@@ -24,22 +24,6 @@
 
 ---
 
-## 📸 Preview
-
-<div align="center">
-
-| 🗺️ Vista Mapa | 📋 Vista Lista | 📅 Vista Calendario |
-|:---:|:---:|:---:|
-| ![Mapa](https://via.placeholder.com/250x150/000000/FFFFFF/?text=Mapa+Interactivo) | ![Lista](https://via.placeholder.com/250x150/111111/FFFFFF/?text=Vista+Lista) | ![Calendario](https://via.placeholder.com/250x150/1a1a1a/FFFFFF/?text=Calendario) |
-
-| 📊 Dashboard Analytics | 🌙 Modo Oscuro | 🌐 Multiidioma |
-|:---:|:---:|:---:|
-| ![Analytics](https://via.placeholder.com/250x150/222222/FFFFFF/?text=Analytics) | ![Dark Mode](https://via.placeholder.com/250x150/0a0a0a/FFFFFF/?text=Modo+Oscuro) | ![i18n](https://via.placeholder.com/250x150/2a2a2a/FFFFFF/?text=ES+EN+FR) |
-
-</div>
-
----
-
 ## 🚀 ¿Qué es EventosMadrid?
 
 **EventosMadrid** es una **Progressive Web App (PWA)** que te permite descubrir **más de 1.240 eventos culturales y de ocio** en tiempo real sobre un mapa interactivo de la Comunidad de Madrid.
