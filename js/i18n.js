@@ -498,11 +498,17 @@ class I18n {
         return this.currentLang;
     }
 
-    // ✅ NUEVA FUNCIÓN: Actualizar toda la UI sin recargar
+    // ✅ FUNCIÓN CORREGIDA: Actualizar toda la UI sin recargar
     updateUI() {
-        // Actualizar elementos con data-i18n
+        // Actualizar elementos con data-i18n (SOLO textContent)
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
+            
+            // ❌ NO actualizar <option> ni <input> para no romper valores
+            if (el.tagName === 'OPTION' || el.tagName === 'INPUT') {
+                return;
+            }
+            
             el.textContent = this.t(key);
         });
 
@@ -524,6 +530,9 @@ class I18n {
             el.setAttribute('aria-label', this.t(key));
         });
 
+        // ✅ Actualizar <option> manualmente SIN cambiar el value
+        this.updateSelectOptions();
+
         // Actualizar el select de idioma
         const langSelect = document.getElementById('lang-select');
         if (langSelect) {
@@ -532,6 +541,59 @@ class I18n {
 
         // ✅ Disparar evento para que app.js recargue datos traducidos
         window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang: this.currentLang } }));
+    }
+
+    // ✅ NUEVA FUNCIÓN: Actualizar opciones de select preservando values
+    updateSelectOptions() {
+        // Filtro de fecha
+        const filtroFecha = document.getElementById('filtro-fecha');
+        if (filtroFecha) {
+            const currentValue = filtroFecha.value;
+            Array.from(filtroFecha.options).forEach(option => {
+                const key = option.getAttribute('data-i18n');
+                if (key) {
+                    option.textContent = this.t(key);
+                }
+            });
+            filtroFecha.value = currentValue; // Restaurar valor
+        }
+
+        // Sort by
+        const sortBy = document.getElementById('sort-by');
+        if (sortBy) {
+            const currentValue = sortBy.value;
+            Array.from(sortBy.options).forEach(option => {
+                const key = option.getAttribute('data-i18n');
+                if (key) {
+                    option.textContent = this.t(key);
+                }
+            });
+            sortBy.value = currentValue; // Restaurar valor
+        }
+
+        // Filtro de zona - Solo el primer option
+        const filtroZona = document.getElementById('filtro-zona');
+        if (filtroZona && filtroZona.options[0]) {
+            const key = filtroZona.options[0].getAttribute('data-i18n');
+            if (key) {
+                const currentValue = filtroZona.value;
+                filtroZona.options[0].textContent = this.t(key);
+                filtroZona.value = currentValue;
+            }
+        }
+
+        // Select de idioma
+        const langSelect = document.getElementById('lang-select');
+        if (langSelect) {
+            const currentValue = langSelect.value;
+            Array.from(langSelect.options).forEach(option => {
+                const key = option.getAttribute('data-i18n');
+                if (key) {
+                    option.textContent = this.t(key);
+                }
+            });
+            langSelect.value = currentValue;
+        }
     }
 }
 
