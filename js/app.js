@@ -947,6 +947,7 @@ function verLugarEnMapa(lugarId) {
     }, 300);
 }
 
+// ===== FILTROS ===== ✅ CORREGIDO
 function applyFilters() {
     const search     = document.getElementById('search').value.toLowerCase().trim();
     const dateFilter = document.getElementById('filtro-fecha').value;
@@ -955,6 +956,7 @@ function applyFilters() {
         document.getElementById('filtro-precio-max')?.value || 100
     );
 
+    // Tipos de eventos (NO incluye lugares)
     const types = Array.from(document.querySelectorAll(
         '.chip input[value="concierto"], .chip input[value="fiesta"], ' +
         '.chip input[value="mercado"], .chip input[value="cultural"], ' +
@@ -966,14 +968,30 @@ function applyFilters() {
         '.chip input[value="gratis"], .chip input[value="pago"]'
     )).filter(cb => cb.checked).map(cb => cb.value);
 
+    // ✅ CATEGORÍAS DE LUGARES (separado completamente)
     const lugarCategorias = Array.from(document.querySelectorAll('.lugar-categoria-cb'))
         .filter(cb => cb.checked)
         .map(cb => cb.value);
 
+    console.log('🔍 Filtros aplicados:', {
+        search,
+        dateFilter,
+        zonaFilter,
+        types,
+        prices,
+        lugarCategorias,
+        precioMax
+    });
+
+    // ========== FILTRAR EVENTOS ==========
     let filtered = allEvents.filter(e => {
+        // Filtro de tipo de evento
         if (types.length && !types.includes(e.tipo)) return false;
+        
+        // Filtro de precio (gratis/pago)
         if (prices.length && !prices.includes(e.precio)) return false;
 
+        // Filtro de búsqueda
         if (search) {
             const zona = getZonaEvento(e);
             const haystack = [
@@ -982,10 +1000,12 @@ function applyFilters() {
             if (!haystack.includes(search)) return false;
         }
 
+        // Filtro de zona
         if (zonaFilter !== 'todas') {
             if (getZonaEvento(e) !== zonaFilter) return false;
         }
 
+        // Filtro de precio máximo
         if (precioMax < 100) {
             if (e.precio === 'gratis') return true;
             if (precioMax === 0) return false;
@@ -998,6 +1018,7 @@ function applyFilters() {
         return true;
     });
 
+    // Filtro de fecha
     if (dateFilter !== 'todos') {
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
@@ -1045,11 +1066,19 @@ function applyFilters() {
         });
     }
 
+    // ========== ✅ FILTRAR LUGARES (SEPARADO) ==========
     let filteredLugares = allLugares.filter(l => {
-        if (lugarCategorias.length && !lugarCategorias.includes(l.categoria)) {
+        // ✅ IMPORTANTE: Si NO hay categorías seleccionadas, NO mostrar NADA
+        if (lugarCategorias.length === 0) {
             return false;
         }
 
+        // Filtro de categoría de lugar
+        if (!lugarCategorias.includes(l.categoria)) {
+            return false;
+        }
+
+        // Filtro de búsqueda
         if (search) {
             const zona = l.zona || inferirZona(l.lat, l.lng);
             const haystack = [
@@ -1062,6 +1091,7 @@ function applyFilters() {
             if (!haystack.includes(search)) return false;
         }
 
+        // Filtro de zona
         if (zonaFilter !== 'todas') {
             const zonaLugar = l.zona || inferirZona(l.lat, l.lng);
             if (zonaLugar !== zonaFilter) return false;
@@ -1069,6 +1099,8 @@ function applyFilters() {
 
         return true;
     });
+
+    console.log(`✅ Filtrados: ${filtered.length} eventos, ${filteredLugares.length} lugares`);
 
     currentFilteredEvents = filtered;
     currentFilteredLugares = filteredLugares;
@@ -1147,6 +1179,8 @@ function actualizarContadorFiltros() {
 }
 
 function clearFilters() {
+    console.log('🧹 Limpiando todos los filtros...');
+    
     document.getElementById('search').value = '';
     document.getElementById('filtro-fecha').value = 'todos';
 
@@ -1159,11 +1193,27 @@ function clearFilters() {
         slider.dispatchEvent(new Event('input'));
     }
 
-    document.querySelectorAll('.chip input').forEach(cb => cb.checked = true);
+    // ✅ Marcar TODOS los checkboxes de eventos
+    document.querySelectorAll('.chip input[value="concierto"], .chip input[value="fiesta"], ' +
+        '.chip input[value="mercado"], .chip input[value="cultural"], ' +
+        '.chip input[value="gastronomia"], .chip input[value="deporte"], ' +
+        '.chip input[value="infantil"]').forEach(cb => cb.checked = true);
+    
+    // ✅ Marcar TODOS los checkboxes de precios
+    document.querySelectorAll('.chip input[value="gratis"], .chip input[value="pago"]')
+        .forEach(cb => cb.checked = true);
+    
+    // ✅ Marcar TODOS los checkboxes de lugares
     document.querySelectorAll('.lugar-categoria-cb').forEach(cb => cb.checked = true);
-    document.getElementById('lugares-select-all').checked = true;
+    
+    const selectAllCb = document.getElementById('lugares-select-all');
+    if (selectAllCb) {
+        selectAllCb.checked = true;
+        selectAllCb.indeterminate = false;
+    }
     
     applyFilters();
+    console.log('✅ Filtros limpiados');
 }
 
 function initSliderPrecio() {

@@ -655,7 +655,16 @@ body.dark-mode .stat-box.highlight .stat-value {
     letter-spacing: 0.5px;
 }
 
-/* ===== TOGGLE DE VISTAS ===== ✅ AJUSTADO */
+/* ===== TOGGLE DE VISTAS ===== ✅ ARREGLADO */
+.view-toggle {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    z-index: 500; /* ✅ Reducido para que la lista quede por encima */
+    background: var(--bg);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    dis/* ===== TOGGLE DE VISTAS ===== ✅ AJUSTADO */
 .view-toggle {
     position: fixed;
     top: 70px;
@@ -665,6 +674,10 @@ body.dark-mode .stat-box.highlight .stat-value {
     border-radius: 12px;
     box-shadow: var(--shadow-lg);
     display: flex;
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}play: flex;
     gap: 0;
     overflow: hidden;
     border: 1px solid var(--border);
@@ -738,6 +751,8 @@ body.dark-mode .stat-box.highlight .stat-value {
     justify-content: space-between;
     align-items: center;
     box-shadow: var(--shadow);
+    position: relative; /* ✅ Añadido */
+    z-index: 600; /* ✅ Añadido - por encima del toggle */
 }
 
 .list-header h2 {
