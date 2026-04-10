@@ -58,7 +58,7 @@
             <span id="hoy-badge-count">0</span>
             <span class="desktop-only">hoy</span>
         </button>
-        <button class="btn-lugares active" id="btn-toggle-lugares" data-i18n-title="filters.places">
+        <button class="btn-lugares active" id="btn-toggle-lugares" title="Lugares">
             <i class="fas fa-landmark"></i>
             <span class="desktop-only" data-i18n="btn.places">Lugares</span>
         </button>
@@ -66,9 +66,9 @@
             <i class="fas fa-chart-bar"></i>
             <span class="desktop-only" data-i18n="btn.stats">Stats</span>
         </button>
-     <button class="settings-toggle" id="settings-toggle" title="Ajustes">
-    <i class="fas fa-cog"></i>
-</button>
+        <button class="settings-toggle" id="settings-toggle" title="Ajustes">
+            <i class="fas fa-cog"></i>
+        </button>
         <div class="event-counter" id="event-count">0</div>
     </div>
 </header>
@@ -87,10 +87,10 @@
             <div class="list-header-right">
                 <label class="sort-label" data-i18n="list.sort">Ordenar:</label>
                 <select id="sort-by" class="sort-select">
-                    <option value="date" data-i18n="list.sort.date">📅 Fecha</option>
-                    <option value="name" data-i18n="list.sort.name">🔤 Nombre</option>
-                    <option value="type" data-i18n="list.sort.type">🎭 Tipo</option>
-                    <option value="distance" data-i18n="list.sort.distance">📍 Distancia</option>
+                    <option value="date">📅 Fecha</option>
+                    <option value="name">🔤 Nombre</option>
+                    <option value="type">🎭 Tipo</option>
+                    <option value="distance">📍 Distancia</option>
                 </select>
             </div>
         </div>
@@ -128,7 +128,6 @@
         <div class="filter-section">
             <input type="text" id="search" class="search-box" 
                    data-i18n-placeholder="filters.search.placeholder"
-                   data-i18n-aria="filters.search.aria"
                    placeholder="🔍 Buscar eventos, lugares...">
         </div>
 
@@ -144,11 +143,11 @@
                 <div class="filter-section">
                     <label class="filter-label" data-i18n="filters.when">Cuándo</label>
                     <select id="filtro-fecha" class="filter-select">
-                        <option value="todos" data-i18n="filters.when.all">Todos</option>
-                        <option value="hoy" data-i18n="filters.when.today">Hoy</option>
-                        <option value="finde" data-i18n="filters.when.weekend">Este fin de semana</option>
-                        <option value="semana" data-i18n="filters.when.week">Próximos 7 días</option>
-                        <option value="mes" data-i18n="filters.when.month">Este mes</option>
+                        <option value="todos">Todos</option>
+                        <option value="hoy">Hoy</option>
+                        <option value="finde">Este fin de semana</option>
+                        <option value="semana">Próximos 7 días</option>
+                        <option value="mes">Este mes</option>
                     </select>
                 </div>
 
@@ -211,7 +210,7 @@
                     <input type="range" id="filtro-precio-max" class="precio-slider"
                            min="0" max="100" value="100" step="5">
                     <div class="precio-marks">
-                        <span data-i18n="filters.price.free">Gratis</span>
+                        <span>Gratis</span>
                         <span>50€</span>
                         <span>100€+</span>
                     </div>
@@ -278,7 +277,7 @@
         <div class="filter-section">
             <label class="filter-label" data-i18n="filters.zone">📍 Zona</label>
             <select id="filtro-zona" class="filter-select">
-                <option value="todas" data-i18n="filters.zone.all">📍 Toda la Comunidad</option>
+                <option value="todas">📍 Toda la Comunidad</option>
                 <optgroup label="Madrid Capital">
                     <option value="Centro">Centro</option>
                     <option value="Arganzuela">Arganzuela</option>
@@ -330,8 +329,9 @@
         </div>
 
         <!-- LIMPIAR FILTROS -->
-        <button class="btn-clear" id="btn-clear" data-i18n="filters.clear">
-            <i class="fas fa-redo"></i> Limpiar filtros
+        <button class="btn-clear" id="btn-clear">
+            <i class="fas fa-redo"></i>
+            <span data-i18n="filters.clear">Limpiar filtros</span>
         </button>
 
     </div>
@@ -376,9 +376,9 @@
                     <p class="setting-description" data-i18n="settings.language.desc">Elige tu idioma preferido</p>
                 </div>
                 <select id="lang-select" class="settings-select">
-                    <option value="es" data-i18n="lang.es">🇪🇸 Español</option>
-                    <option value="en" data-i18n="lang.en">🇬🇧 English</option>
-                    <option value="fr" data-i18n="lang.fr">🇫🇷 Français</option>
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="fr">🇫🇷 Français</option>
                 </select>
             </div>
 
@@ -418,7 +418,8 @@
 
             <div class="setting-item">
                 <button class="btn-clear" style="margin: 0; margin-top: 12px;" id="btn-clear-cache">
-                    <i class="fas fa-trash"></i> <span data-i18n="settings.privacy.clear">Limpiar datos</span>
+                    <i class="fas fa-trash"></i>
+                    <span data-i18n="settings.privacy.clear">Limpiar datos</span>
                 </button>
             </div>
 
@@ -441,6 +442,60 @@
     </div>
 </aside>
 
+<!-- PANEL STATS -->
+<aside class="stats-panel" id="stats-panel">
+    <div class="panel-header">
+        <h2 data-i18n="stats.title">📊 Estadísticas</h2>
+        <button class="close-panel" id="close-stats">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="panel-content">
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-icon">🎵</div>
+                <div class="stat-value" id="stat-conciertos">0</div>
+                <div class="stat-name" data-i18n="stats.concerts">Conciertos</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">🎪</div>
+                <div class="stat-value" id="stat-fiestas">0</div>
+                <div class="stat-name" data-i18n="stats.parties">Fiestas</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">🛍️</div>
+                <div class="stat-value" id="stat-mercados">0</div>
+                <div class="stat-name" data-i18n="stats.markets">Mercados</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">🎭</div>
+                <div class="stat-value" id="stat-cultural">0</div>
+                <div class="stat-name" data-i18n="stats.cultural">Cultural</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">🍽️</div>
+                <div class="stat-value" id="stat-gastronomia">0</div>
+                <div class="stat-name" data-i18n="stats.gastro">Gastro</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">⚽</div>
+                <div class="stat-value" id="stat-deporte">0</div>
+                <div class="stat-name" data-i18n="stats.sports">Deportes</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">👶</div>
+                <div class="stat-value" id="stat-infantil">0</div>
+                <div class="stat-name" data-i18n="stats.kids">Infantil</div>
+            </div>
+            <div class="stat-box highlight">
+                <div class="stat-icon">✓</div>
+                <div class="stat-value" id="stat-gratis">0</div>
+                <div class="stat-name" data-i18n="stats.free">Gratis</div>
+            </div>
+        </div>
+    </div>
+</aside>
+
 <!-- GEOLOCALIZACIÓN -->
 <button class="btn-geolocate" id="btn-geolocate" title="Mi ubicación">
     <i class="fas fa-location-arrow"></i>
@@ -449,7 +504,6 @@
 <!-- SCRIPTS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-<script src="js/i18n.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

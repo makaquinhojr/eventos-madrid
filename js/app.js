@@ -1079,7 +1079,7 @@ function initSliderPrecio() {
         slider.style.setProperty('--pct', val + '%');
 
         if (val >= 100) {
-            label.textContent = 'Cualquiera';
+            label.textContent = i18n.t('filters.price.any');
         } else if (val === 0) {
             label.textContent = 'Solo gratis';
         } else {
@@ -1466,7 +1466,7 @@ function initSettingsPanel() {
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
             
-            const mensaje = newTheme === 'dark' ? i18n.t('toast.theme_dark') : i18n.t('toast.theme_light');
+            const mensaje = i18n.t(newTheme === 'dark' ? 'toast.theme_dark' : 'toast.theme_light');
             mostrarToast(mensaje);
         });
     }
@@ -1491,7 +1491,7 @@ function initSettingsPanel() {
         
         notificationsToggle.addEventListener('change', (e) => {
             localStorage.setItem('notifications', e.target.checked);
-            const mensaje = e.target.checked ? i18n.t('toast.notifications_on') : i18n.t('toast.notifications_off');
+            const mensaje = i18n.t(e.target.checked ? 'toast.notifications_on' : 'toast.notifications_off');
             mostrarToast(mensaje);
         });
     }
@@ -1504,7 +1504,7 @@ function initSettingsPanel() {
         
         saveSearchesToggle.addEventListener('change', (e) => {
             localStorage.setItem('saveSearches', e.target.checked);
-            const mensaje = e.target.checked ? i18n.t('toast.searches_on') : i18n.t('toast.searches_off');
+            const mensaje = i18n.t(e.target.checked ? 'toast.searches_on' : 'toast.searches_off');
             mostrarToast(mensaje);
         });
     }
@@ -1567,7 +1567,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sort-by').addEventListener('change', e => {
         currentSort = e.target.value;
         if (currentSort === 'distance' && !userLocation) {
-            mostrarToast(i18n.t('toast.activate_location'), 'error');
+            mostrarToast('📍 Activa tu ubicación primero', 'error');
             e.target.value = 'date';
             currentSort = 'date';
             return;
@@ -1587,3 +1587,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape') cerrarModalCompartir();
     });
 });
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/eventos-madrid/sw.js')
+            .then(reg => console.log('✅ SW registrado:', reg.scope))
+            .catch(err => console.log('❌ SW error:', err));
+    });
+}

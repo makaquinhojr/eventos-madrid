@@ -37,8 +37,6 @@ const translations = {
         'filters.price.paid': '💰 De pago',
         'filters.price.max': 'Precio máximo',
         'filters.price.any': 'Cualquiera',
-        'filters.price.only_free': 'Solo gratis',
-        'filters.price.until': 'hasta',
         
         // Grupo Lugares
         'filters.places': '🏛️ Filtros de Lugares',
@@ -68,25 +66,6 @@ const translations = {
         'list.sort.distance': '📍 Distancia',
         
         'list.places': '🏛️ Lugares de Interés',
-        'list.empty': 'No se encontraron eventos',
-        'list.empty.subtitle': 'Prueba a cambiar los filtros',
-        
-        // ===== BADGES =====
-        'badge.today': '🔥 HOY',
-        'badge.tomorrow': '⚡ MAÑANA',
-        'badge.free': '💚 GRATIS',
-        'badge.paid': '💰',
-        'badge.zone': '📍',
-        
-        // ===== BOTONES =====
-        'btn.view_map': 'Ver en mapa',
-        'btn.more_info': 'Más info',
-        'btn.search': 'Buscar',
-        'btn.add_calendar': '📅 Añadir al calendario',
-        'btn.directions': 'Cómo llegar',
-        'btn.share': 'Compartir',
-        'btn.confirm': 'Confirmar',
-        'btn.close': 'Cerrar',
         
         // ===== STATS =====
         'stats.title': '📊 Estadísticas',
@@ -119,28 +98,7 @@ const translations = {
         'settings.about.version': 'v1.0.0',
         'settings.about.desc': 'Mapa de eventos culturales y de ocio en Madrid',
         
-        // ===== POPUP =====
-        'popup.share_event': 'Compartir evento',
-        'popup.share_place': 'Compartir lugar',
-        'popup.copy_link': 'Copiar link',
-        'popup.copied': '¡Copiado!',
-        'popup.location': 'Tu ubicación',
-        'popup.here': 'Estás aquí',
-        
         // ===== TOAST =====
-        'toast.loading_location': '📍 Buscando tu ubicación...',
-        'toast.location_found': '✅ Ubicación encontrada',
-        'toast.location_denied': '❌ Permiso denegado',
-        'toast.location_unavailable': '❌ Posición no disponible',
-        'toast.location_timeout': '❌ Tiempo de espera agotado',
-        'toast.location_disabled': '📍 Geolocalización desactivada',
-        'toast.places_visible': '🏛️ Lugares visibles',
-        'toast.places_hidden': '🏛️ Lugares ocultos',
-        'toast.activate_location': '📍 Activa tu ubicación primero',
-        'toast.events_today': 'eventos hoy en Madrid',
-        'toast.copy_error': '❌ No se pudo copiar',
-        'toast.loading': 'Cargando eventos...',
-        'toast.loaded': 'eventos cargados',
         'toast.theme_dark': '🌙 Modo oscuro activado',
         'toast.theme_light': '☀️ Modo claro activado',
         'toast.lang_changed': '🌐 Idioma cambiado',
@@ -161,14 +119,12 @@ const translations = {
     },
     
     en: {
-        // ===== HEADER =====
         'logo.text': 'EventosMadrid',
         'btn.map': 'Map',
         'btn.list': 'List',
         'btn.places': 'Places',
         'btn.stats': 'Stats',
         
-        // ===== FILTERS =====
         'filters.title': '🔍 Filters',
         'filters.search.placeholder': '🔍 Search events, places...',
         'filters.search.aria': 'Search events',
@@ -195,8 +151,6 @@ const translations = {
         'filters.price.paid': '💰 Paid',
         'filters.price.max': 'Maximum price',
         'filters.price.any': 'Any',
-        'filters.price.only_free': 'Free only',
-        'filters.price.until': 'up to',
         
         'filters.places': '🏛️ Place Filters',
         'filters.places.all': '✓ All',
@@ -223,23 +177,6 @@ const translations = {
         'list.sort.distance': '📍 Distance',
         
         'list.places': '🏛️ Points of Interest',
-        'list.empty': 'No events found',
-        'list.empty.subtitle': 'Try changing the filters',
-        
-        'badge.today': '🔥 TODAY',
-        'badge.tomorrow': '⚡ TOMORROW',
-        'badge.free': '💚 FREE',
-        'badge.paid': '💰',
-        'badge.zone': '📍',
-        
-        'btn.view_map': 'View on map',
-        'btn.more_info': 'More info',
-        'btn.search': 'Search',
-        'btn.add_calendar': '📅 Add to calendar',
-        'btn.directions': 'Directions',
-        'btn.share': 'Share',
-        'btn.confirm': 'Confirm',
-        'btn.close': 'Close',
         
         'stats.title': '📊 Statistics',
         'stats.concerts': 'Concerts',
@@ -270,26 +207,6 @@ const translations = {
         'settings.about.version': 'v1.0.0',
         'settings.about.desc': 'Cultural and leisure events map in Madrid',
         
-        'popup.share_event': 'Share event',
-        'popup.share_place': 'Share place',
-        'popup.copy_link': 'Copy link',
-        'popup.copied': 'Copied!',
-        'popup.location': 'Your location',
-        'popup.here': 'You are here',
-        
-        'toast.loading_location': '📍 Finding your location...',
-        'toast.location_found': '✅ Location found',
-        'toast.location_denied': '❌ Permission denied',
-        'toast.location_unavailable': '❌ Position unavailable',
-        'toast.location_timeout': '❌ Request timeout',
-        'toast.location_disabled': '📍 Geolocation disabled',
-        'toast.places_visible': '🏛️ Places visible',
-        'toast.places_hidden': '🏛️ Places hidden',
-        'toast.activate_location': '📍 Activate location first',
-        'toast.events_today': 'events today in Madrid',
-        'toast.copy_error': '❌ Could not copy',
-        'toast.loading': 'Loading events...',
-        'toast.loaded': 'events loaded',
         'toast.theme_dark': '🌙 Dark mode enabled',
         'toast.theme_light': '☀️ Light mode enabled',
         'toast.lang_changed': '🌐 Language changed',
@@ -308,14 +225,12 @@ const translations = {
     },
     
     fr: {
-        // ===== HEADER =====
         'logo.text': 'EventosMadrid',
         'btn.map': 'Carte',
         'btn.list': 'Liste',
         'btn.places': 'Lieux',
         'btn.stats': 'Stats',
         
-        // ===== FILTERS =====
         'filters.title': '🔍 Filtres',
         'filters.search.placeholder': '🔍 Chercher événements, lieux...',
         'filters.search.aria': 'Chercher événements',
@@ -342,8 +257,6 @@ const translations = {
         'filters.price.paid': '💰 Payant',
         'filters.price.max': 'Prix maximum',
         'filters.price.any': 'N\'importe',
-        'filters.price.only_free': 'Gratuit seulement',
-        'filters.price.until': 'jusqu\'à',
         
         'filters.places': '🏛️ Filtres de lieux',
         'filters.places.all': '✓ Tous',
@@ -370,23 +283,6 @@ const translations = {
         'list.sort.distance': '📍 Distance',
         
         'list.places': '🏛️ Points d\'intérêt',
-        'list.empty': 'Aucun événement trouvé',
-        'list.empty.subtitle': 'Essayez de modifier les filtres',
-        
-        'badge.today': '🔥 AUJOURD\'HUI',
-        'badge.tomorrow': '⚡ DEMAIN',
-        'badge.free': '💚 GRATUIT',
-        'badge.paid': '💰',
-        'badge.zone': '📍',
-        
-        'btn.view_map': 'Voir sur la carte',
-        'btn.more_info': 'Plus d\'info',
-        'btn.search': 'Rechercher',
-        'btn.add_calendar': '📅 Ajouter au calendrier',
-        'btn.directions': 'Itinéraires',
-        'btn.share': 'Partager',
-        'btn.confirm': 'Confirmer',
-        'btn.close': 'Fermer',
         
         'stats.title': '📊 Statistiques',
         'stats.concerts': 'Concerts',
@@ -417,26 +313,6 @@ const translations = {
         'settings.about.version': 'v1.0.0',
         'settings.about.desc': 'Carte des événements culturels et de loisirs à Madrid',
         
-        'popup.share_event': 'Partager l\'événement',
-        'popup.share_place': 'Partager le lieu',
-        'popup.copy_link': 'Copier le lien',
-        'popup.copied': 'Copié!',
-        'popup.location': 'Votre localisation',
-        'popup.here': 'Vous êtes ici',
-        
-        'toast.loading_location': '📍 Recherche de votre localisation...',
-        'toast.location_found': '✅ Localisation trouvée',
-        'toast.location_denied': '❌ Permission refusée',
-        'toast.location_unavailable': '❌ Position non disponible',
-        'toast.location_timeout': '❌ Délai d\'attente dépassé',
-        'toast.location_disabled': '📍 Géolocalisation désactivée',
-        'toast.places_visible': '🏛️ Lieux visibles',
-        'toast.places_hidden': '🏛️ Lieux masqués',
-        'toast.activate_location': '📍 Activez d\'abord votre localisation',
-        'toast.events_today': 'événements aujourd\'hui à Madrid',
-        'toast.copy_error': '❌ Impossible de copier',
-        'toast.loading': 'Chargement des événements...',
-        'toast.loaded': 'événements chargés',
         'toast.theme_dark': '🌙 Mode sombre activé',
         'toast.theme_light': '☀️ Mode clair activé',
         'toast.lang_changed': '🌐 Langue modifiée',
@@ -498,16 +374,17 @@ class I18n {
         return this.currentLang;
     }
 
-    // ✅ FUNCIÓN CORREGIDA: Actualizar toda la UI sin recargar
+    // ✅ FUNCIÓN SIMPLIFICADA: Solo actualiza textos estáticos
     updateUI() {
-        // Actualizar elementos con data-i18n (SOLO textContent)
+        // Solo actualizar elementos que NO son interactivos
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             
-            // ❌ NO actualizar <option> ni <input> para no romper valores
-            if (el.tagName === 'OPTION' || el.tagName === 'INPUT') {
-                return;
-            }
+            // Excluir elementos que tienen hijos (como botones con iconos)
+            if (el.children.length > 0) return;
+            
+            // Excluir inputs, options, buttons
+            if (['OPTION', 'INPUT', 'BUTTON'].includes(el.tagName)) return;
             
             el.textContent = this.t(key);
         });
@@ -518,81 +395,38 @@ class I18n {
             el.placeholder = this.t(key);
         });
 
-        // Actualizar títulos (title attribute)
-        document.querySelectorAll('[data-i18n-title]').forEach(el => {
-            const key = el.getAttribute('data-i18n-title');
-            el.title = this.t(key);
-        });
-
-        // Actualizar aria-label
-        document.querySelectorAll('[data-i18n-aria]').forEach(el => {
-            const key = el.getAttribute('data-i18n-aria');
-            el.setAttribute('aria-label', this.t(key));
-        });
-
-        // ✅ Actualizar <option> manualmente SIN cambiar el value
+        // Actualizar select options manualmente
         this.updateSelectOptions();
-
-        // Actualizar el select de idioma
-        const langSelect = document.getElementById('lang-select');
-        if (langSelect) {
-            langSelect.value = this.currentLang;
-        }
-
-        // ✅ Disparar evento para que app.js recargue datos traducidos
-        window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang: this.currentLang } }));
     }
 
-    // ✅ NUEVA FUNCIÓN: Actualizar opciones de select preservando values
     updateSelectOptions() {
-        // Filtro de fecha
-        const filtroFecha = document.getElementById('filtro-fecha');
-        if (filtroFecha) {
-            const currentValue = filtroFecha.value;
-            Array.from(filtroFecha.options).forEach(option => {
-                const key = option.getAttribute('data-i18n');
-                if (key) {
-                    option.textContent = this.t(key);
+        const selects = [
+            { id: 'filtro-fecha', options: ['filters.when.all', 'filters.when.today', 'filters.when.weekend', 'filters.when.week', 'filters.when.month'] },
+            { id: 'sort-by', options: ['list.sort.date', 'list.sort.name', 'list.sort.type', 'list.sort.distance'] },
+            { id: 'lang-select', options: ['lang.es', 'lang.en', 'lang.fr'] }
+        ];
+
+        selects.forEach(({ id, options }) => {
+            const select = document.getElementById(id);
+            if (!select) return;
+            
+            const currentValue = select.value;
+            
+            Array.from(select.options).forEach((option, index) => {
+                if (options[index]) {
+                    option.textContent = this.t(options[index]);
                 }
             });
-            filtroFecha.value = currentValue; // Restaurar valor
-        }
+            
+            select.value = currentValue;
+        });
 
-        // Sort by
-        const sortBy = document.getElementById('sort-by');
-        if (sortBy) {
-            const currentValue = sortBy.value;
-            Array.from(sortBy.options).forEach(option => {
-                const key = option.getAttribute('data-i18n');
-                if (key) {
-                    option.textContent = this.t(key);
-                }
-            });
-            sortBy.value = currentValue; // Restaurar valor
-        }
-
-        // Filtro de zona - Solo el primer option
+        // Actualizar primera opción de zona
         const filtroZona = document.getElementById('filtro-zona');
-        if (filtroZona && filtroZona.options[0]) {
-            const key = filtroZona.options[0].getAttribute('data-i18n');
-            if (key) {
-                const currentValue = filtroZona.value;
-                filtroZona.options[0].textContent = this.t(key);
-                filtroZona.value = currentValue;
-            }
-        }
-
-        // Select de idioma
-        const langSelect = document.getElementById('lang-select');
-        if (langSelect) {
-            const currentValue = langSelect.value;
-            Array.from(langSelect.options).forEach(option => {
-                const key = option.getAttribute('data-i18n');
-                if (key) {
-                    option.textContent = this.t(key);
-                }
-            });
-            langSelect.value = currentValue;
+        if (filtroZona?.options[0]) {
+            const currentValue = filtroZona.value;
+            filtroZona.options[0].textContent = this.t('filters.zone.all');
+            filtroZona.value = currentValue;
         }
     }
 }
@@ -600,9 +434,11 @@ class I18n {
 // Crear instancia global
 const i18n = new I18n();
 
-// ✅ Actualizar UI al cargar
+// ✅ Actualizar UI al cargar (sin romper eventos)
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => i18n.updateUI());
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => i18n.updateUI(), 100);
+    });
 } else {
-    i18n.updateUI();
+    setTimeout(() => i18n.updateUI(), 100);
 }
