@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
     <link rel="stylesheet" href="css/style.css">
+    
+    <!-- ✅ SCRIPT I18N PRIMERO -->
+    <script src="js/i18n.js"></script>
 </head>
 <body>
 
@@ -21,8 +24,8 @@
 <div class="loader-overlay" id="loader">
     <div class="loader-contenido">
         <div class="loader-emoji">🎉</div>
-        <h2 class="loader-titulo">EventosMadrid</h2>
-        <p class="loader-subtitulo">Cargando eventos...</p>
+        <h2 class="loader-titulo" data-i18n="loader.title">EventosMadrid</h2>
+        <p class="loader-subtitulo" data-i18n="loader.subtitle">Cargando eventos...</p>
         <div class="loader-barra">
             <div class="loader-progreso" id="loader-progreso"></div>
         </div>
@@ -34,20 +37,29 @@
 <header class="top-bar">
     <div class="logo">
         <span class="logo-icon">🎉</span>
-        <span class="logo-text">EventosMadrid</span>
+        <span class="logo-text" data-i18n="logo.text">EventosMadrid</span>
     </div>
 
-    <div class="top-bar-center">
-        <div class="view-toggle">
-            <button class="view-btn active" id="view-map-btn">
-                <i class="fas fa-map"></i>
-                <span>Mapa</span>
-            </button>
-            <button class="view-btn" id="view-list-btn">
-                <i class="fas fa-list"></i>
-                <span>Lista</span>
-            </button>
-        </div>
+    <!-- SELECTOR DE IDIOMA -->
+    <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; z-index: 100;">
+        <label for="lang-select" style="font-size: 13px; font-weight: 600; color: var(--text-light); margin: 0; display: none;" id="lang-label" data-i18n="lang.select">🌐 Idioma</label>
+        <select id="lang-select" class="filter-select" style="padding: 8px 12px; font-size: 13px; min-width: 120px; display: none;">
+            <option value="es" data-i18n="lang.spanish">Español</option>
+            <option value="en" data-i18n="lang.english">English</option>
+            <option value="fr" data-i18n="lang.french">Français</option>
+        </select>
+    </div>
+
+    <!-- TOGGLE MAPA/LISTA -->
+    <div class="view-toggle">
+        <button class="view-btn active" id="view-map-btn">
+            <i class="fas fa-map"></i>
+            <span data-i18n="btn.map">Mapa</span>
+        </button>
+        <button class="view-btn" id="view-list-btn">
+            <i class="fas fa-list"></i>
+            <span data-i18n="btn.list">Lista</span>
+        </button>
     </div>
 
     <div class="top-bar-actions">
@@ -56,13 +68,13 @@
             <span id="hoy-badge-count">0</span>
             <span class="desktop-only">hoy</span>
         </button>
-        <button class="btn-lugares active" id="btn-toggle-lugares" title="Mostrar/ocultar lugares">
+        <button class="btn-lugares active" id="btn-toggle-lugares" data-i18n-title="filters.places">
             <i class="fas fa-landmark"></i>
-            <span class="desktop-only">Lugares</span>
+            <span class="desktop-only" data-i18n="btn.places">Lugares</span>
         </button>
         <button class="stats-toggle" id="stats-toggle">
             <i class="fas fa-chart-bar"></i>
-            <span class="desktop-only">Stats</span>
+            <span class="desktop-only" data-i18n="btn.stats">Stats</span>
         </button>
         <button class="theme-toggle" id="theme-toggle">
             <i class="fas fa-sun"></i>
@@ -79,23 +91,23 @@
     <div class="list-container">
         <div class="list-header">
             <div class="list-header-left">
-                <h2>📅 Eventos en Madrid</h2>
-                <p class="list-subtitle" id="list-subtitle">Mostrando todos los eventos</p>
+                <h2 data-i18n="list.title">📅 Eventos en Madrid</h2>
+                <p class="list-subtitle" id="list-subtitle" data-i18n="list.subtitle">Mostrando todos los eventos</p>
             </div>
             <div class="list-header-right">
-                <label class="sort-label">Ordenar:</label>
+                <label class="sort-label" data-i18n="list.sort">Ordenar:</label>
                 <select id="sort-by" class="sort-select">
-                    <option value="date">📅 Fecha</option>
-                    <option value="name">🔤 Nombre</option>
-                    <option value="type">🎭 Tipo</option>
-                    <option value="distance">📍 Distancia</option>
+                    <option value="date" data-i18n="list.sort.date">📅 Fecha</option>
+                    <option value="name" data-i18n="list.sort.name">🔤 Nombre</option>
+                    <option value="type" data-i18n="list.sort.type">🎭 Tipo</option>
+                    <option value="distance" data-i18n="list.sort.distance">📍 Distancia</option>
                 </select>
             </div>
         </div>
         <div id="events-list" class="events-list"></div>
         <div class="lugares-section" id="lugares-section">
             <div class="lugares-header" id="lugares-header">
-                <h2>🏛️ Lugares de Interés</h2>
+                <h2 data-i18n="list.places">🏛️ Lugares de Interés</h2>
                 <button class="lugares-toggle-btn" id="lugares-toggle-btn">
                     <i class="fas fa-chevron-up"></i>
                 </button>
@@ -108,13 +120,13 @@
 <!-- BOTÓN FLOTANTE FILTROS -->
 <button class="fab-filters" id="fab-filters">
     <i class="fas fa-sliders-h"></i>
-    <span>Filtros</span>
+    <span data-i18n="filters.title">Filtros</span>
 </button>
 
 <!-- PANEL FILTROS -->
 <aside class="filters-panel" id="filters-panel">
     <div class="panel-header">
-        <h2>🔍 Filtros</h2>
+        <h2 data-i18n="filters.title">🔍 Filtros</h2>
         <button class="close-panel" id="close-panel">
             <i class="fas fa-times"></i>
         </button>
@@ -125,75 +137,77 @@
         <!-- BÚSQUEDA -->
         <div class="filter-section">
             <input type="text" id="search" class="search-box" 
+                   data-i18n-placeholder="filters.search.placeholder"
+                   data-i18n-aria="filters.search.aria"
                    placeholder="🔍 Buscar eventos, lugares...">
         </div>
 
         <!-- GRUPO: FILTROS DE EVENTOS -->
         <div class="filter-group">
             <button class="filter-group-header" id="eventos-header">
-                <span class="filter-group-title">🎭 Filtros de Eventos</span>
+                <span class="filter-group-title" data-i18n="filters.events">🎭 Filtros de Eventos</span>
                 <i class="fas fa-chevron-down"></i>
             </button>
             <div class="filter-group-content" id="eventos-content">
 
                 <!-- Cuándo -->
                 <div class="filter-section">
-                    <label class="filter-label">Cuándo</label>
+                    <label class="filter-label" data-i18n="filters.when">Cuándo</label>
                     <select id="filtro-fecha" class="filter-select">
-                        <option value="todos">Todos</option>
-                        <option value="hoy">Hoy</option>
-                        <option value="finde">Este fin de semana</option>
-                        <option value="semana">Próximos 7 días</option>
-                        <option value="mes">Este mes</option>
+                        <option value="todos" data-i18n="filters.when.all">Todos</option>
+                        <option value="hoy" data-i18n="filters.when.today">Hoy</option>
+                        <option value="finde" data-i18n="filters.when.weekend">Este fin de semana</option>
+                        <option value="semana" data-i18n="filters.when.week">Próximos 7 días</option>
+                        <option value="mes" data-i18n="filters.when.month">Este mes</option>
                     </select>
                 </div>
 
                 <!-- Tipo de evento -->
                 <div class="filter-section">
-                    <label class="filter-label">Tipo de Evento</label>
+                    <label class="filter-label" data-i18n="filters.type">Tipo de Evento</label>
                     <div class="filter-chips">
                         <label class="chip">
                             <input type="checkbox" value="concierto" checked>
-                            <span class="chip-content concierto">🎵 Conciertos</span>
+                            <span class="chip-content concierto" data-i18n="filters.type.concerts">🎵 Conciertos</span>
                         </label>
                         <label class="chip">
                             <input type="checkbox" value="fiesta" checked>
-                            <span class="chip-content fiesta">🎪 Fiestas</span>
+                            <span class="chip-content fiesta" data-i18n="filters.type.parties">🎪 Fiestas</span>
                         </label>
                         <label class="chip">
                             <input type="checkbox" value="mercado" checked>
-                            <span class="chip-content mercado">🛍️ Mercados</span>
+                            <span class="chip-content mercado" data-i18n="filters.type.markets">🛍️ Mercados</span>
                         </label>
                         <label class="chip">
                             <input type="checkbox" value="cultural" checked>
-                            <span class="chip-content cultural">🎭 Cultural</span>
+                            <span class="chip-content cultural" data-i18n="filters.type.cultural">🎭 Cultural</span>
                         </label>
                         <label class="chip">
                             <input type="checkbox" value="gastronomia" checked>
-                            <span class="chip-content gastronomia">🍽️ Gastro</span>
+                            <span class="chip-content gastronomia" data-i18n="filters.type.gastro">🍽️ Gastro</span>
                         </label>
                         <label class="chip">
                             <input type="checkbox" value="deporte" checked>
-                            <span class="chip-content deporte">⚽ Deportes</span>
+                            <span class="chip-content deporte" data-i18n="filters.type.sports">⚽ Deportes</span>
                         </label>
                         <label class="chip">
                             <input type="checkbox" value="infantil" checked>
-                            <span class="chip-content infantil">👶 Infantil</span>
+                            <span class="chip-content infantil" data-i18n="filters.type.kids">👶 Infantil</span>
                         </label>
                     </div>
                 </div>
 
                 <!-- Precio -->
                 <div class="filter-section">
-                    <label class="filter-label">Precio</label>
+                    <label class="filter-label" data-i18n="filters.price">Precio</label>
                     <div class="filter-chips">
                         <label class="chip">
                             <input type="checkbox" value="gratis" checked>
-                            <span class="chip-content gratis">💚 Gratis</span>
+                            <span class="chip-content gratis" data-i18n="filters.price.free">💚 Gratis</span>
                         </label>
                         <label class="chip">
                             <input type="checkbox" value="pago" checked>
-                            <span class="chip-content pago">💰 De pago</span>
+                            <span class="chip-content pago" data-i18n="filters.price.paid">💰 De pago</span>
                         </label>
                     </div>
                 </div>
@@ -201,13 +215,13 @@
                 <!-- Precio máximo -->
                 <div class="filter-section">
                     <label class="filter-label">
-                        Precio máximo
-                        <span class="precio-valor" id="precio-valor-label">Cualquiera</span>
+                        <span data-i18n="filters.price.max">Precio máximo</span>
+                        <span class="precio-valor" id="precio-valor-label" data-i18n="filters.price.any">Cualquiera</span>
                     </label>
                     <input type="range" id="filtro-precio-max" class="precio-slider"
                            min="0" max="100" value="100" step="5">
                     <div class="precio-marks">
-                        <span>Gratis</span>
+                        <span data-i18n="filters.price.free">Gratis</span>
                         <span>50€</span>
                         <span>100€+</span>
                     </div>
@@ -219,7 +233,7 @@
         <!-- GRUPO: FILTROS DE LUGARES -->
         <div class="filter-group">
             <button class="filter-group-header" id="lugares-header-filter">
-                <span class="filter-group-title">🏛️ Filtros de Lugares</span>
+                <span class="filter-group-title" data-i18n="filters.places">🏛️ Filtros de Lugares</span>
                 <i class="fas fa-chevron-down"></i>
             </button>
             <div class="filter-group-content" id="lugares-content">
@@ -228,41 +242,41 @@
                 <div class="filter-section">
                     <label class="chip">
                         <input type="checkbox" id="lugares-select-all" checked>
-                        <span class="chip-content lugares-all">✓ Todos</span>
+                        <span class="chip-content lugares-all" data-i18n="filters.places.all">✓ Todos</span>
                     </label>
                 </div>
 
                 <!-- Categorías de lugares -->
                 <div class="filter-section">
-                    <label class="filter-label">Categorías</label>
+                    <label class="filter-label" data-i18n="filters.places.categories">Categorías</label>
                     <div class="filter-chips">
                         <label class="chip">
                             <input type="checkbox" class="lugar-categoria-cb" value="museo" checked>
-                            <span class="chip-content lugar-museo">🏛️ Museos</span>
+                            <span class="chip-content lugar-museo" data-i18n="filters.places.museums">🏛️ Museos</span>
                         </label>
                         <label class="chip">
                             <input type="checkbox" class="lugar-categoria-cb" value="monumento" checked>
-                            <span class="chip-content lugar-monumento">🗿 Monumentos</span>
+                            <span class="chip-content lugar-monumento" data-i18n="filters.places.monuments">🗿 Monumentos</span>
                         </label>
                         <label class="chip">
                             <input type="checkbox" class="lugar-categoria-cb" value="teatro" checked>
-                            <span class="chip-content lugar-teatro">🎭 Teatros</span>
+                            <span class="chip-content lugar-teatro" data-i18n="filters.places.theaters">🎭 Teatros</span>
                         </label>
                         <label class="chip">
                             <input type="checkbox" class="lugar-categoria-cb" value="sala" checked>
-                            <span class="chip-content lugar-sala">🎵 Salas</span>
+                            <span class="chip-content lugar-sala" data-i18n="filters.places.halls">🎵 Salas</span>
                         </label>
                         <label class="chip">
                             <input type="checkbox" class="lugar-categoria-cb" value="parque" checked>
-                            <span class="chip-content lugar-parque">🌳 Parques</span>
+                            <span class="chip-content lugar-parque" data-i18n="filters.places.parks">🌳 Parques</span>
                         </label>
                         <label class="chip">
                             <input type="checkbox" class="lugar-categoria-cb" value="galeria" checked>
-                            <span class="chip-content lugar-galeria">🖼️ Galerías</span>
+                            <span class="chip-content lugar-galeria" data-i18n="filters.places.galleries">🖼️ Galerías</span>
                         </label>
                         <label class="chip">
                             <input type="checkbox" class="lugar-categoria-cb" value="mercado" checked>
-                            <span class="chip-content lugar-mercado">🛍️ Mercados</span>
+                            <span class="chip-content lugar-mercado" data-i18n="filters.places.markets">🛍️ Mercados</span>
                         </label>
                     </div>
                 </div>
@@ -272,10 +286,10 @@
 
         <!-- ZONA -->
         <div class="filter-section">
-            <label class="filter-label">📍 Zona</label>
+            <label class="filter-label" data-i18n="filters.zone">📍 Zona</label>
             <select id="filtro-zona" class="filter-select">
-                <option value="todas">📍 Toda la Comunidad</option>
-                <optgroup label="🏙️ Madrid Capital">
+                <option value="todas" data-i18n="filters.zone.all">📍 Toda la Comunidad</option>
+                <optgroup label="Madrid Capital">
                     <option value="Centro">Centro</option>
                     <option value="Arganzuela">Arganzuela</option>
                     <option value="Retiro">Retiro</option>
@@ -298,7 +312,7 @@
                     <option value="San Blas">San Blas</option>
                     <option value="Barajas">Barajas</option>
                 </optgroup>
-                <optgroup label="🌆 Municipios">
+                <optgroup label="Municipios">
                     <option value="Getafe">Getafe</option>
                     <option value="Leganés">Leganés</option>
                     <option value="Alcorcón">Alcorcón</option>
@@ -326,7 +340,7 @@
         </div>
 
         <!-- LIMPIAR FILTROS -->
-        <button class="btn-clear" id="btn-clear">
+        <button class="btn-clear" id="btn-clear" data-i18n="filters.clear">
             <i class="fas fa-redo"></i> Limpiar filtros
         </button>
 
@@ -336,7 +350,7 @@
 <!-- PANEL STATS -->
 <aside class="stats-panel" id="stats-panel">
     <div class="panel-header">
-        <h2>📊 Estadísticas</h2>
+        <h2 data-i18n="stats.title">📊 Estadísticas</h2>
         <button class="close-panel" id="close-stats">
             <i class="fas fa-times"></i>
         </button>
@@ -346,42 +360,42 @@
             <div class="stat-box">
                 <div class="stat-icon">🎵</div>
                 <div class="stat-value" id="stat-conciertos">0</div>
-                <div class="stat-name">Conciertos</div>
+                <div class="stat-name" data-i18n="stats.concerts">Conciertos</div>
             </div>
             <div class="stat-box">
                 <div class="stat-icon">🎪</div>
                 <div class="stat-value" id="stat-fiestas">0</div>
-                <div class="stat-name">Fiestas</div>
+                <div class="stat-name" data-i18n="stats.parties">Fiestas</div>
             </div>
             <div class="stat-box">
                 <div class="stat-icon">🛍️</div>
                 <div class="stat-value" id="stat-mercados">0</div>
-                <div class="stat-name">Mercados</div>
+                <div class="stat-name" data-i18n="stats.markets">Mercados</div>
             </div>
             <div class="stat-box">
                 <div class="stat-icon">🎭</div>
                 <div class="stat-value" id="stat-cultural">0</div>
-                <div class="stat-name">Cultural</div>
+                <div class="stat-name" data-i18n="stats.cultural">Cultural</div>
             </div>
             <div class="stat-box">
                 <div class="stat-icon">🍽️</div>
                 <div class="stat-value" id="stat-gastronomia">0</div>
-                <div class="stat-name">Gastro</div>
+                <div class="stat-name" data-i18n="stats.gastro">Gastro</div>
             </div>
             <div class="stat-box">
                 <div class="stat-icon">⚽</div>
                 <div class="stat-value" id="stat-deporte">0</div>
-                <div class="stat-name">Deportes</div>
+                <div class="stat-name" data-i18n="stats.sports">Deportes</div>
             </div>
             <div class="stat-box">
                 <div class="stat-icon">👶</div>
                 <div class="stat-value" id="stat-infantil">0</div>
-                <div class="stat-name">Infantil</div>
+                <div class="stat-name" data-i18n="stats.kids">Infantil</div>
             </div>
             <div class="stat-box highlight">
                 <div class="stat-icon">✓</div>
                 <div class="stat-value" id="stat-gratis">0</div>
-                <div class="stat-name">Gratis</div>
+                <div class="stat-name" data-i18n="stats.free">Gratis</div>
             </div>
         </div>
     </div>
