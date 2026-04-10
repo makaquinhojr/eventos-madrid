@@ -5,7 +5,7 @@
     box-sizing: border-box;
 }
 
-/* ===== VARIABLES ===== */
+/* ===== VARIABLES (TEMA OSCURO POR DEFECTO) ===== */
 :root {
     --bg: #000000;
     --bg-1: #0a0a0a;
@@ -31,6 +31,22 @@
     --radius: 8px;
     --radius-lg: 12px;
     --radius-full: 9999px;
+}
+
+/* ===== TEMA CLARO ===== */
+[data-theme="light"] {
+    --bg: #ffffff;
+    --bg-1: #fafafa;
+    --bg-2: #f5f5f5;
+    --bg-3: #eeeeee;
+    --bg-4: #e5e5e5;
+    --border: #e5e5e5;
+    --border-light: #d4d4d4;
+    --text: #0a0a0a;
+    --text-2: #525252;
+    --text-3: #a3a3a3;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-lg: 0 4px 24px rgba(0,0,0,0.1);
 }
 
 body.light-mode {

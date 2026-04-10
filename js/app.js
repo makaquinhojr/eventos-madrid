@@ -1442,36 +1442,36 @@ function initSettingsPanel() {
     
     if (!settingsToggle || !settingsPanel) return;
     
-    // Abrir panel
+    // ✅ Abrir panel
     settingsToggle.addEventListener('click', () => {
         settingsPanel.classList.add('active');
     });
     
-    // Cerrar panel
+    // ✅ Cerrar panel
     closeSettings.addEventListener('click', () => {
         settingsPanel.classList.remove('active');
     });
     
-    // Tema toggle - DIRECTO Y SIMPLE
+    // ===== TEMA (DARK/LIGHT) =====
     const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
-        const isDark = document.body.classList.contains('dark-mode');
-        themeToggle.checked = isDark;
+        // Cargar tema guardado
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        themeToggle.checked = (savedTheme === 'dark');
         
+        // Cambiar tema
         themeToggle.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                document.body.classList.add('dark-mode');
-                localStorage.setItem('theme', 'dark');
-                mostrarToast('🌙 Modo oscuro');
-            } else {
-                document.body.classList.remove('dark-mode');
-                localStorage.setItem('theme', 'light');
-                mostrarToast('☀️ Modo claro');
-            }
+            const newTheme = e.target.checked ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            const mensaje = newTheme === 'dark' ? i18n.t('toast.theme_dark') : i18n.t('toast.theme_light');
+            mostrarToast(mensaje);
         });
     }
     
-    // Idioma
+    // ===== IDIOMA =====
     const langSelect = document.getElementById('lang-select');
     if (langSelect && typeof i18n !== 'undefined') {
         langSelect.value = i18n.getLanguage();
@@ -1479,10 +1479,11 @@ function initSettingsPanel() {
         langSelect.addEventListener('change', (e) => {
             const newLang = e.target.value;
             i18n.setLanguage(newLang);
+            mostrarToast(i18n.t('toast.lang_changed'));
         });
     }
     
-    // Notificaciones toggle
+    // ===== NOTIFICACIONES =====
     const notificationsToggle = document.getElementById('notifications-toggle');
     if (notificationsToggle) {
         const saved = localStorage.getItem('notifications');
@@ -1490,11 +1491,12 @@ function initSettingsPanel() {
         
         notificationsToggle.addEventListener('change', (e) => {
             localStorage.setItem('notifications', e.target.checked);
-            mostrarToast(e.target.checked ? '🔔 Notificaciones activadas' : '🔔 Notificaciones desactivadas');
+            const mensaje = e.target.checked ? i18n.t('toast.notifications_on') : i18n.t('toast.notifications_off');
+            mostrarToast(mensaje);
         });
     }
     
-    // Guardar búsquedas toggle
+    // ===== GUARDAR BÚSQUEDAS =====
     const saveSearchesToggle = document.getElementById('save-searches-toggle');
     if (saveSearchesToggle) {
         const saved = localStorage.getItem('saveSearches');
@@ -1502,17 +1504,22 @@ function initSettingsPanel() {
         
         saveSearchesToggle.addEventListener('change', (e) => {
             localStorage.setItem('saveSearches', e.target.checked);
-            mostrarToast(e.target.checked ? '💾 Se guardarán tus búsquedas' : '🗑️ Las búsquedas no se guardarán');
+            const mensaje = e.target.checked ? i18n.t('toast.searches_on') : i18n.t('toast.searches_off');
+            mostrarToast(mensaje);
         });
     }
     
-    // Limpiar datos
+    // ===== LIMPIAR DATOS =====
     const clearCacheBtn = document.getElementById('btn-clear-cache');
     if (clearCacheBtn) {
         clearCacheBtn.addEventListener('click', () => {
             if (confirm('¿Estás seguro de que deseas limpiar todos los datos?')) {
+                const theme = localStorage.getItem('theme');
+                const lang = localStorage.getItem('language');
                 localStorage.clear();
-                mostrarToast('🗑️ Datos limpiados');
+                localStorage.setItem('theme', theme || 'dark');
+                localStorage.setItem('language', lang || 'es');
+                mostrarToast(i18n.t('toast.data_cleared'));
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);
@@ -1523,6 +1530,10 @@ function initSettingsPanel() {
 
 // ===== DOMContentLoaded =====
 document.addEventListener('DOMContentLoaded', () => {
+    // ✅ Aplicar tema guardado ANTES de inicializar
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    
     // Inicializar app
     initMap();
     loadEvents();
@@ -1532,22 +1543,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initLugaresSelectAll();
     initLugaresListToggle();
     initSettingsPanel();
-
-    // Tema
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-    } else {
-        document.body.classList.remove('dark-mode');
-    }
-    
-    // Actualizar toggle del panel
-    setTimeout(() => {
-        const themeToggle = document.getElementById('theme-toggle');
-        if (themeToggle) {
-            themeToggle.checked = document.body.classList.contains('dark-mode');
-        }
-    }, 100);
 
     // Panels
     document.getElementById('fab-filters').addEventListener('click', () => {
@@ -1572,7 +1567,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sort-by').addEventListener('change', e => {
         currentSort = e.target.value;
         if (currentSort === 'distance' && !userLocation) {
-            mostrarToast('📍 Activa tu ubicación primero', 'error');
+            mostrarToast(i18n.t('toast.activate_location'), 'error');
             e.target.value = 'date';
             currentSort = 'date';
             return;
@@ -1592,11 +1587,3 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape') cerrarModalCompartir();
     });
 });
-
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/eventos-madrid/sw.js')
-            .then(reg => console.log('✅ SW registrado:', reg.scope))
-            .catch(err => console.log('❌ SW error:', err));
-    });
-}

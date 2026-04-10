@@ -340,7 +340,7 @@
 <!-- PANEL AJUSTES -->
 <aside class="settings-panel" id="settings-panel">
     <div class="panel-header">
-        <h2>⚙️ Ajustes</h2>
+        <h2 data-i18n="settings.title">⚙️ Ajustes</h2>
         <button class="close-panel" id="close-settings">
             <i class="fas fa-times"></i>
         </button>
@@ -350,13 +350,13 @@
 
         <!-- SECCIÓN: APARIENCIA -->
         <div class="settings-section">
-            <h3 class="settings-section-title">🎨 Apariencia</h3>
+            <h3 class="settings-section-title" data-i18n="settings.appearance">🎨 Apariencia</h3>
 
             <!-- Tema -->
             <div class="setting-item">
                 <div class="setting-info">
-                    <label class="setting-label">Modo oscuro</label>
-                    <p class="setting-description">Cambiar entre tema claro y oscuro</p>
+                    <label class="setting-label" data-i18n="settings.theme">Modo oscuro</label>
+                    <p class="setting-description" data-i18n="settings.theme.desc">Cambiar entre tema claro y oscuro</p>
                 </div>
                 <label class="toggle-switch">
                     <input type="checkbox" id="theme-toggle" class="toggle-checkbox">
@@ -368,17 +368,17 @@
 
         <!-- SECCIÓN: IDIOMA -->
         <div class="settings-section">
-            <h3 class="settings-section-title">🌐 Idioma</h3>
+            <h3 class="settings-section-title" data-i18n="settings.language">🌐 Idioma</h3>
 
             <div class="setting-item">
                 <div class="setting-info">
-                    <label class="setting-label">Seleccionar idioma</label>
-                    <p class="setting-description">Elige tu idioma preferido</p>
+                    <label class="setting-label" data-i18n="settings.language.select">Seleccionar idioma</label>
+                    <p class="setting-description" data-i18n="settings.language.desc">Elige tu idioma preferido</p>
                 </div>
                 <select id="lang-select" class="settings-select">
-                    <option value="es">🇪🇸 Español</option>
-                    <option value="en">🇬🇧 English</option>
-                    <option value="fr">🇫🇷 Français</option>
+                    <option value="es" data-i18n="lang.es">🇪🇸 Español</option>
+                    <option value="en" data-i18n="lang.en">🇬🇧 English</option>
+                    <option value="fr" data-i18n="lang.fr">🇫🇷 Français</option>
                 </select>
             </div>
 
@@ -386,12 +386,12 @@
 
         <!-- SECCIÓN: NOTIFICACIONES -->
         <div class="settings-section">
-            <h3 class="settings-section-title">🔔 Notificaciones</h3>
+            <h3 class="settings-section-title" data-i18n="settings.notifications">🔔 Notificaciones</h3>
 
             <div class="setting-item">
                 <div class="setting-info">
-                    <label class="setting-label">Notificaciones push</label>
-                    <p class="setting-description">Recibir alertas de nuevos eventos</p>
+                    <label class="setting-label" data-i18n="settings.notifications.push">Notificaciones push</label>
+                    <p class="setting-description" data-i18n="settings.notifications.desc">Recibir alertas de nuevos eventos</p>
                 </div>
                 <label class="toggle-switch">
                     <input type="checkbox" id="notifications-toggle" class="toggle-checkbox" checked>
@@ -403,12 +403,12 @@
 
         <!-- SECCIÓN: PRIVACIDAD -->
         <div class="settings-section">
-            <h3 class="settings-section-title">🔒 Privacidad</h3>
+            <h3 class="settings-section-title" data-i18n="settings.privacy">🔒 Privacidad</h3>
 
             <div class="setting-item">
                 <div class="setting-info">
-                    <label class="setting-label">Guardar búsquedas</label>
-                    <p class="setting-description">Recordar tus últimas búsquedas</p>
+                    <label class="setting-label" data-i18n="settings.privacy.save">Guardar búsquedas</label>
+                    <p class="setting-description" data-i18n="settings.privacy.save.desc">Recordar tus últimas búsquedas</p>
                 </div>
                 <label class="toggle-switch">
                     <input type="checkbox" id="save-searches-toggle" class="toggle-checkbox" checked>
@@ -418,7 +418,7 @@
 
             <div class="setting-item">
                 <button class="btn-clear" style="margin: 0; margin-top: 12px;" id="btn-clear-cache">
-                    <i class="fas fa-trash"></i> Limpiar datos
+                    <i class="fas fa-trash"></i> <span data-i18n="settings.privacy.clear">Limpiar datos</span>
                 </button>
             </div>
 
@@ -426,72 +426,18 @@
 
         <!-- SECCIÓN: SOBRE -->
         <div class="settings-section">
-            <h3 class="settings-section-title">ℹ️ Sobre</h3>
+            <h3 class="settings-section-title" data-i18n="settings.about">ℹ️ Sobre</h3>
 
             <div class="setting-item" style="flex-direction: column; gap: 12px;">
                 <div style="text-align: center;">
-                    <p class="setting-label">EventosMadrid</p>
-                    <p class="setting-description">v1.0.0</p>
-                    <p class="setting-description" style="font-size: 12px; margin-top: 8px;">Mapa de eventos culturales y de ocio en Madrid</p>
+                    <p class="setting-label" data-i18n="settings.about.app">EventosMadrid</p>
+                    <p class="setting-description" data-i18n="settings.about.version">v1.0.0</p>
+                    <p class="setting-description" style="font-size: 12px; margin-top: 8px;" data-i18n="settings.about.desc">Mapa de eventos culturales y de ocio en Madrid</p>
                 </div>
             </div>
 
         </div>
 
-    </div>
-</aside>
-
-<!-- PANEL STATS -->
-<aside class="stats-panel" id="stats-panel">
-    <div class="panel-header">
-        <h2 data-i18n="stats.title">📊 Estadísticas</h2>
-        <button class="close-panel" id="close-stats">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
-    <div class="panel-content">
-        <div class="stats-grid">
-            <div class="stat-box">
-                <div class="stat-icon">🎵</div>
-                <div class="stat-value" id="stat-conciertos">0</div>
-                <div class="stat-name" data-i18n="stats.concerts">Conciertos</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-icon">🎪</div>
-                <div class="stat-value" id="stat-fiestas">0</div>
-                <div class="stat-name" data-i18n="stats.parties">Fiestas</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-icon">🛍️</div>
-                <div class="stat-value" id="stat-mercados">0</div>
-                <div class="stat-name" data-i18n="stats.markets">Mercados</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-icon">🎭</div>
-                <div class="stat-value" id="stat-cultural">0</div>
-                <div class="stat-name" data-i18n="stats.cultural">Cultural</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-icon">🍽️</div>
-                <div class="stat-value" id="stat-gastronomia">0</div>
-                <div class="stat-name" data-i18n="stats.gastro">Gastro</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-icon">⚽</div>
-                <div class="stat-value" id="stat-deporte">0</div>
-                <div class="stat-name" data-i18n="stats.sports">Deportes</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-icon">👶</div>
-                <div class="stat-value" id="stat-infantil">0</div>
-                <div class="stat-name" data-i18n="stats.kids">Infantil</div>
-            </div>
-            <div class="stat-box highlight">
-                <div class="stat-icon">✓</div>
-                <div class="stat-value" id="stat-gratis">0</div>
-                <div class="stat-name" data-i18n="stats.free">Gratis</div>
-            </div>
-        </div>
     </div>
 </aside>
 

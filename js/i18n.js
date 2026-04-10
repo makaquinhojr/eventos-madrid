@@ -55,8 +55,6 @@ const translations = {
         // Zona
         'filters.zone': '📍 Zona',
         'filters.zone.all': '📍 Toda la Comunidad',
-        'filters.zone.madrid': '🏙️ Madrid Capital',
-        'filters.zone.municipalities': '🌆 Municipios',
         
         'filters.clear': 'Limpiar filtros',
         
@@ -101,6 +99,26 @@ const translations = {
         'stats.kids': 'Infantil',
         'stats.free': 'Gratis',
         
+        // ===== AJUSTES =====
+        'settings.title': '⚙️ Ajustes',
+        'settings.appearance': '🎨 Apariencia',
+        'settings.theme': 'Modo oscuro',
+        'settings.theme.desc': 'Cambiar entre tema claro y oscuro',
+        'settings.language': '🌐 Idioma',
+        'settings.language.select': 'Seleccionar idioma',
+        'settings.language.desc': 'Elige tu idioma preferido',
+        'settings.notifications': '🔔 Notificaciones',
+        'settings.notifications.push': 'Notificaciones push',
+        'settings.notifications.desc': 'Recibir alertas de nuevos eventos',
+        'settings.privacy': '🔒 Privacidad',
+        'settings.privacy.save': 'Guardar búsquedas',
+        'settings.privacy.save.desc': 'Recordar tus últimas búsquedas',
+        'settings.privacy.clear': 'Limpiar datos',
+        'settings.about': 'ℹ️ Sobre',
+        'settings.about.app': 'EventosMadrid',
+        'settings.about.version': 'v1.0.0',
+        'settings.about.desc': 'Mapa de eventos culturales y de ocio en Madrid',
+        
         // ===== POPUP =====
         'popup.share_event': 'Compartir evento',
         'popup.share_place': 'Compartir lugar',
@@ -123,32 +141,23 @@ const translations = {
         'toast.copy_error': '❌ No se pudo copiar',
         'toast.loading': 'Cargando eventos...',
         'toast.loaded': 'eventos cargados',
+        'toast.theme_dark': '🌙 Modo oscuro activado',
+        'toast.theme_light': '☀️ Modo claro activado',
+        'toast.lang_changed': '🌐 Idioma cambiado',
+        'toast.notifications_on': '🔔 Notificaciones activadas',
+        'toast.notifications_off': '🔕 Notificaciones desactivadas',
+        'toast.searches_on': '💾 Se guardarán tus búsquedas',
+        'toast.searches_off': '🗑️ Las búsquedas no se guardarán',
+        'toast.data_cleared': '🗑️ Datos limpiados',
         
         // ===== LOADER =====
         'loader.title': 'EventosMadrid',
         'loader.subtitle': 'Cargando eventos...',
         
-        // ===== DISTANCE =====
-        'distance.meters': 'm',
-        'distance.km': 'km',
-        
-        // ===== PLACES =====
-        'place.museum': 'Museo',
-        'place.monument': 'Monumento',
-        'place.theater': 'Teatro',
-        'place.hall': 'Sala',
-        'place.park': 'Parque',
-        'place.gallery': 'Galería',
-        'place.market': 'Mercado',
-        'place.schedule': 'Consultar horario',
-        'place.free': 'Gratis',
-        'place.paid': 'De pago',
-        
-        // ===== LANGUAGE =====
-        'lang.select': '🌐 Idioma',
-        'lang.spanish': 'Español',
-        'lang.english': 'English',
-        'lang.french': 'Français',
+        // ===== IDIOMAS =====
+        'lang.es': '🇪🇸 Español',
+        'lang.en': '🇬🇧 English',
+        'lang.fr': '🇫🇷 Français',
     },
     
     en: {
@@ -202,8 +211,6 @@ const translations = {
         
         'filters.zone': '📍 Zone',
         'filters.zone.all': '📍 All Community',
-        'filters.zone.madrid': '🏙️ Madrid City',
-        'filters.zone.municipalities': '🌆 Municipalities',
         
         'filters.clear': 'Clear filters',
         
@@ -244,6 +251,25 @@ const translations = {
         'stats.kids': 'Kids',
         'stats.free': 'Free',
         
+        'settings.title': '⚙️ Settings',
+        'settings.appearance': '🎨 Appearance',
+        'settings.theme': 'Dark mode',
+        'settings.theme.desc': 'Switch between light and dark theme',
+        'settings.language': '🌐 Language',
+        'settings.language.select': 'Select language',
+        'settings.language.desc': 'Choose your preferred language',
+        'settings.notifications': '🔔 Notifications',
+        'settings.notifications.push': 'Push notifications',
+        'settings.notifications.desc': 'Receive alerts for new events',
+        'settings.privacy': '🔒 Privacy',
+        'settings.privacy.save': 'Save searches',
+        'settings.privacy.save.desc': 'Remember your recent searches',
+        'settings.privacy.clear': 'Clear data',
+        'settings.about': 'ℹ️ About',
+        'settings.about.app': 'EventosMadrid',
+        'settings.about.version': 'v1.0.0',
+        'settings.about.desc': 'Cultural and leisure events map in Madrid',
+        
         'popup.share_event': 'Share event',
         'popup.share_place': 'Share place',
         'popup.copy_link': 'Copy link',
@@ -264,28 +290,21 @@ const translations = {
         'toast.copy_error': '❌ Could not copy',
         'toast.loading': 'Loading events...',
         'toast.loaded': 'events loaded',
+        'toast.theme_dark': '🌙 Dark mode enabled',
+        'toast.theme_light': '☀️ Light mode enabled',
+        'toast.lang_changed': '🌐 Language changed',
+        'toast.notifications_on': '🔔 Notifications enabled',
+        'toast.notifications_off': '🔕 Notifications disabled',
+        'toast.searches_on': '💾 Searches will be saved',
+        'toast.searches_off': '🗑️ Searches won\'t be saved',
+        'toast.data_cleared': '🗑️ Data cleared',
         
         'loader.title': 'EventosMadrid',
         'loader.subtitle': 'Loading events...',
         
-        'distance.meters': 'm',
-        'distance.km': 'km',
-        
-        'place.museum': 'Museum',
-        'place.monument': 'Monument',
-        'place.theater': 'Theater',
-        'place.hall': 'Concert Hall',
-        'place.park': 'Park',
-        'place.gallery': 'Gallery',
-        'place.market': 'Market',
-        'place.schedule': 'Check schedule',
-        'place.free': 'Free',
-        'place.paid': 'Paid',
-        
-        'lang.select': '🌐 Language',
-        'lang.spanish': 'Español',
-        'lang.english': 'English',
-        'lang.french': 'Français',
+        'lang.es': '🇪🇸 Español',
+        'lang.en': '🇬🇧 English',
+        'lang.fr': '🇫🇷 Français',
     },
     
     fr: {
@@ -339,8 +358,6 @@ const translations = {
         
         'filters.zone': '📍 Zone',
         'filters.zone.all': '📍 Toute la Communauté',
-        'filters.zone.madrid': '🏙️ Madrid Ville',
-        'filters.zone.municipalities': '🌆 Municipalités',
         
         'filters.clear': 'Effacer les filtres',
         
@@ -381,6 +398,25 @@ const translations = {
         'stats.kids': 'Enfants',
         'stats.free': 'Gratuit',
         
+        'settings.title': '⚙️ Paramètres',
+        'settings.appearance': '🎨 Apparence',
+        'settings.theme': 'Mode sombre',
+        'settings.theme.desc': 'Basculer entre thème clair et sombre',
+        'settings.language': '🌐 Langue',
+        'settings.language.select': 'Sélectionner la langue',
+        'settings.language.desc': 'Choisissez votre langue préférée',
+        'settings.notifications': '🔔 Notifications',
+        'settings.notifications.push': 'Notifications push',
+        'settings.notifications.desc': 'Recevoir des alertes pour les nouveaux événements',
+        'settings.privacy': '🔒 Confidentialité',
+        'settings.privacy.save': 'Enregistrer les recherches',
+        'settings.privacy.save.desc': 'Se souvenir de vos dernières recherches',
+        'settings.privacy.clear': 'Effacer les données',
+        'settings.about': 'ℹ️ À propos',
+        'settings.about.app': 'EventosMadrid',
+        'settings.about.version': 'v1.0.0',
+        'settings.about.desc': 'Carte des événements culturels et de loisirs à Madrid',
+        
         'popup.share_event': 'Partager l\'événement',
         'popup.share_place': 'Partager le lieu',
         'popup.copy_link': 'Copier le lien',
@@ -401,28 +437,21 @@ const translations = {
         'toast.copy_error': '❌ Impossible de copier',
         'toast.loading': 'Chargement des événements...',
         'toast.loaded': 'événements chargés',
+        'toast.theme_dark': '🌙 Mode sombre activé',
+        'toast.theme_light': '☀️ Mode clair activé',
+        'toast.lang_changed': '🌐 Langue modifiée',
+        'toast.notifications_on': '🔔 Notifications activées',
+        'toast.notifications_off': '🔕 Notifications désactivées',
+        'toast.searches_on': '💾 Les recherches seront enregistrées',
+        'toast.searches_off': '🗑️ Les recherches ne seront pas enregistrées',
+        'toast.data_cleared': '🗑️ Données effacées',
         
         'loader.title': 'EventosMadrid',
         'loader.subtitle': 'Chargement des événements...',
         
-        'distance.meters': 'm',
-        'distance.km': 'km',
-        
-        'place.museum': 'Musée',
-        'place.monument': 'Monument',
-        'place.theater': 'Théâtre',
-        'place.hall': 'Salle',
-        'place.park': 'Parc',
-        'place.gallery': 'Galerie',
-        'place.market': 'Marché',
-        'place.schedule': 'Vérifier les horaires',
-        'place.free': 'Gratuit',
-        'place.paid': 'Payant',
-        
-        'lang.select': '🌐 Langue',
-        'lang.spanish': 'Español',
-        'lang.english': 'English',
-        'lang.french': 'Français',
+        'lang.es': '🇪🇸 Español',
+        'lang.en': '🇬🇧 English',
+        'lang.fr': '🇫🇷 Français',
     }
 };
 
@@ -459,15 +488,59 @@ class I18n {
     setLanguage(lang) {
         if (['es', 'en', 'fr'].includes(lang)) {
             this.currentLang = lang;
-            this.init();
-            window.location.reload();
+            localStorage.setItem('language', lang);
+            document.documentElement.lang = lang;
+            this.updateUI();
         }
     }
 
     getLanguage() {
         return this.currentLang;
     }
+
+    // ✅ NUEVA FUNCIÓN: Actualizar toda la UI sin recargar
+    updateUI() {
+        // Actualizar elementos con data-i18n
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            el.textContent = this.t(key);
+        });
+
+        // Actualizar placeholders
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            el.placeholder = this.t(key);
+        });
+
+        // Actualizar títulos (title attribute)
+        document.querySelectorAll('[data-i18n-title]').forEach(el => {
+            const key = el.getAttribute('data-i18n-title');
+            el.title = this.t(key);
+        });
+
+        // Actualizar aria-label
+        document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+            const key = el.getAttribute('data-i18n-aria');
+            el.setAttribute('aria-label', this.t(key));
+        });
+
+        // Actualizar el select de idioma
+        const langSelect = document.getElementById('lang-select');
+        if (langSelect) {
+            langSelect.value = this.currentLang;
+        }
+
+        // ✅ Disparar evento para que app.js recargue datos traducidos
+        window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang: this.currentLang } }));
+    }
 }
 
 // Crear instancia global
 const i18n = new I18n();
+
+// ✅ Actualizar UI al cargar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => i18n.updateUI());
+} else {
+    i18n.updateUI();
+}
