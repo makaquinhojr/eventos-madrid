@@ -99,9 +99,12 @@ const ZONAS_COORDS = {
     'Arganda del Rey': { lat: 40.3008, lng: -3.4394, radio: 4.0 },
 };
 
-// ===== FUNCIONES AUXILIARES =====
+// ===== FUNCIÓN T (traducción) =====
 function t(key) {
-    return i18n.t(key);
+    if (typeof i18n !== 'undefined') {
+        return i18n.t(key);
+    }
+    return key;
 }
 
 function inferirZona(lat, lng) {
@@ -171,7 +174,7 @@ async function loadEvents() {
         procesarUrlEvento();
 
     } catch (error) {
-        console.error('Error cargando datos:', error);
+        console.error('❌ Error cargando datos:', error);
         ocultarLoader(0);
     }
 }
@@ -197,8 +200,8 @@ function displayLugares(lugares) {
         marker.lugarId = lugar.id;
 
         const precioHTML = lugar.precio === 'gratis'
-            ? `<strong style="color:#059669;">${t('place.free')}</strong>`
-            : lugar.precio_desde || t('place.paid');
+            ? '<strong style="color:#059669;">Gratis</strong>'
+            : lugar.precio_desde || 'De pago';
 
         const distanciaHTML = userLocation
             ? `<p><strong>🚶</strong> ${getDistanciaHTMLCoords(lugar.lat, lugar.lng)}</p>`
@@ -213,7 +216,7 @@ function displayLugares(lugares) {
                 <p><strong>📍</strong> ${lugar.lugar}</p>
                 <p><strong>🗺️</strong> ${lugar.zona || inferirZona(lugar.lat, lugar.lng)}</p>
                 <p><strong>💰</strong> ${precioHTML}</p>
-                <p><strong>🕐</strong> ${lugar.horario || t('place.schedule')}</p>
+                <p><strong>🕐</strong> ${lugar.horario || 'Consultar horario'}</p>
                 ${distanciaHTML}
                 ${lugar.descripcion ? `<p style="color:#6B7280;font-size:13px;margin-top:8px;line-height:1.4;">${lugar.descripcion}</p>` : ''}
                 <div class="popup-actions">
@@ -221,10 +224,10 @@ function displayLugares(lugares) {
                 </div>
                 <div class="popup-acciones-extra">
                     <button class="popup-btn-extra" onclick="comoLlegarCoords(${lugar.lat}, ${lugar.lng}, '${lugar.nombre.replace(/'/g, "\\'")}')" >
-                        <i class="fas fa-route"></i> ${t('btn.directions')}
+                        <i class="fas fa-route"></i> Cómo llegar
                     </button>
                     <button class="popup-btn-extra compartir" onclick="compartirLugar('${lugar.id}')">
-                        <i class="fas fa-share-alt"></i> ${t('btn.share')}
+                        <i class="fas fa-share-alt"></i> Compartir
                     </button>
                 </div>
             </div>
@@ -245,23 +248,23 @@ function toggleLugares() {
     if (mostrarLugares) {
         displayLugares(currentFilteredLugares.length ? currentFilteredLugares : allLugares);
         btn.classList.add('active');
-        mostrarToast(t('toast.places_visible'));
+        mostrarToast('🏛️ Lugares visibles');
     } else {
         lugaresLayer.clearLayers();
         btn.classList.remove('active');
-        mostrarToast(t('toast.places_hidden'));
+        mostrarToast('🏛️ Lugares ocultos');
     }
 }
 
 function categoriaNombre(categoria) {
     const nombres = {
-        museo: t('place.museum'),
-        monumento: t('place.monument'),
-        teatro: t('place.theater'),
-        sala: t('place.hall'),
-        parque: t('place.park'),
-        galeria: t('place.gallery'),
-        mercado: t('place.market')
+        museo: 'Museo',
+        monumento: 'Monumento',
+        teatro: 'Teatro',
+        sala: 'Sala',
+        parque: 'Parque',
+        galeria: 'Galería',
+        mercado: 'Mercado'
     };
     return nombres[categoria] || 'Lugar de interés';
 }
@@ -272,7 +275,7 @@ function compartirLugar(lugarId) {
 
     const url = `${window.location.origin}${window.location.pathname}?lugar=${lugarId}`;
     const emoji = lugaresIcons[lugar.categoria] || '📍';
-    const texto = `${emoji} *${lugar.nombre}*\n📍 ${lugar.lugar}\n🕐 ${lugar.horario || t('place.schedule')}`;
+    const texto = `${emoji} *${lugar.nombre}*\n📍 ${lugar.lugar}\n🕐 ${lugar.horario || 'Ver horarios'}`;
 
     document.getElementById('modal-compartir')?.remove();
 
@@ -282,7 +285,7 @@ function compartirLugar(lugarId) {
     modal.innerHTML = `
         <div class="modal-compartir">
             <div class="modal-compartir-header">
-                <span>${emoji} ${t('popup.share_place')}</span>
+                <span>${emoji} Compartir lugar</span>
                 <button class="modal-compartir-close" onclick="cerrarModalCompartir()">
                     <i class="fas fa-times"></i>
                 </button>
@@ -300,7 +303,7 @@ function compartirLugar(lugarId) {
                     <i class="fab fa-x-twitter"></i> Twitter
                 </a>
                 <button class="modal-compartir-btn copiar" onclick="copiarLinkEvento('${url}', this)">
-                    <i class="fas fa-link"></i> ${t('popup.copy_link')}
+                    <i class="fas fa-link"></i> Copiar link
                 </button>
             </div>
         </div>
@@ -340,21 +343,21 @@ function esLinkUtil(url) {
 
 function getLinkHTML(evento) {
     if (esLinkUtil(evento.url)) {
-        return `<a href="${evento.url}" target="_blank" class="popup-link">${t('btn.more_info')} →</a>`;
+        return `<a href="${evento.url}" target="_blank" class="popup-link">Ver más información →</a>`;
     }
     const busqueda = encodeURIComponent(`${evento.nombre} Madrid`);
-    return `<a href="https://www.google.com/search?q=${busqueda}" target="_blank" class="popup-link popup-link-google">🔍 ${t('btn.search')}</a>`;
+    return `<a href="https://www.google.com/search?q=${busqueda}" target="_blank" class="popup-link popup-link-google">🔍 Buscar en Google</a>`;
 }
 
 function getBotonMasInfo(evento) {
     const busqueda = encodeURIComponent(`${evento.nombre} Madrid`);
     if (esLinkUtil(evento.url)) {
         return `<a href="${evento.url}" target="_blank" class="event-btn event-btn-secondary">
-                    <i class="fas fa-external-link-alt"></i> ${t('btn.more_info')}
+                    <i class="fas fa-external-link-alt"></i> Más info
                 </a>`;
     }
     return `<a href="https://www.google.com/search?q=${busqueda}" target="_blank" class="event-btn event-btn-google">
-                <i class="fas fa-search"></i> ${t('btn.search')}
+                <i class="fas fa-search"></i> Buscar
             </a>`;
 }
 
@@ -365,7 +368,7 @@ function generarUrlCompartir(evento) {
 
 function generarTextoCompartir(evento) {
     const fecha = formatDate(evento.fecha);
-    const precio = evento.precio === 'gratis' ? '¡GRATIS!' : (evento.precio_desde || t('place.paid'));
+    const precio = evento.precio === 'gratis' ? '¡GRATIS!' : (evento.precio_desde || 'De pago');
     const emoji = icons[evento.tipo] || '📍';
     return `${emoji} *${evento.nombre}*\n📅 ${fecha}\n📍 ${evento.lugar}\n💰 ${precio}`;
 }
@@ -386,7 +389,7 @@ function compartirEvento(eventoId) {
     modal.innerHTML = `
         <div class="modal-compartir">
             <div class="modal-compartir-header">
-                <span>${emoji} ${t('popup.share_event')}</span>
+                <span>${emoji} Compartir evento</span>
                 <button class="modal-compartir-close" onclick="cerrarModalCompartir()">
                     <i class="fas fa-times"></i>
                 </button>
@@ -404,7 +407,7 @@ function compartirEvento(eventoId) {
                     <i class="fab fa-x-twitter"></i> Twitter
                 </a>
                 <button class="modal-compartir-btn copiar" onclick="copiarLinkEvento('${url}', this)">
-                    <i class="fas fa-link"></i> ${t('popup.copy_link')}
+                    <i class="fas fa-link"></i> Copiar link
                 </button>
             </div>
         </div>
@@ -429,14 +432,14 @@ async function copiarLinkEvento(url, btn) {
     try {
         await navigator.clipboard.writeText(url);
         const original = btn.innerHTML;
-        btn.innerHTML = `<i class="fas fa-check"></i> ${t('popup.copied')}`;
+        btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
         btn.classList.add('copiado');
         setTimeout(() => {
             btn.innerHTML = original;
             btn.classList.remove('copiado');
         }, 2000);
     } catch {
-        mostrarToast(t('toast.copy_error'), 'error');
+        mostrarToast('❌ No se pudo copiar', 'error');
     }
 }
 
@@ -554,7 +557,7 @@ function displayEvents(events) {
 
         const calendarLink = generarLinkCalendar(event);
         const calendarHTML = calendarLink
-            ? `<a href="${calendarLink}" target="_blank" class="popup-link popup-link-calendar">📅 ${t('btn.add_calendar')}</a>`
+            ? `<a href="${calendarLink}" target="_blank" class="popup-link popup-link-calendar">📅 Añadir al calendario</a>`
             : '';
 
         const distanciaHTML = userLocation
@@ -564,10 +567,10 @@ function displayEvents(events) {
         const popupAccionesExtra = `
             <div class="popup-acciones-extra">
                 <button class="popup-btn-extra" onclick="comoLlegar(${event.id})">
-                    <i class="fas fa-route"></i> ${t('btn.directions')}
+                    <i class="fas fa-route"></i> Cómo llegar
                 </button>
                 <button class="popup-btn-extra compartir" onclick="compartirEvento(${event.id})">
-                    <i class="fas fa-share-alt"></i> ${t('btn.share')}
+                    <i class="fas fa-share-alt"></i> Compartir
                 </button>
             </div>
         `;
@@ -580,8 +583,8 @@ function displayEvents(events) {
                 <p><strong>🗺️</strong> ${zona}</p>
                 <p><strong>💰</strong> ${
                     event.precio === 'gratis'
-                        ? `<strong style="color:#059669;">${t('place.free')}</strong>`
-                        : event.precio_desde || t('place.paid')
+                        ? '<strong style="color:#059669;">Gratis</strong>'
+                        : event.precio_desde || 'De pago'
                 }</p>
                 ${distanciaHTML}
                 ${descripcion
@@ -629,8 +632,8 @@ function renderListView(events) {
         listContainer.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-search"></i>
-                <h3>${t('list.empty')}</h3>
-                <p>${t('list.empty.subtitle')}</p>
+                <h3>No se encontraron eventos</h3>
+                <p>Prueba a cambiar los filtros</p>
             </div>
         `;
         return;
@@ -662,15 +665,15 @@ function renderListView(events) {
         const esMañana = fechaEvento.toDateString() === new Date(hoy.getTime() + 86400000).toDateString();
 
         let proximidadBadge = '';
-        if (esHoy) proximidadBadge = `<span class="event-badge hoy">${t('badge.today')}</span>`;
-        else if (esMañana) proximidadBadge = `<span class="event-badge hoy">${t('badge.tomorrow')}</span>`;
+        if (esHoy) proximidadBadge = '<span class="event-badge hoy">🔥 HOY</span>';
+        else if (esMañana) proximidadBadge = '<span class="event-badge hoy">⚡ MAÑANA</span>';
 
         const precioBadge = evento.precio === 'gratis'
-            ? `<span class="event-badge gratis">${t('badge.free')}</span>`
-            : `<span class="event-badge pago">💰 ${evento.precio_desde || t('place.paid')}</span>`;
+            ? '<span class="event-badge gratis">💚 GRATIS</span>'
+            : `<span class="event-badge pago">💰 ${evento.precio_desde || 'Pago'}</span>`;
 
         const zona = getZonaEvento(evento);
-        const zonaBadge = `<span class="event-badge zona">${t('badge.zone')} ${zona}</span>`;
+        const zonaBadge = `<span class="event-badge zona">📍 ${zona}</span>`;
 
         const fechaTexto = evento.fecha_fin
             ? `${formatDate(evento.fecha)} - ${formatDate(evento.fecha_fin)}`
@@ -685,7 +688,7 @@ function renderListView(events) {
         const botonMasInfo = getBotonMasInfo(evento);
         const calendarLink = generarLinkCalendar(evento);
         const botonCalendar = calendarLink
-            ? `<a href="${calendarLink}" target="_blank" class="event-btn event-btn-calendar" data-i18n-title="btn.add_calendar" title="${t('btn.add_calendar')}">
+            ? `<a href="${calendarLink}" target="_blank" class="event-btn event-btn-calendar" title="Añadir al calendario">
                     <i class="fas fa-calendar-plus"></i>
                </a>`
             : '';
@@ -693,13 +696,13 @@ function renderListView(events) {
         const descripcion = limpiarDescripcion(evento.descripcion, 200);
 
         const botonComoLlegar = `
-            <button class="event-btn event-btn-llegar" onclick="comoLlegar(${evento.id})" data-i18n-title="btn.directions" title="${t('btn.directions')}">
+            <button class="event-btn event-btn-llegar" onclick="comoLlegar(${evento.id})" title="Cómo llegar">
                 <i class="fas fa-route"></i>
             </button>
         `;
 
         const botonCompartir = `
-            <button class="event-btn event-btn-compartir" onclick="compartirEvento(${evento.id})" data-i18n-title="btn.share" title="${t('btn.share')}">
+            <button class="event-btn event-btn-compartir" onclick="compartirEvento(${evento.id})" title="Compartir">
                 <i class="fas fa-share-alt"></i>
             </button>
         `;
@@ -730,13 +733,13 @@ function renderListView(events) {
                     ${descripcion
                         ? `<div class="event-description">${descripcion}</div>`
                         : `<div class="event-description sin-descripcion">
-                               📍 ${evento.lugar} · ${evento.precio === 'gratis' ? t('place.free') : evento.precio_desde || t('place.paid')}
+                               📍 ${evento.lugar} · ${evento.precio === 'gratis' ? 'Entrada gratuita' : evento.precio_desde || 'De pago'}
                            </div>`
                     }
                 </div>
                 <div class="event-actions">
                     <button class="event-btn event-btn-primary" onclick="verEnMapa(${evento.id})">
-                        <i class="fas fa-map-marked-alt"></i> ${t('btn.view_map')}
+                        <i class="fas fa-map-marked-alt"></i> Ver en mapa
                     </button>
                     ${botonMasInfo}
                     <div class="event-actions-row">
@@ -781,10 +784,10 @@ function renderLugaresList(lugares) {
         const zona = lugar.zona || inferirZona(lugar.lat, lugar.lng);
 
         const precioBadge = lugar.precio === 'gratis'
-            ? `<span class="event-badge gratis">${t('badge.free')}</span>`
-            : `<span class="event-badge pago">💰 ${lugar.precio_desde || t('place.paid')}</span>`;
+            ? '<span class="event-badge gratis">💚 GRATIS</span>'
+            : `<span class="event-badge pago">💰 ${lugar.precio_desde || 'Pago'}</span>`;
 
-        const zonaBadge = `<span class="event-badge zona">${t('badge.zone')} ${zona}</span>`;
+        const zonaBadge = `<span class="event-badge zona">📍 ${zona}</span>`;
         const categoriaBadge = `<span class="lugar-categoria-badge" style="background:${color}20;color:${color};">${emoji} ${categoriaNom}</span>`;
 
         const distanciaItem = userLocation ? `
@@ -812,7 +815,7 @@ function renderLugaresList(lugares) {
                         </div>
                         <div class="event-meta-item">
                             <i class="fas fa-clock"></i>
-                            ${lugar.horario || t('place.schedule')}
+                            ${lugar.horario || 'Consultar horario'}
                         </div>
                         ${distanciaItem}
                     </div>
@@ -820,16 +823,16 @@ function renderLugaresList(lugares) {
                 </div>
                 <div class="event-actions">
                     <button class="event-btn event-btn-primary" onclick="verLugarEnMapa('${lugar.id}')">
-                        <i class="fas fa-map-marked-alt"></i> ${t('btn.view_map')}
+                        <i class="fas fa-map-marked-alt"></i> Ver en mapa
                     </button>
                     <a href="${lugar.url}" target="_blank" class="event-btn event-btn-secondary">
-                        <i class="fas fa-external-link-alt"></i> ${t('btn.more_info')}
+                        <i class="fas fa-external-link-alt"></i> Más info
                     </a>
                     <div class="event-actions-row">
-                        <button class="event-btn event-btn-llegar" onclick="comoLlegarCoords(${lugar.lat}, ${lugar.lng}, '${lugar.nombre.replace(/'/g, "\\'")}')" data-i18n-title="btn.directions" title="${t('btn.directions')}">
+                        <button class="event-btn event-btn-llegar" onclick="comoLlegarCoords(${lugar.lat}, ${lugar.lng}, '${lugar.nombre.replace(/'/g, "\\'")}')" title="Cómo llegar">
                             <i class="fas fa-route"></i>
                         </button>
-                        <button class="event-btn event-btn-compartir" onclick="compartirLugar('${lugar.id}')" data-i18n-title="btn.share" title="${t('btn.share')}">
+                        <button class="event-btn event-btn-compartir" onclick="compartirLugar('${lugar.id}')" title="Compartir">
                             <i class="fas fa-share-alt"></i>
                         </button>
                     </div>
@@ -886,8 +889,6 @@ function applyFilters() {
     const lugarCategorias = Array.from(document.querySelectorAll('.lugar-categoria-cb'))
         .filter(cb => cb.checked)
         .map(cb => cb.value);
-
-    console.log('🔍 Filtros aplicados:', { search, dateFilter, zonaFilter, types, prices, lugarCategorias, precioMax });
 
     // FILTRAR EVENTOS
     let filtered = allEvents.filter(e => {
@@ -979,8 +980,6 @@ function applyFilters() {
         return true;
     });
 
-    console.log(`✅ Filtrados: ${filtered.length} eventos, ${filteredLugares.length} lugares`);
-
     currentFilteredEvents = filtered;
     currentFilteredLugares = filteredLugares;
 
@@ -1049,8 +1048,6 @@ function actualizarContadorFiltros() {
 }
 
 function clearFilters() {
-    console.log('🧹 Limpiando filtros...');
-    
     document.getElementById('search').value = '';
     document.getElementById('filtro-fecha').value = 'todos';
     document.getElementById('filtro-zona').value = 'todas';
@@ -1070,7 +1067,6 @@ function clearFilters() {
     }
     
     applyFilters();
-    console.log('✅ Filtros limpiados');
 }
 
 function initSliderPrecio() {
@@ -1083,11 +1079,11 @@ function initSliderPrecio() {
         slider.style.setProperty('--pct', val + '%');
 
         if (val >= 100) {
-            label.textContent = t('filters.price.any');
+            label.textContent = 'Cualquiera';
         } else if (val === 0) {
-            label.textContent = t('filters.price.only_free');
+            label.textContent = 'Solo gratis';
         } else {
-            label.textContent = `${t('filters.price.until')} ${val}€`;
+            label.textContent = `hasta ${val}€`;
         }
         applyFilters();
     }
@@ -1164,7 +1160,7 @@ function calcularDistancia(lat1, lng1, lat2, lng2) {
 }
 
 function formatearDistancia(km) {
-    return km < 1 ? `${Math.round(km * 1000)} ${t('distance.meters')}` : `${km.toFixed(1)} ${t('distance.km')}`;
+    return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
 }
 
 function getDistanciaHTML(evento) {
@@ -1196,7 +1192,7 @@ function initGeolocate() {
         }
         btn.classList.add('loading');
         btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
-        mostrarToast(t('toast.loading_location'));
+        mostrarToast('📍 Buscando tu ubicación...');
         navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError, {
             enableHighAccuracy: true, timeout: 8000, maximumAge: 60000
         });
@@ -1214,7 +1210,7 @@ function onGeoSuccess(position) {
     colocarMarkerUsuario(latitude, longitude);
     displayEvents(currentFilteredEvents.length ? currentFilteredEvents : allEvents);
     displayLugares(currentFilteredLugares.length ? currentFilteredLugares : allLugares);
-    mostrarToast(t('toast.location_found'));
+    mostrarToast('✅ Ubicación encontrada');
 }
 
 function onGeoError(error) {
@@ -1222,14 +1218,13 @@ function onGeoError(error) {
     btn.classList.remove('loading');
     btn.innerHTML = '<i class="fas fa-location-arrow"></i>';
     
-    const mensajesKeys = {
-        1: 'toast.location_denied',
-        2: 'toast.location_unavailable',
-        3: 'toast.location_timeout'
+    const mensajes = {
+        1: '❌ Permiso denegado',
+        2: '❌ Posición no disponible',
+        3: '❌ Tiempo de espera agotado'
     };
     
-    const key = mensajesKeys[error.code] || 'toast.location_timeout';
-    mostrarToast(t(key), 'error');
+    mostrarToast(mensajes[error.code] || '❌ Error desconocido', 'error');
 }
 
 function colocarMarkerUsuario(lat, lng) {
@@ -1241,7 +1236,7 @@ function colocarMarkerUsuario(lat, lng) {
         iconAnchor: [10, 10]
     });
     userMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 })
-        .bindPopup(`<div class="popup-evento"><h3>${t('popup.location')}</h3><p>${t('popup.here')}</p></div>`)
+        .bindPopup('<div class="popup-evento"><h3>📍 Tu ubicación</h3><p>Estás aquí</p></div>')
         .addTo(map);
 }
 
@@ -1257,7 +1252,7 @@ function desactivarGeolocalizacion() {
     map.setView([40.4168, -3.7038], 12);
     displayEvents(allEvents);
     displayLugares(allLugares);
-    mostrarToast(t('toast.location_disabled'));
+    mostrarToast('📍 Geolocalización desactivada');
 }
 
 function mostrarToast(mensaje, tipo = 'normal') {
@@ -1341,7 +1336,7 @@ function iniciarBannerHoy() {
     badge.addEventListener('click', () => {
         document.getElementById('filtro-fecha').value = 'hoy';
         applyFilters();
-        const txt = `${eventosHoy.length} ${t('toast.events_today')}`;
+        const txt = `${eventosHoy.length} eventos hoy en Madrid`;
         mostrarToast(txt);
     });
 }
@@ -1369,7 +1364,7 @@ function generarLinkCalendar(evento) {
 function ocultarLoader(numEventos) {
     const loader = document.getElementById('loader');
     const count = document.getElementById('loader-count');
-    if (count) count.textContent = `✅ ${numEventos} ${t('toast.loaded')}`;
+    if (count) count.textContent = `✅ ${numEventos} eventos cargados`;
     setTimeout(() => {
         if (loader) loader.classList.add('oculto');
     }, 600);
@@ -1449,36 +1444,49 @@ function initLugaresListToggle() {
 // ===== SELECTOR DE IDIOMA =====
 function initLanguageSelector() {
     const selector = document.getElementById('lang-select');
-    const label = document.getElementById('lang-label');
     
-    if (!selector) return;
+    if (!selector) {
+        console.log('⚠️ Selector de idioma no encontrado');
+        return;
+    }
     
-    // Mostrar selector en desktop (opcional)
-    // selector.style.display = 'block';
-    // label.style.display = 'block';
-    
-    selector.value = i18n.getLanguage();
+    // Establecer idioma actual
+    if (typeof i18n !== 'undefined') {
+        selector.value = i18n.getLanguage();
+    }
 
     selector.addEventListener('change', (e) => {
         const newLang = e.target.value;
-        i18n.setLanguage(newLang);
+        if (typeof i18n !== 'undefined') {
+            i18n.setLanguage(newLang);
+        }
     });
 }
 
 // ===== DOMContentLoaded =====
 document.addEventListener('DOMContentLoaded', () => {
-    // Aplicar traducciones
-    initLanguageSelector();
-    i18n.applyTranslations();
+    console.log('✅ DOM cargado, iniciando app...');
+    
+    // Verificar que i18n existe
+    if (typeof i18n === 'undefined') {
+        console.error('❌ i18n no está definido');
+    } else {
+        console.log('✅ i18n disponible, idioma:', i18n.getLanguage());
+    }
     
     // Inicializar app
     initMap();
+    console.log('✅ Mapa inicializado');
+    
     loadEvents();
+    console.log('✅ Cargando eventos...');
+    
     initGeolocate();
     initSliderPrecio();
     initCollapseGroups();
     initLugaresSelectAll();
     initLugaresListToggle();
+    initLanguageSelector();
 
     // Tema
     const savedTheme = localStorage.getItem('theme');
@@ -1513,7 +1521,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sort-by').addEventListener('change', e => {
         currentSort = e.target.value;
         if (currentSort === 'distance' && !userLocation) {
-            mostrarToast(t('toast.activate_location'), 'error');
+            mostrarToast('📍 Activa tu ubicación primero', 'error');
             e.target.value = 'date';
             currentSort = 'date';
             return;
@@ -1532,6 +1540,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') cerrarModalCompartir();
     });
+
+    console.log('✅ App lista!');
 });
 
 if ('serviceWorker' in navigator) {
