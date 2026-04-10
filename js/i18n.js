@@ -116,6 +116,22 @@ const translations = {
         'lang.es': '🇪🇸 Español',
         'lang.en': '🇬🇧 English',
         'lang.fr': '🇫🇷 Français',
+        // ===== FAVORITOS =====
+'favorites.title': '❤️ Mis Favoritos',
+'favorites.empty': 'No tienes favoritos',
+'favorites.empty.desc': 'Añade eventos tocando el ❤️',
+'favorites.added': '❤️ Añadido a favoritos',
+'favorites.removed': '💔 Eliminado de favoritos',
+
+// ===== BOTONES =====
+'btn.calendar': 'Calendario',
+'btn.favorite': 'Añadir a favoritos',
+'btn.share': 'Compartir',
+
+// ===== CHARTS =====
+'stats.charts.events_by_type': '📊 Eventos por Tipo',
+'stats.charts.events_by_zone': '🗺️ Eventos por Zona',
+'stats.charts.events_timeline': '📅 Eventos en el Tiempo',
     },
     
     en: {
@@ -222,6 +238,19 @@ const translations = {
         'lang.es': '🇪🇸 Español',
         'lang.en': '🇬🇧 English',
         'lang.fr': '🇫🇷 Français',
+        'favorites.title': '❤️ My Favorites',
+'favorites.empty': 'No favorites yet',
+'favorites.empty.desc': 'Add events by tapping the ❤️',
+'favorites.added': '❤️ Added to favorites',
+'favorites.removed': '💔 Removed from favorites',
+
+'btn.calendar': 'Calendar',
+'btn.favorite': 'Add to favorites',
+'btn.share': 'Share',
+
+'stats.charts.events_by_type': '📊 Events by Type',
+'stats.charts.events_by_zone': '🗺️ Events by Zone',
+'stats.charts.events_timeline': '📅 Events Timeline',
     },
     
     fr: {
@@ -328,6 +357,19 @@ const translations = {
         'lang.es': '🇪🇸 Español',
         'lang.en': '🇬🇧 English',
         'lang.fr': '🇫🇷 Français',
+        'favorites.title': '❤️ Mes Favoris',
+'favorites.empty': 'Aucun favori',
+'favorites.empty.desc': 'Ajoutez des événements en appuyant sur ❤️',
+'favorites.added': '❤️ Ajouté aux favoris',
+'favorites.removed': '💔 Retiré des favoris',
+
+'btn.calendar': 'Calendrier',
+'btn.favorite': 'Ajouter aux favoris',
+'btn.share': 'Partager',
+
+'stats.charts.events_by_type': '📊 Événements par Type',
+'stats.charts.events_by_zone': '🗺️ Événements par Zone',
+'stats.charts.events_timeline': '📅 Événements dans le Temps',
     }
 };
 

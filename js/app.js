@@ -12,6 +12,9 @@ let userMarker = null;
 let userLocation = null;
 let mostrarLugares = true;
 let mostrarLugaresEnLista = true;
+let favorites = [];
+let currentCalendarDate = new Date();
+let charts = {};
 
 const icons = {
     concierto: '🎵',
@@ -124,6 +127,416 @@ function getZonaEvento(evento) {
     return evento.zona || inferirZona(evento.lat, evento.lng);
 }
 
+// ===== SISTEMA DE FAVORITOS =====
+function loadFavorites() {
+    const saved = localStorage.getItem('favorites');
+    favorites = saved ? JSON.parse(saved) : [];
+    updateFavoritesCount();
+}
+
+function saveFavorites() {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+    updateFavoritesCount();
+}
+
+function toggleFavorite(eventoId) {
+    const index = favorites.indexOf(eventoId);
+    if (index > -1) {
+        favorites.splice(index, 1);
+        mostrarToast(i18n.t('favorites.removed'));
+    } else {
+        favorites.push(eventoId);
+        mostrarToast(i18n.t('favorites.added'));
+    }
+    saveFavorites();
+    renderFavoritesList();
+    
+    // Actualizar botones de favoritos
+    document.querySelectorAll(`[data-event-id="${eventoId}"]`).forEach(btn => {
+        btn.classList.toggle('active', favorites.includes(eventoId));
+    });
+}
+
+function isFavorite(eventoId) {
+    return favorites.includes(eventoId);
+}
+
+function updateFavoritesCount() {
+    const badge = document.getElementById('favorites-count');
+    if (favorites.length > 0) {
+        badge.textContent = favorites.length;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+function renderFavoritesList() {
+    const container = document.getElementById('favorites-list');
+    const emptyState = document.getElementById('favorites-empty');
+    
+    if (favorites.length === 0) {
+        container.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    emptyState.style.display = 'none';
+    
+    const favoritosEventos = allEvents.filter(e => favorites.includes(e.id));
+    
+    container.innerHTML = favoritosEventos.map(evento => {
+        const emoji = icons[evento.tipo] || '📍';
+        const color = colors[evento.tipo] || '#6B7280';
+        const fecha = formatDate(evento.fecha);
+        
+        return `
+            <div class="favorite-item">
+                <div class="favorite-item-icon ${evento.tipo}" style="background:${color}20;">
+                    ${emoji}
+                </div>
+                <div class="favorite-item-info">
+                    <div class="favorite-item-title">${evento.nombre}</div>
+                    <div class="favorite-item-meta">
+                        <span>📅 ${fecha}</span>
+                        <span>📍 ${evento.lugar}</span>
+                    </div>
+                </div>
+                <button class="btn-remove-favorite" onclick="toggleFavorite(${evento.id})">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+// ===== COMPARTIR NATIVO =====
+async function compartirEventoNativo(eventoId) {
+    const evento = allEvents.find(e => e.id === eventoId);
+    if (!evento) return;
+
+    const url = generarUrlCompartir(evento);
+    const texto = generarTextoCompartir(evento);
+
+    // Verificar si Web Share API está disponible
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: evento.nombre,
+                text: texto,
+                url: url
+            });
+            mostrarToast('✅ Compartido correctamente');
+        } catch (err) {
+            // Usuario canceló o error
+            if (err.name !== 'AbortError') {
+                // Fallback al modal si falla
+                compartirEvento(eventoId);
+            }
+        }
+    } else {
+        // Fallback al modal si no soporta Web Share API
+        compartirEvento(eventoId);
+    }
+}
+
+// ===== VISTA DE CALENDARIO =====
+function renderCalendar() {
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    
+    // Actualizar título
+    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    document.getElementById('calendar-month-year').textContent = `${monthNames[month]} ${year}`;
+    
+    // Obtener primer y último día del mes
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    
+    // Ajustar para que la semana empiece en lunes
+    let startDay = firstDay.getDay() - 1;
+    if (startDay === -1) startDay = 6;
+    
+    const daysInMonth = lastDay.getDate();
+    const prevMonthDays = new Date(year, month, 0).getDate();
+    
+    const grid = document.getElementById('calendar-grid');
+    grid.innerHTML = '';
+    
+    // Días del mes anterior
+    for (let i = startDay - 1; i >= 0; i--) {
+        const day = prevMonthDays - i;
+        const cell = createCalendarDay(day, month - 1, year, true);
+        grid.appendChild(cell);
+    }
+    
+    // Días del mes actual
+    for (let day = 1; day <= daysInMonth; day++) {
+        const cell = createCalendarDay(day, month, year, false);
+        grid.appendChild(cell);
+    }
+    
+    // Días del mes siguiente
+    const remainingCells = 42 - (startDay + daysInMonth);
+    for (let day = 1; day <= remainingCells; day++) {
+        const cell = createCalendarDay(day, month + 1, year, true);
+        grid.appendChild(cell);
+    }
+}
+
+function createCalendarDay(day, month, year, isOtherMonth) {
+    const cell = document.createElement('div');
+    cell.className = 'calendar-day';
+    if (isOtherMonth) cell.classList.add('other-month');
+    
+    const date = new Date(year, month, day);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (date.toDateString() === today.toDateString()) {
+        cell.classList.add('today');
+    }
+    
+    // Obtener eventos de este día
+    const eventsOnDay = allEvents.filter(e => {
+        const eventStart = new Date(e.fecha);
+        const eventEnd = e.fecha_fin ? new Date(e.fecha_fin) : eventStart;
+        eventStart.setHours(0, 0, 0, 0);
+        eventEnd.setHours(0, 0, 0, 0);
+        return date >= eventStart && date <= eventEnd;
+    });
+    
+    cell.innerHTML = `
+        <div class="calendar-day-number">${day}</div>
+        ${eventsOnDay.length > 0 ? `
+            <div class="calendar-day-events-count">
+                <i class="fas fa-circle" style="font-size:4px;"></i>
+                ${eventsOnDay.length} ${eventsOnDay.length === 1 ? 'evento' : 'eventos'}
+            </div>
+            <div class="calendar-day-dots">
+                ${eventsOnDay.slice(0, 5).map(e => 
+                    `<div class="calendar-dot ${e.tipo}"></div>`
+                ).join('')}
+            </div>
+        ` : ''}
+    `;
+    
+    if (!isOtherMonth && eventsOnDay.length > 0) {
+        cell.addEventListener('click', () => showDayEvents(date, eventsOnDay));
+    }
+    
+    return cell;
+}
+
+function showDayEvents(date, events) {
+    const container = document.getElementById('calendar-day-events');
+    const title = document.getElementById('calendar-day-title');
+    const list = document.getElementById('calendar-day-list');
+    
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    title.textContent = date.toLocaleDateString('es-ES', options);
+    
+    list.innerHTML = events.map(evento => {
+        const emoji = icons[evento.tipo] || '📍';
+        const precioBadge = evento.precio === 'gratis'
+            ? '<span class="event-badge gratis">💚 GRATIS</span>'
+            : `<span class="event-badge pago">💰 ${evento.precio_desde || 'Pago'}</span>`;
+        
+        return `
+            <div class="event-card" style="margin-bottom: 8px;">
+                <div class="event-icon ${evento.tipo}">
+                    ${emoji}
+                </div>
+                <div class="event-info">
+                    <div class="event-title">
+                        ${evento.nombre}
+                        ${precioBadge}
+                    </div>
+                    <div class="event-meta">
+                        <div class="event-meta-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            ${evento.lugar}
+                        </div>
+                    </div>
+                </div>
+                <div class="event-actions">
+                    <button class="event-btn event-btn-primary" onclick="verEnMapa(${evento.id})">
+                        <i class="fas fa-map-marked-alt"></i> Ver
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    container.style.display = 'block';
+    container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    
+    // Marcar día seleccionado
+    document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+}
+
+// ===== DASHBOARD DE ANALYTICS =====
+function initCharts() {
+    // Destruir gráficos anteriores si existen
+    Object.values(charts).forEach(chart => chart?.destroy());
+    
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const textColor = isDark ? '#ededed' : '#0a0a0a';
+    const gridColor = isDark ? '#2a2a2a' : '#e5e5e5';
+    
+    Chart.defaults.color = textColor;
+    Chart.defaults.borderColor = gridColor;
+    
+    // Gráfico de eventos por tipo
+    const tiposData = {
+        labels: ['Conciertos', 'Fiestas', 'Mercados', 'Cultural', 'Gastro', 'Deportes', 'Infantil'],
+        datasets: [{
+            label: 'Eventos',
+            data: [
+                currentFilteredEvents.filter(e => e.tipo === 'concierto').length,
+                currentFilteredEvents.filter(e => e.tipo === 'fiesta').length,
+                currentFilteredEvents.filter(e => e.tipo === 'mercado').length,
+                currentFilteredEvents.filter(e => e.tipo === 'cultural').length,
+                currentFilteredEvents.filter(e => e.tipo === 'gastronomia').length,
+                currentFilteredEvents.filter(e => e.tipo === 'deporte').length,
+                currentFilteredEvents.filter(e => e.tipo === 'infantil').length,
+            ],
+            backgroundColor: [
+                colors.concierto,
+                colors.fiesta,
+                colors.mercado,
+                colors.cultural,
+                colors.gastronomia,
+                colors.deporte,
+                colors.infantil
+            ]
+        }]
+    };
+    
+    const ctxTipos = document.getElementById('chart-tipos');
+    if (ctxTipos) {
+        charts.tipos = new Chart(ctxTipos, {
+            type: 'doughnut',
+            data: tiposData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+    
+    // Gráfico de eventos por zona (top 10)
+    const zonasCounts = {};
+    currentFilteredEvents.forEach(e => {
+        const zona = getZonaEvento(e);
+        zonasCounts[zona] = (zonasCounts[zona] || 0) + 1;
+    });
+    
+    const topZonas = Object.entries(zonasCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+    
+    const zonasData = {
+        labels: topZonas.map(z => z[0]),
+        datasets: [{
+            label: 'Eventos',
+            data: topZonas.map(z => z[1]),
+            backgroundColor: '#C60B1E',
+            borderColor: '#C60B1E',
+            borderWidth: 1
+        }]
+    };
+    
+    const ctxZonas = document.getElementById('chart-zonas');
+    if (ctxZonas) {
+        charts.zonas = new Chart(ctxZonas, {
+            type: 'bar',
+            data: zonasData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Gráfico de eventos en el tiempo (próximos 30 días)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const timelineData = [];
+    const timelineLabels = [];
+    
+    for (let i = 0; i < 30; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        
+        const count = currentFilteredEvents.filter(e => {
+            const eventStart = new Date(e.fecha);
+            const eventEnd = e.fecha_fin ? new Date(e.fecha_fin) : eventStart;
+            eventStart.setHours(0, 0, 0, 0);
+            eventEnd.setHours(0, 0, 0, 0);
+            return date >= eventStart && date <= eventEnd;
+        }).length;
+        
+        timelineLabels.push(date.getDate() + '/' + (date.getMonth() + 1));
+        timelineData.push(count);
+    }
+    
+    const ctxTimeline = document.getElementById('chart-timeline');
+    if (ctxTimeline) {
+        charts.timeline = new Chart(ctxTimeline, {
+            type: 'line',
+            data: {
+                labels: timelineLabels,
+                datasets: [{
+                    label: 'Eventos activos',
+                    data: timelineData,
+                    borderColor: '#C60B1E',
+                    backgroundColor: 'rgba(198, 11, 30, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
 function initMap() {
     map = L.map('map').setView([40.4168, -3.7038], 12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -172,6 +585,15 @@ async function loadEvents() {
         iniciarBannerHoy();
         ocultarLoader(allEvents.length);
         procesarUrlEvento();
+        
+        // Cargar favoritos
+        loadFavorites();
+        renderFavoritesList();
+        
+        // Renderizar calendario
+        if (currentView === 'calendar') {
+            renderCalendar();
+        }
 
     } catch (error) {
         console.error('❌ Error cargando datos:', error);
@@ -569,7 +991,7 @@ function displayEvents(events) {
                 <button class="popup-btn-extra" onclick="comoLlegar(${event.id})">
                     <i class="fas fa-route"></i> Cómo llegar
                 </button>
-                <button class="popup-btn-extra compartir" onclick="compartirEvento(${event.id})">
+                <button class="popup-btn-extra compartir" onclick="compartirEventoNativo(${event.id})">
                     <i class="fas fa-share-alt"></i> Compartir
                 </button>
             </div>
@@ -605,9 +1027,12 @@ function displayEvents(events) {
 
     if (currentView === 'list') {
         renderListView(events);
+    } else if (currentView === 'calendar') {
+        renderCalendar();
     }
 
     actualizarEstadisticas(events);
+    initCharts();
 }
 
 function switchView(view) {
@@ -617,11 +1042,17 @@ function switchView(view) {
     document.getElementById(`view-${view}-btn`).classList.add('active');
 
     document.querySelectorAll('.view-container').forEach(c => c.classList.remove('active'));
-    document.getElementById(view === 'map' ? 'map' : 'list-view').classList.add('active');
-
-    if (view === 'list') {
+    
+    if (view === 'map') {
+        document.getElementById('map').classList.add('active');
+        setTimeout(() => map.invalidateSize(), 100);
+    } else if (view === 'list') {
+        document.getElementById('list-view').classList.add('active');
         renderListView(currentFilteredEvents);
         renderLugaresList(currentFilteredLugares);
+    } else if (view === 'calendar') {
+        document.getElementById('calendar-view').classList.add('active');
+        renderCalendar();
     }
 }
 
@@ -702,8 +1133,17 @@ function renderListView(events) {
         `;
 
         const botonCompartir = `
-            <button class="event-btn event-btn-compartir" onclick="compartirEvento(${evento.id})" title="Compartir">
+            <button class="event-btn event-btn-compartir" onclick="compartirEventoNativo(${evento.id})" title="Compartir">
                 <i class="fas fa-share-alt"></i>
+            </button>
+        `;
+        
+        const botonFavorito = `
+            <button class="btn-favorite ${isFavorite(evento.id) ? 'active' : ''}" 
+                    data-event-id="${evento.id}" 
+                    onclick="toggleFavorite(${evento.id})" 
+                    title="Añadir a favoritos">
+                <i class="fas fa-heart"></i>
             </button>
         `;
 
@@ -746,6 +1186,7 @@ function renderListView(events) {
                         ${botonCalendar}
                         ${botonComoLlegar}
                         ${botonCompartir}
+                        ${botonFavorito}
                     </div>
                 </div>
             </div>
@@ -1468,6 +1909,11 @@ function initSettingsPanel() {
             
             const mensaje = i18n.t(newTheme === 'dark' ? 'toast.theme_dark' : 'toast.theme_light');
             mostrarToast(mensaje);
+            
+            // Reiniciar gráficos con nuevo tema
+            if (document.getElementById('stats-panel').classList.contains('active')) {
+                initCharts();
+            }
         });
     }
     
@@ -1553,16 +1999,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('stats-toggle').addEventListener('click', () => {
         document.getElementById('stats-panel').classList.add('active');
+        setTimeout(() => initCharts(), 100);
     });
     document.getElementById('close-stats').addEventListener('click', () => {
         document.getElementById('stats-panel').classList.remove('active');
+    });
+    
+    // Panel Favoritos
+    document.getElementById('favorites-toggle').addEventListener('click', () => {
+        document.getElementById('favorites-panel').classList.add('active');
+    });
+    document.getElementById('close-favorites').addEventListener('click', () => {
+        document.getElementById('favorites-panel').classList.remove('active');
     });
 
     // Eventos
     document.getElementById('btn-clear').addEventListener('click', clearFilters);
     document.getElementById('view-map-btn').addEventListener('click', () => switchView('map'));
     document.getElementById('view-list-btn').addEventListener('click', () => switchView('list'));
+    document.getElementById('view-calendar-btn').addEventListener('click', () => switchView('calendar'));
     document.getElementById('btn-toggle-lugares')?.addEventListener('click', toggleLugares);
+    
+    // Navegación del calendario
+    document.getElementById('calendar-prev')?.addEventListener('click', () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+        renderCalendar();
+    });
+    document.getElementById('calendar-next')?.addEventListener('click', () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+        renderCalendar();
+    });
 
     document.getElementById('sort-by').addEventListener('change', e => {
         currentSort = e.target.value;
@@ -1584,7 +2050,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') cerrarModalCompartir();
+        if (e.key === 'Escape') {
+            cerrarModalCompartir();
+            document.querySelectorAll('.panel-header .close-panel').forEach(btn => {
+                if (btn.closest('.filters-panel, .stats-panel, .favorites-panel, .settings-panel').classList.contains('active')) {
+                    btn.click();
+                }
+            });
+        }
     });
 });
 
