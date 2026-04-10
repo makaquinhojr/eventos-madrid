@@ -14,91 +14,89 @@ let mostrarLugares = true;
 let mostrarLugaresEnLista = true;
 
 const icons = {
-    concierto:   '🎵',
-    fiesta:      '🎪',
-    mercado:     '🛍️',
-    cultural:    '🎭',
+    concierto: '🎵',
+    fiesta: '🎪',
+    mercado: '🛍️',
+    cultural: '🎭',
     gastronomia: '🍽️',
-    deporte:     '⚽',
-    infantil:    '👶'
+    deporte: '⚽',
+    infantil: '👶'
 };
 
 const colors = {
-    concierto:   '#7C3AED',
-    fiesta:      '#DC2626',
-    mercado:     '#059669',
-    cultural:    '#2563EB',
+    concierto: '#7C3AED',
+    fiesta: '#DC2626',
+    mercado: '#059669',
+    cultural: '#2563EB',
     gastronomia: '#D97706',
-    deporte:     '#16A34A',
-    infantil:    '#F59E0B'
+    deporte: '#16A34A',
+    infantil: '#F59E0B'
 };
 
-// ===== ICONOS Y COLORES DE LUGARES =====
 const lugaresIcons = {
-    museo:      '🏛️',
-    monumento:  '🗿',
-    teatro:     '🎭',
-    sala:       '🎵',
-    parque:     '🌳',
-    galeria:    '🖼️',
-    mercado:    '🛍️'
+    museo: '🏛️',
+    monumento: '🗿',
+    teatro: '🎭',
+    sala: '🎵',
+    parque: '🌳',
+    galeria: '🖼️',
+    mercado: '🛍️'
 };
 
 const lugaresColors = {
-    museo:      '#0891B2',
-    monumento:  '#7C3AED',
-    teatro:     '#BE185D',
-    sala:       '#9333EA',
-    parque:     '#16A34A',
-    galeria:    '#EA580C',
-    mercado:    '#CA8A04'
+    museo: '#0891B2',
+    monumento: '#7C3AED',
+    teatro: '#BE185D',
+    sala: '#9333EA',
+    parque: '#16A34A',
+    galeria: '#EA580C',
+    mercado: '#CA8A04'
 };
 
-// ===== ZONAS POR COORDENADAS =====
 const ZONAS_COORDS = {
-    'Centro':                     { lat: 40.4168, lng: -3.7038, radio: 1.5 },
-    'Arganzuela':                 { lat: 40.3964, lng: -3.7006, radio: 1.8 },
-    'Retiro':                     { lat: 40.4083, lng: -3.6844, radio: 1.8 },
-    'Salamanca':                  { lat: 40.4286, lng: -3.6824, radio: 1.5 },
-    'Chamartín':                  { lat: 40.4536, lng: -3.6772, radio: 2.0 },
-    'Tetuán':                     { lat: 40.4597, lng: -3.7031, radio: 1.5 },
-    'Chamberí':                   { lat: 40.4394, lng: -3.7023, radio: 1.5 },
-    'Fuencarral':                 { lat: 40.4894, lng: -3.7108, radio: 3.0 },
-    'Moncloa':                    { lat: 40.4350, lng: -3.7245, radio: 2.5 },
-    'Latina':                     { lat: 40.4061, lng: -3.7364, radio: 2.0 },
-    'Carabanchel':                { lat: 40.3828, lng: -3.7364, radio: 2.5 },
-    'Usera':                      { lat: 40.3897, lng: -3.7108, radio: 1.5 },
-    'Puente de Vallecas':         { lat: 40.3919, lng: -3.6546, radio: 2.0 },
-    'Moratalaz':                  { lat: 40.4061, lng: -3.6394, radio: 1.5 },
-    'Ciudad Lineal':              { lat: 40.4394, lng: -3.6508, radio: 2.5 },
-    'Hortaleza':                  { lat: 40.4772, lng: -3.6394, radio: 3.0 },
-    'Villaverde':                 { lat: 40.3469, lng: -3.7108, radio: 2.5 },
-    'Villa de Vallecas':          { lat: 40.3736, lng: -3.6197, radio: 2.5 },
-    'Vicálvaro':                  { lat: 40.4061, lng: -3.6053, radio: 2.0 },
-    'San Blas':                   { lat: 40.4286, lng: -3.6053, radio: 2.5 },
-    'Barajas':                    { lat: 40.4772, lng: -3.5800, radio: 3.0 },
-    'Getafe':                     { lat: 40.3058, lng: -3.7326, radio: 5.0 },
-    'Leganés':                    { lat: 40.3281, lng: -3.7638, radio: 5.0 },
-    'Alcorcón':                   { lat: 40.3494, lng: -3.8244, radio: 5.0 },
-    'Móstoles':                   { lat: 40.3224, lng: -3.8652, radio: 5.0 },
-    'Fuenlabrada':                { lat: 40.2842, lng: -3.7946, radio: 5.0 },
-    'Alcalá de Henares':          { lat: 40.4818, lng: -3.3641, radio: 6.0 },
-    'Torrejón de Ardoz':          { lat: 40.4599, lng: -3.4794, radio: 5.0 },
-    'Alcobendas':                 { lat: 40.5469, lng: -3.6398, radio: 4.0 },
-    'Las Rozas':                  { lat: 40.4930, lng: -3.8740, radio: 5.0 },
-    'Pozuelo':                    { lat: 40.4350, lng: -3.8138, radio: 4.0 },
-    'Majadahonda':                { lat: 40.4728, lng: -3.8726, radio: 4.0 },
-    'Collado Villalba':           { lat: 40.6346, lng: -4.0076, radio: 5.0 },
-    'Tres Cantos':                { lat: 40.5927, lng: -3.7090, radio: 4.0 },
+    'Centro': { lat: 40.4168, lng: -3.7038, radio: 1.5 },
+    'Arganzuela': { lat: 40.3964, lng: -3.7006, radio: 1.8 },
+    'Retiro': { lat: 40.4083, lng: -3.6844, radio: 1.8 },
+    'Salamanca': { lat: 40.4286, lng: -3.6824, radio: 1.5 },
+    'Chamartín': { lat: 40.4536, lng: -3.6772, radio: 2.0 },
+    'Tetuán': { lat: 40.4597, lng: -3.7031, radio: 1.5 },
+    'Chamberí': { lat: 40.4394, lng: -3.7023, radio: 1.5 },
+    'Fuencarral': { lat: 40.4894, lng: -3.7108, radio: 3.0 },
+    'Moncloa': { lat: 40.4350, lng: -3.7245, radio: 2.5 },
+    'Latina': { lat: 40.4061, lng: -3.7364, radio: 2.0 },
+    'Carabanchel': { lat: 40.3828, lng: -3.7364, radio: 2.5 },
+    'Usera': { lat: 40.3897, lng: -3.7108, radio: 1.5 },
+    'Puente de Vallecas': { lat: 40.3919, lng: -3.6546, radio: 2.0 },
+    'Moratalaz': { lat: 40.4061, lng: -3.6394, radio: 1.5 },
+    'Ciudad Lineal': { lat: 40.4394, lng: -3.6508, radio: 2.5 },
+    'Hortaleza': { lat: 40.4772, lng: -3.6394, radio: 3.0 },
+    'Villaverde': { lat: 40.3469, lng: -3.7108, radio: 2.5 },
+    'Villa de Vallecas': { lat: 40.3736, lng: -3.6197, radio: 2.5 },
+    'Vicálvaro': { lat: 40.4061, lng: -3.6053, radio: 2.0 },
+    'San Blas': { lat: 40.4286, lng: -3.6053, radio: 2.5 },
+    'Barajas': { lat: 40.4772, lng: -3.5800, radio: 3.0 },
+    'Getafe': { lat: 40.3058, lng: -3.7326, radio: 5.0 },
+    'Leganés': { lat: 40.3281, lng: -3.7638, radio: 5.0 },
+    'Alcorcón': { lat: 40.3494, lng: -3.8244, radio: 5.0 },
+    'Móstoles': { lat: 40.3224, lng: -3.8652, radio: 5.0 },
+    'Fuenlabrada': { lat: 40.2842, lng: -3.7946, radio: 5.0 },
+    'Alcalá de Henares': { lat: 40.4818, lng: -3.3641, radio: 6.0 },
+    'Torrejón de Ardoz': { lat: 40.4599, lng: -3.4794, radio: 5.0 },
+    'Alcobendas': { lat: 40.5469, lng: -3.6398, radio: 4.0 },
+    'Las Rozas': { lat: 40.4930, lng: -3.8740, radio: 5.0 },
+    'Pozuelo': { lat: 40.4350, lng: -3.8138, radio: 4.0 },
+    'Majadahonda': { lat: 40.4728, lng: -3.8726, radio: 4.0 },
+    'Collado Villalba': { lat: 40.6346, lng: -4.0076, radio: 5.0 },
+    'Tres Cantos': { lat: 40.5927, lng: -3.7090, radio: 4.0 },
     'San Sebastián de los Reyes': { lat: 40.5487, lng: -3.6271, radio: 4.0 },
-    'Coslada':                    { lat: 40.4233, lng: -3.5645, radio: 3.0 },
-    'Rivas Vaciamadrid':          { lat: 40.3561, lng: -3.5234, radio: 4.0 },
-    'Aranjuez':                   { lat: 40.0319, lng: -3.6010, radio: 5.0 },
-    'Valdemoro':                  { lat: 40.1908, lng: -3.6742, radio: 4.0 },
-    'Parla':                      { lat: 40.2390, lng: -3.7754, radio: 4.0 },
-    'Torrelodones':               { lat: 40.5756, lng: -3.9287, radio: 4.0 },
-    'Boadilla del Monte':         { lat: 40.4067, lng: -3.8760, radio: 4.0 },
-    'Arganda del Rey':            { lat: 40.3008, lng: -3.4394, radio: 4.0 },
+    'Coslada': { lat: 40.4233, lng: -3.5645, radio: 3.0 },
+    'Rivas Vaciamadrid': { lat: 40.3561, lng: -3.5234, radio: 4.0 },
+    'Aranjuez': { lat: 40.0319, lng: -3.6010, radio: 5.0 },
+    'Valdemoro': { lat: 40.1908, lng: -3.6742, radio: 4.0 },
+    'Parla': { lat: 40.2390, lng: -3.7754, radio: 4.0 },
+    'Torrelodones': { lat: 40.5756, lng: -3.9287, radio: 4.0 },
+    'Boadilla del Monte': { lat: 40.4067, lng: -3.8760, radio: 4.0 },
+    'Arganda del Rey': { lat: 40.3008, lng: -3.4394, radio: 4.0 },
 };
 
 function inferirZona(lat, lng) {
@@ -145,7 +143,7 @@ async function loadEvents() {
             fetch('data/lugares.json')
         ]);
 
-        const events  = await eventosRes.json();
+        const events = await eventosRes.json();
         const lugares = await lugaresRes.json();
 
         const today = new Date();
@@ -183,22 +181,14 @@ function displayLugares(lugares) {
         const emoji = lugaresIcons[lugar.categoria] || '📍';
 
         const icon = L.divIcon({
-            html: `
-                <div class="lugar-marker" style="background:${color};">
-                    ${emoji}
-                </div>
-            `,
+            html: `<div class="lugar-marker" style="background:${color};">${emoji}</div>`,
             className: '',
             iconSize: [36, 36],
             iconAnchor: [18, 18],
             popupAnchor: [0, -20]
         });
 
-        const marker = L.marker([lugar.lat, lugar.lng], {
-            icon,
-            riseOnHover: true
-        });
-
+        const marker = L.marker([lugar.lat, lugar.lng], { icon, riseOnHover: true });
         marker.lugarId = lugar.id;
 
         const precioHTML = lugar.precio === 'gratis'
@@ -220,23 +210,15 @@ function displayLugares(lugares) {
                 <p><strong>💰</strong> ${precioHTML}</p>
                 <p><strong>🕐</strong> ${lugar.horario || 'Consultar horario'}</p>
                 ${distanciaHTML}
-                ${lugar.descripcion
-                    ? `<p style="color:#6B7280;font-size:13px;margin-top:8px;line-height:1.4;">
-                           ${lugar.descripcion}
-                       </p>`
-                    : ''}
+                ${lugar.descripcion ? `<p style="color:#6B7280;font-size:13px;margin-top:8px;line-height:1.4;">${lugar.descripcion}</p>` : ''}
                 <div class="popup-actions">
-                    <a href="${lugar.url}" target="_blank" class="popup-link">
-                        Ver más información →
-                    </a>
+                    <a href="${lugar.url}" target="_blank" class="popup-link">Ver más información →</a>
                 </div>
                 <div class="popup-acciones-extra">
-                    <button class="popup-btn-extra"
-                            onclick="comoLlegarCoords(${lugar.lat}, ${lugar.lng}, '${lugar.nombre.replace(/'/g, "\\'")}')">
+                    <button class="popup-btn-extra" onclick="comoLlegarCoords(${lugar.lat}, ${lugar.lng}, '${lugar.nombre.replace(/'/g, "\\'")}')" >
                         <i class="fas fa-route"></i> Cómo llegar
                     </button>
-                    <button class="popup-btn-extra compartir"
-                            onclick="compartirLugar('${lugar.id}')">
+                    <button class="popup-btn-extra compartir" onclick="compartirLugar('${lugar.id}')">
                         <i class="fas fa-share-alt"></i> Compartir
                     </button>
                 </div>
@@ -254,28 +236,27 @@ function displayLugares(lugares) {
 
 function toggleLugares() {
     mostrarLugares = !mostrarLugares;
-
     const btn = document.getElementById('btn-toggle-lugares');
     if (mostrarLugares) {
         displayLugares(currentFilteredLugares.length ? currentFilteredLugares : allLugares);
         btn.classList.add('active');
-        mostrarToast('🏛️ Lugares de interés visibles');
+        mostrarToast('🏛️ Lugares visibles');
     } else {
         lugaresLayer.clearLayers();
         btn.classList.remove('active');
-        mostrarToast('🏛️ Lugares de interés ocultos');
+        mostrarToast('🏛️ Lugares ocultos');
     }
 }
 
 function categoriaNombre(categoria) {
     const nombres = {
-        museo:     'Museo',
+        museo: 'Museo',
         monumento: 'Monumento',
-        teatro:    'Teatro',
-        sala:      'Sala',
-        parque:    'Parque',
-        galeria:   'Galería',
-        mercado:   'Mercado'
+        teatro: 'Teatro',
+        sala: 'Sala',
+        parque: 'Parque',
+        galeria: 'Galería',
+        mercado: 'Mercado'
     };
     return nombres[categoria] || 'Lugar de interés';
 }
@@ -284,7 +265,7 @@ function compartirLugar(lugarId) {
     const lugar = allLugares.find(l => l.id === lugarId);
     if (!lugar) return;
 
-    const url   = `${window.location.origin}${window.location.pathname}?lugar=${lugarId}`;
+    const url = `${window.location.origin}${window.location.pathname}?lugar=${lugarId}`;
     const emoji = lugaresIcons[lugar.categoria] || '📍';
     const texto = `${emoji} *${lugar.nombre}*\n📍 ${lugar.lugar}\n🕐 ${lugar.horario || 'Ver horarios'}`;
 
@@ -305,22 +286,16 @@ function compartirLugar(lugarId) {
             <div class="modal-compartir-acciones">
                 <a class="modal-compartir-btn whatsapp"
                    href="https://wa.me/?text=${encodeURIComponent(texto + '\n\n🗺️ Ver en EventosMadrid: ' + url)}"
-                   target="_blank"
-                   onclick="cerrarModalCompartir()">
-                    <i class="fab fa-whatsapp"></i>
-                    WhatsApp
+                   target="_blank" onclick="cerrarModalCompartir()">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
                 </a>
                 <a class="modal-compartir-btn twitter"
                    href="https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(url)}"
-                   target="_blank"
-                   onclick="cerrarModalCompartir()">
-                    <i class="fab fa-x-twitter"></i>
-                    Twitter
+                   target="_blank" onclick="cerrarModalCompartir()">
+                    <i class="fab fa-x-twitter"></i> Twitter
                 </a>
-                <button class="modal-compartir-btn copiar"
-                        onclick="copiarLinkEvento('${url}', this)">
-                    <i class="fas fa-link"></i>
-                    Copiar link
+                <button class="modal-compartir-btn copiar" onclick="copiarLinkEvento('${url}', this)">
+                    <i class="fas fa-link"></i> Copiar link
                 </button>
             </div>
         </div>
@@ -363,27 +338,20 @@ function esLinkUtil(url) {
 
 function getLinkHTML(evento) {
     if (esLinkUtil(evento.url)) {
-        return `<a href="${evento.url}" target="_blank" class="popup-link">
-                    Ver más información →
-                </a>`;
+        return `<a href="${evento.url}" target="_blank" class="popup-link">Ver más información →</a>`;
     }
     const busqueda = encodeURIComponent(`${evento.nombre} Madrid`);
-    return `<a href="https://www.google.com/search?q=${busqueda}"
-               target="_blank" class="popup-link popup-link-google">
-                🔍 Buscar en Google
-            </a>`;
+    return `<a href="https://www.google.com/search?q=${busqueda}" target="_blank" class="popup-link popup-link-google">🔍 Buscar en Google</a>`;
 }
 
 function getBotonMasInfo(evento) {
     const busqueda = encodeURIComponent(`${evento.nombre} Madrid`);
     if (esLinkUtil(evento.url)) {
-        return `<a href="${evento.url}" target="_blank"
-                   class="event-btn event-btn-secondary">
+        return `<a href="${evento.url}" target="_blank" class="event-btn event-btn-secondary">
                     <i class="fas fa-external-link-alt"></i> Más info
                 </a>`;
     }
-    return `<a href="https://www.google.com/search?q=${busqueda}"
-               target="_blank" class="event-btn event-btn-google">
+    return `<a href="https://www.google.com/search?q=${busqueda}" target="_blank" class="event-btn event-btn-google">
                 <i class="fas fa-search"></i> Buscar
             </a>`;
 }
@@ -394,9 +362,9 @@ function generarUrlCompartir(evento) {
 }
 
 function generarTextoCompartir(evento) {
-    const fecha  = formatDate(evento.fecha);
+    const fecha = formatDate(evento.fecha);
     const precio = evento.precio === 'gratis' ? '¡GRATIS!' : (evento.precio_desde || 'De pago');
-    const emoji  = icons[evento.tipo] || '📍';
+    const emoji = icons[evento.tipo] || '📍';
     return `${emoji} *${evento.nombre}*\n📅 ${fecha}\n📍 ${evento.lugar}\n💰 ${precio}`;
 }
 
@@ -404,7 +372,7 @@ function compartirEvento(eventoId) {
     const evento = allEvents.find(e => e.id === eventoId);
     if (!evento) return;
 
-    const url   = generarUrlCompartir(evento);
+    const url = generarUrlCompartir(evento);
     const texto = generarTextoCompartir(evento);
     const emoji = icons[evento.tipo] || '📍';
 
@@ -425,22 +393,16 @@ function compartirEvento(eventoId) {
             <div class="modal-compartir-acciones">
                 <a class="modal-compartir-btn whatsapp"
                    href="https://wa.me/?text=${encodeURIComponent(texto + '\n\n🗺️ Ver en EventosMadrid: ' + url)}"
-                   target="_blank"
-                   onclick="cerrarModalCompartir()">
-                    <i class="fab fa-whatsapp"></i>
-                    WhatsApp
+                   target="_blank" onclick="cerrarModalCompartir()">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
                 </a>
                 <a class="modal-compartir-btn twitter"
                    href="https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(url)}"
-                   target="_blank"
-                   onclick="cerrarModalCompartir()">
-                    <i class="fab fa-x-twitter"></i>
-                    Twitter
+                   target="_blank" onclick="cerrarModalCompartir()">
+                    <i class="fab fa-x-twitter"></i> Twitter
                 </a>
-                <button class="modal-compartir-btn copiar"
-                        onclick="copiarLinkEvento('${url}', this)">
-                    <i class="fas fa-link"></i>
-                    Copiar link
+                <button class="modal-compartir-btn copiar" onclick="copiarLinkEvento('${url}', this)">
+                    <i class="fas fa-link"></i> Copiar link
                 </button>
             </div>
         </div>
@@ -491,6 +453,7 @@ function comoLlegarCoords(lat, lng, nombre) {
     }
     window.open(url, '_blank');
 }
+
 function procesarUrlEvento() {
     const params = new URLSearchParams(window.location.search);
 
@@ -579,24 +542,17 @@ function displayEvents(events) {
             popupAnchor: [0, -20]
         });
 
-        const marker = L.marker([event.lat, event.lng], {
-            icon,
-            riseOnHover: true
-        });
-
+        const marker = L.marker([event.lat, event.lng], { icon, riseOnHover: true });
         marker.eventoId = event.id;
 
-        const dateText    = formatearFechaSafe(event.fecha, event.fecha_fin);
+        const dateText = formatearFechaSafe(event.fecha, event.fecha_fin);
         const descripcion = limpiarDescripcion(event.descripcion, 150);
-        const linkHTML    = getLinkHTML(event);
-        const zona        = getZonaEvento(event);
+        const linkHTML = getLinkHTML(event);
+        const zona = getZonaEvento(event);
 
         const calendarLink = generarLinkCalendar(event);
         const calendarHTML = calendarLink
-            ? `<a href="${calendarLink}" target="_blank"
-                  class="popup-link popup-link-calendar">
-                    📅 Añadir al calendario
-               </a>`
+            ? `<a href="${calendarLink}" target="_blank" class="popup-link popup-link-calendar">📅 Añadir al calendario</a>`
             : '';
 
         const distanciaHTML = userLocation
@@ -605,12 +561,10 @@ function displayEvents(events) {
 
         const popupAccionesExtra = `
             <div class="popup-acciones-extra">
-                <button class="popup-btn-extra"
-                        onclick="comoLlegar(${event.id})">
+                <button class="popup-btn-extra" onclick="comoLlegar(${event.id})">
                     <i class="fas fa-route"></i> Cómo llegar
                 </button>
-                <button class="popup-btn-extra compartir"
-                        onclick="compartirEvento(${event.id})">
+                <button class="popup-btn-extra compartir" onclick="compartirEvento(${event.id})">
                     <i class="fas fa-share-alt"></i> Compartir
                 </button>
             </div>
@@ -629,10 +583,7 @@ function displayEvents(events) {
                 }</p>
                 ${distanciaHTML}
                 ${descripcion
-                    ? `<p style="color:#6B7280;font-size:13px;
-                                 margin-top:8px;line-height:1.4;">
-                            ${descripcion}
-                       </p>`
+                    ? `<p style="color:#6B7280;font-size:13px;margin-top:8px;line-height:1.4;">${descripcion}</p>`
                     : ''}
                 <div class="popup-actions">
                     ${linkHTML}
@@ -657,17 +608,11 @@ function displayEvents(events) {
 function switchView(view) {
     currentView = view;
 
-    document.querySelectorAll('.view-btn').forEach(btn =>
-        btn.classList.remove('active')
-    );
+    document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`view-${view}-btn`).classList.add('active');
 
-    document.querySelectorAll('.view-container').forEach(c =>
-        c.classList.remove('active')
-    );
-    document.getElementById(
-        view === 'map' ? 'map' : 'list-view'
-    ).classList.add('active');
+    document.querySelectorAll('.view-container').forEach(c => c.classList.remove('active'));
+    document.getElementById(view === 'map' ? 'map' : 'list-view').classList.add('active');
 
     if (view === 'list') {
         renderListView(currentFilteredEvents);
@@ -683,7 +628,7 @@ function renderListView(events) {
             <div class="empty-state">
                 <i class="fas fa-search"></i>
                 <h3>No se encontraron eventos</h3>
-                <p>Prueba a cambiar los filtros o la búsqueda</p>
+                <p>Prueba a cambiar los filtros</p>
             </div>
         `;
         return;
@@ -699,11 +644,8 @@ function renderListView(events) {
                 return a.tipo.localeCompare(b.tipo);
             case 'distance':
                 if (!userLocation) return 0;
-                return calcularDistancia(
-                    userLocation.lat, userLocation.lng, a.lat, a.lng
-                ) - calcularDistancia(
-                    userLocation.lat, userLocation.lng, b.lat, b.lng
-                );
+                return calcularDistancia(userLocation.lat, userLocation.lng, a.lat, a.lng) -
+                       calcularDistancia(userLocation.lat, userLocation.lng, b.lat, b.lng);
             default:
                 return 0;
         }
@@ -715,18 +657,17 @@ function renderListView(events) {
     listContainer.innerHTML = sortedEvents.map(evento => {
         const fechaEvento = new Date(evento.fecha);
         const esHoy = fechaEvento.toDateString() === hoy.toDateString();
-        const esMañana = fechaEvento.toDateString() ===
-            new Date(hoy.getTime() + 86400000).toDateString();
+        const esMañana = fechaEvento.toDateString() === new Date(hoy.getTime() + 86400000).toDateString();
 
         let proximidadBadge = '';
-        if (esHoy)         proximidadBadge = '<span class="event-badge hoy">🔥 HOY</span>';
+        if (esHoy) proximidadBadge = '<span class="event-badge hoy">🔥 HOY</span>';
         else if (esMañana) proximidadBadge = '<span class="event-badge hoy">⚡ MAÑANA</span>';
 
         const precioBadge = evento.precio === 'gratis'
             ? '<span class="event-badge gratis">💚 GRATIS</span>'
             : `<span class="event-badge pago">💰 ${evento.precio_desde || 'Pago'}</span>`;
 
-        const zona      = getZonaEvento(evento);
+        const zona = getZonaEvento(evento);
         const zonaBadge = `<span class="event-badge zona">📍 ${zona}</span>`;
 
         const fechaTexto = evento.fecha_fin
@@ -739,12 +680,10 @@ function renderListView(events) {
             </div>
         ` : '';
 
-        const botonMasInfo  = getBotonMasInfo(evento);
-        const calendarLink  = generarLinkCalendar(evento);
+        const botonMasInfo = getBotonMasInfo(evento);
+        const calendarLink = generarLinkCalendar(evento);
         const botonCalendar = calendarLink
-            ? `<a href="${calendarLink}" target="_blank"
-                  class="event-btn event-btn-calendar"
-                  title="Añadir al calendario">
+            ? `<a href="${calendarLink}" target="_blank" class="event-btn event-btn-calendar" title="Añadir al calendario">
                     <i class="fas fa-calendar-plus"></i>
                </a>`
             : '';
@@ -752,17 +691,13 @@ function renderListView(events) {
         const descripcion = limpiarDescripcion(evento.descripcion, 200);
 
         const botonComoLlegar = `
-            <button class="event-btn event-btn-llegar"
-                    onclick="comoLlegar(${evento.id})"
-                    title="Cómo llegar">
+            <button class="event-btn event-btn-llegar" onclick="comoLlegar(${evento.id})" title="Cómo llegar">
                 <i class="fas fa-route"></i>
             </button>
         `;
 
         const botonCompartir = `
-            <button class="event-btn event-btn-compartir"
-                    onclick="compartirEvento(${evento.id})"
-                    title="Compartir">
+            <button class="event-btn event-btn-compartir" onclick="compartirEvento(${evento.id})" title="Compartir">
                 <i class="fas fa-share-alt"></i>
             </button>
         `;
@@ -793,16 +728,12 @@ function renderListView(events) {
                     ${descripcion
                         ? `<div class="event-description">${descripcion}</div>`
                         : `<div class="event-description sin-descripcion">
-                               📍 ${evento.lugar} ·
-                               ${evento.precio === 'gratis'
-                                   ? 'Entrada gratuita'
-                                   : evento.precio_desde || 'De pago'}
+                               📍 ${evento.lugar} · ${evento.precio === 'gratis' ? 'Entrada gratuita' : evento.precio_desde || 'De pago'}
                            </div>`
                     }
                 </div>
                 <div class="event-actions">
-                    <button class="event-btn event-btn-primary"
-                            onclick="verEnMapa(${evento.id})">
+                    <button class="event-btn event-btn-primary" onclick="verEnMapa(${evento.id})">
                         <i class="fas fa-map-marked-alt"></i> Ver en mapa
                     </button>
                     ${botonMasInfo}
@@ -834,11 +765,8 @@ function renderLugaresList(lugares) {
                 return a.nombre.localeCompare(b.nombre);
             case 'distance':
                 if (!userLocation) return 0;
-                return calcularDistancia(
-                    userLocation.lat, userLocation.lng, a.lat, a.lng
-                ) - calcularDistancia(
-                    userLocation.lat, userLocation.lng, b.lat, b.lng
-                );
+                return calcularDistancia(userLocation.lat, userLocation.lng, a.lat, a.lng) -
+                       calcularDistancia(userLocation.lat, userLocation.lng, b.lat, b.lng);
             default:
                 return a.nombre.localeCompare(b.nombre);
         }
@@ -886,29 +814,20 @@ function renderLugaresList(lugares) {
                         </div>
                         ${distanciaItem}
                     </div>
-                    ${lugar.descripcion
-                        ? `<div class="event-description">${limpiarDescripcion(lugar.descripcion, 200)}</div>`
-                        : ''
-                    }
+                    ${lugar.descripcion ? `<div class="event-description">${limpiarDescripcion(lugar.descripcion, 200)}</div>` : ''}
                 </div>
                 <div class="event-actions">
-                    <button class="event-btn event-btn-primary"
-                            onclick="verLugarEnMapa('${lugar.id}')">
+                    <button class="event-btn event-btn-primary" onclick="verLugarEnMapa('${lugar.id}')">
                         <i class="fas fa-map-marked-alt"></i> Ver en mapa
                     </button>
-                    <a href="${lugar.url}" target="_blank"
-                       class="event-btn event-btn-secondary">
+                    <a href="${lugar.url}" target="_blank" class="event-btn event-btn-secondary">
                         <i class="fas fa-external-link-alt"></i> Más info
                     </a>
                     <div class="event-actions-row">
-                        <button class="event-btn event-btn-llegar"
-                                onclick="comoLlegarCoords(${lugar.lat}, ${lugar.lng}, '${lugar.nombre.replace(/'/g, "\\'")}')"
-                                title="Cómo llegar">
+                        <button class="event-btn event-btn-llegar" onclick="comoLlegarCoords(${lugar.lat}, ${lugar.lng}, '${lugar.nombre.replace(/'/g, "\\'")}')" title="Cómo llegar">
                             <i class="fas fa-route"></i>
                         </button>
-                        <button class="event-btn event-btn-compartir"
-                                onclick="compartirLugar('${lugar.id}')"
-                                title="Compartir">
+                        <button class="event-btn event-btn-compartir" onclick="compartirLugar('${lugar.id}')" title="Compartir">
                             <i class="fas fa-share-alt"></i>
                         </button>
                     </div>
@@ -925,9 +844,7 @@ function verEnMapa(eventoId) {
     map.setView([evento.lat, evento.lng], 15);
     markersLayer.eachLayer(marker => {
         if (marker.eventoId === eventoId) {
-            markersLayer.zoomToShowLayer(marker, () => {
-                marker.openPopup();
-            });
+            markersLayer.zoomToShowLayer(marker, () => marker.openPopup());
         }
     });
 }
@@ -937,7 +854,6 @@ function verLugarEnMapa(lugarId) {
     const lugar = allLugares.find(l => l.id === lugarId);
     if (!lugar) return;
     map.setView([lugar.lat, lugar.lng], 16);
-    
     setTimeout(() => {
         lugaresLayer.eachLayer(marker => {
             if (marker.lugarId === lugarId) {
@@ -947,16 +863,14 @@ function verLugarEnMapa(lugarId) {
     }, 300);
 }
 
-// ===== FILTROS ===== ✅ CORREGIDO
+// ===== ✅ FILTROS CORREGIDOS =====
 function applyFilters() {
-    const search     = document.getElementById('search').value.toLowerCase().trim();
+    const search = document.getElementById('search').value.toLowerCase().trim();
     const dateFilter = document.getElementById('filtro-fecha').value;
     const zonaFilter = document.getElementById('filtro-zona')?.value || 'todas';
-    const precioMax  = parseInt(
-        document.getElementById('filtro-precio-max')?.value || 100
-    );
+    const precioMax = parseInt(document.getElementById('filtro-precio-max')?.value || 100);
 
-    // Tipos de eventos (NO incluye lugares)
+    // ✅ TIPOS DE EVENTOS (checkboxes normales)
     const types = Array.from(document.querySelectorAll(
         '.chip input[value="concierto"], .chip input[value="fiesta"], ' +
         '.chip input[value="mercado"], .chip input[value="cultural"], ' +
@@ -964,48 +878,37 @@ function applyFilters() {
         '.chip input[value="infantil"]'
     )).filter(cb => cb.checked).map(cb => cb.value);
 
+    // ✅ PRECIOS (checkboxes normales)
     const prices = Array.from(document.querySelectorAll(
         '.chip input[value="gratis"], .chip input[value="pago"]'
     )).filter(cb => cb.checked).map(cb => cb.value);
 
-    // ✅ CATEGORÍAS DE LUGARES (separado completamente)
+    // ✅ CATEGORÍAS DE LUGARES (checkboxes específicos)
     const lugarCategorias = Array.from(document.querySelectorAll('.lugar-categoria-cb'))
         .filter(cb => cb.checked)
         .map(cb => cb.value);
 
-    console.log('🔍 Filtros aplicados:', {
-        search,
-        dateFilter,
-        zonaFilter,
-        types,
-        prices,
-        lugarCategorias,
-        precioMax
-    });
+    console.log('🔍 Filtros aplicados:', { search, dateFilter, zonaFilter, types, prices, lugarCategorias, precioMax });
 
     // ========== FILTRAR EVENTOS ==========
     let filtered = allEvents.filter(e => {
-        // Filtro de tipo de evento
+        // Tipo de evento
         if (types.length && !types.includes(e.tipo)) return false;
         
-        // Filtro de precio (gratis/pago)
+        // Precio (gratis/pago)
         if (prices.length && !prices.includes(e.precio)) return false;
 
-        // Filtro de búsqueda
+        // Búsqueda
         if (search) {
             const zona = getZonaEvento(e);
-            const haystack = [
-                e.nombre, e.descripcion || '', e.lugar, zona
-            ].join(' ').toLowerCase();
+            const haystack = [e.nombre, e.descripcion || '', e.lugar, zona].join(' ').toLowerCase();
             if (!haystack.includes(search)) return false;
         }
 
-        // Filtro de zona
-        if (zonaFilter !== 'todas') {
-            if (getZonaEvento(e) !== zonaFilter) return false;
-        }
+        // Zona
+        if (zonaFilter !== 'todas' && getZonaEvento(e) !== zonaFilter) return false;
 
-        // Filtro de precio máximo
+        // Precio máximo
         if (precioMax < 100) {
             if (e.precio === 'gratis') return true;
             if (precioMax === 0) return false;
@@ -1025,9 +928,7 @@ function applyFilters() {
 
         filtered = filtered.filter(e => {
             const fechaInicio = new Date(e.fecha + 'T00:00:00');
-            const fechaFin    = e.fecha_fin
-                ? new Date(e.fecha_fin + 'T00:00:00')
-                : fechaInicio;
+            const fechaFin = e.fecha_fin ? new Date(e.fecha_fin + 'T00:00:00') : fechaInicio;
 
             switch (dateFilter) {
                 case 'hoy':
@@ -1068,30 +969,20 @@ function applyFilters() {
 
     // ========== ✅ FILTRAR LUGARES (SEPARADO) ==========
     let filteredLugares = allLugares.filter(l => {
-        // ✅ IMPORTANTE: Si NO hay categorías seleccionadas, NO mostrar NADA
-        if (lugarCategorias.length === 0) {
-            return false;
-        }
+        // ✅ Si NO hay categorías seleccionadas, NO mostrar NADA
+        if (lugarCategorias.length === 0) return false;
 
-        // Filtro de categoría de lugar
-        if (!lugarCategorias.includes(l.categoria)) {
-            return false;
-        }
+        // Categoría de lugar
+        if (!lugarCategorias.includes(l.categoria)) return false;
 
-        // Filtro de búsqueda
+        // Búsqueda
         if (search) {
             const zona = l.zona || inferirZona(l.lat, l.lng);
-            const haystack = [
-                l.nombre,
-                l.descripcion || '',
-                l.lugar,
-                zona,
-                categoriaNombre(l.categoria)
-            ].join(' ').toLowerCase();
+            const haystack = [l.nombre, l.descripcion || '', l.lugar, zona, categoriaNombre(l.categoria)].join(' ').toLowerCase();
             if (!haystack.includes(search)) return false;
         }
 
-        // Filtro de zona
+        // Zona
         if (zonaFilter !== 'todas') {
             const zonaLugar = l.zona || inferirZona(l.lat, l.lng);
             if (zonaLugar !== zonaFilter) return false;
@@ -1114,7 +1005,7 @@ function applyFilters() {
 }
 
 function mostrarZonaActiva(zona) {
-    const select     = document.getElementById('filtro-zona');
+    const select = document.getElementById('filtro-zona');
     const contenedor = select?.parentElement;
     if (!contenedor) return;
 
@@ -1147,23 +1038,14 @@ function actualizarContadorFiltros() {
     const fecha = document.getElementById('filtro-fecha')?.value;
     if (fecha && fecha !== 'todos') count++;
 
-    const tiposDesactivados = Array.from(
-        document.querySelectorAll('.chip input[type="checkbox"]')
-    ).filter(cb => !cb.checked).length;
+    const tiposDesactivados = Array.from(document.querySelectorAll('.chip input[type="checkbox"]')).filter(cb => !cb.checked).length;
     if (tiposDesactivados > 0) count++;
 
-    const precioMax = parseInt(
-        document.getElementById('filtro-precio-max')?.value || 100
-    );
+    const precioMax = parseInt(document.getElementById('filtro-precio-max')?.value || 100);
     if (precioMax < 100) count++;
 
     const search = document.getElementById('search')?.value;
     if (search && search.trim()) count++;
-
-    const lugaresDesactivados = Array.from(
-        document.querySelectorAll('.lugar-categoria-cb')
-    ).filter(cb => !cb.checked).length;
-    if (lugaresDesactivados > 0) count++;
 
     let badge = fab.querySelector('.filtros-count');
     if (count > 0) {
@@ -1179,13 +1061,11 @@ function actualizarContadorFiltros() {
 }
 
 function clearFilters() {
-    console.log('🧹 Limpiando todos los filtros...');
+    console.log('🧹 Limpiando filtros...');
     
     document.getElementById('search').value = '';
     document.getElementById('filtro-fecha').value = 'todos';
-
-    const zonaSelect = document.getElementById('filtro-zona');
-    if (zonaSelect) zonaSelect.value = 'todas';
+    document.getElementById('filtro-zona').value = 'todas';
 
     const slider = document.getElementById('filtro-precio-max');
     if (slider) {
@@ -1193,18 +1073,8 @@ function clearFilters() {
         slider.dispatchEvent(new Event('input'));
     }
 
-    // ✅ Marcar TODOS los checkboxes de eventos
-    document.querySelectorAll('.chip input[value="concierto"], .chip input[value="fiesta"], ' +
-        '.chip input[value="mercado"], .chip input[value="cultural"], ' +
-        '.chip input[value="gastronomia"], .chip input[value="deporte"], ' +
-        '.chip input[value="infantil"]').forEach(cb => cb.checked = true);
-    
-    // ✅ Marcar TODOS los checkboxes de precios
-    document.querySelectorAll('.chip input[value="gratis"], .chip input[value="pago"]')
-        .forEach(cb => cb.checked = true);
-    
-    // ✅ Marcar TODOS los checkboxes de lugares
-    document.querySelectorAll('.lugar-categoria-cb').forEach(cb => cb.checked = true);
+    // ✅ Marcar TODOS los checkboxes
+    document.querySelectorAll('.chip input[type="checkbox"]').forEach(cb => cb.checked = true);
     
     const selectAllCb = document.getElementById('lugares-select-all');
     if (selectAllCb) {
@@ -1218,7 +1088,7 @@ function clearFilters() {
 
 function initSliderPrecio() {
     const slider = document.getElementById('filtro-precio-max');
-    const label  = document.getElementById('precio-valor-label');
+    const label = document.getElementById('precio-valor-label');
     if (!slider || !label) return;
 
     function actualizarSlider() {
@@ -1227,13 +1097,10 @@ function initSliderPrecio() {
 
         if (val >= 100) {
             label.textContent = 'Cualquiera';
-            label.style.color = '';
         } else if (val === 0) {
             label.textContent = 'Solo gratis';
-            label.style.color = 'var(--green)';
         } else {
             label.textContent = `hasta ${val}€`;
-            label.style.color = '';
         }
         applyFilters();
     }
@@ -1257,11 +1124,8 @@ function formatearFechaSafe(fechaInicio, fechaFin) {
     if (fechaFin) {
         const fecha2 = parsearFecha(fechaFin);
         if (fecha2) {
-            if (fecha1.getMonth() === fecha2.getMonth() &&
-                fecha1.getFullYear() === fecha2.getFullYear()) {
-                return `${fecha1.getDate()}-${fecha2.getDate()} ${
-                    fecha2.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })
-                }`;
+            if (fecha1.getMonth() === fecha2.getMonth() && fecha1.getFullYear() === fecha2.getFullYear()) {
+                return `${fecha1.getDate()}-${fecha2.getDate()} ${fecha2.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })}`;
             }
             return `${textoFecha1} - ${fecha2.toLocaleDateString('es-ES', opciones)}`;
         }
@@ -1307,8 +1171,7 @@ function calcularDistancia(lat1, lng1, lat2, lng2) {
     const dLng = (lng2 - lng1) * Math.PI / 180;
     const a =
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * Math.PI / 180) *
-        Math.cos(lat2 * Math.PI / 180) *
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
         Math.sin(dLng / 2) * Math.sin(dLng / 2);
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
@@ -1347,15 +1210,14 @@ function initGeolocate() {
         btn.classList.add('loading');
         btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
         mostrarToast('📍 Buscando tu ubicación...');
-        navigator.geolocation.getCurrentPosition(
-            onGeoSuccess, onGeoError,
-            { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
-        );
+        navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError, {
+            enableHighAccuracy: true, timeout: 8000, maximumAge: 60000
+        });
     });
 }
 
 function onGeoSuccess(position) {
-    const { latitude, longitude, accuracy } = position.coords;
+    const { latitude, longitude } = position.coords;
     const btn = document.getElementById('btn-geolocate');
     userLocation = { lat: latitude, lng: longitude };
     btn.classList.remove('loading');
@@ -1365,7 +1227,7 @@ function onGeoSuccess(position) {
     colocarMarkerUsuario(latitude, longitude);
     displayEvents(currentFilteredEvents.length ? currentFilteredEvents : allEvents);
     displayLugares(currentFilteredLugares.length ? currentFilteredLugares : allLugares);
-    mostrarToast(accuracy < 100 ? '✅ Ubicación encontrada' : '📍 Ubicación aproximada');
+    mostrarToast('✅ Ubicación encontrada');
 }
 
 function onGeoError(error) {
@@ -1389,12 +1251,7 @@ function colocarMarkerUsuario(lat, lng) {
         iconAnchor: [10, 10]
     });
     userMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 })
-        .bindPopup(`
-            <div class="popup-evento">
-                <h3>📍 Tu ubicación</h3>
-                <p>Estás aquí</p>
-            </div>
-        `)
+        .bindPopup('<div class="popup-evento"><h3>📍 Tu ubicación</h3><p>Estás aquí</p></div>')
         .addTo(map);
 }
 
@@ -1404,7 +1261,7 @@ function desactivarGeolocalizacion() {
     btn.innerHTML = '<i class="fas fa-location-arrow"></i>';
     if (userMarker) {
         map.removeLayer(userMarker);
-        userMarker   = null;
+        userMarker = null;
         userLocation = null;
     }
     map.setView([40.4168, -3.7038], 12);
@@ -1436,23 +1293,23 @@ function actualizarEstadisticas(eventos) {
         if (stats[evento.tipo] !== undefined) stats[evento.tipo]++;
         if (evento.precio === 'gratis') stats.gratis++;
     });
-    animarContador('stat-conciertos',  stats.concierto);
-    animarContador('stat-fiestas',     stats.fiesta);
-    animarContador('stat-mercados',    stats.mercado);
-    animarContador('stat-cultural',    stats.cultural);
+    animarContador('stat-conciertos', stats.concierto);
+    animarContador('stat-fiestas', stats.fiesta);
+    animarContador('stat-mercados', stats.mercado);
+    animarContador('stat-cultural', stats.cultural);
     animarContador('stat-gastronomia', stats.gastronomia);
-    animarContador('stat-deporte',     stats.deporte);
-    animarContador('stat-infantil',    stats.infantil);
-    animarContador('stat-gratis',      stats.gratis);
+    animarContador('stat-deporte', stats.deporte);
+    animarContador('stat-infantil', stats.infantil);
+    animarContador('stat-gratis', stats.gratis);
 }
 
 function animarContador(elementId, valorFinal) {
     const elemento = document.getElementById(elementId);
     if (!elemento) return;
-    const duracion   = 1000;
-    const pasos      = 60;
+    const duracion = 1000;
+    const pasos = 60;
     const incremento = valorFinal / pasos;
-    let valorActual  = 0;
+    let valorActual = 0;
     const intervalo = setInterval(() => {
         valorActual += incremento;
         if (valorActual >= valorFinal) {
@@ -1472,8 +1329,7 @@ function toggleTheme() {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    document.querySelector('.theme-toggle i').className =
-        isDark ? 'fas fa-moon' : 'fas fa-sun';
+    document.querySelector('.theme-toggle i').className = isDark ? 'fas fa-moon' : 'fas fa-sun';
 }
 
 function iniciarBannerHoy() {
@@ -1481,9 +1337,7 @@ function iniciarBannerHoy() {
     hoy.setHours(0, 0, 0, 0);
     const eventosHoy = allEvents.filter(e => {
         const fechaInicio = new Date(e.fecha + 'T00:00:00');
-        const fechaFin    = e.fecha_fin
-            ? new Date(e.fecha_fin + 'T00:00:00')
-            : fechaInicio;
+        const fechaFin = e.fecha_fin ? new Date(e.fecha_fin + 'T00:00:00') : fechaInicio;
         return fechaInicio <= hoy && fechaFin >= hoy;
     });
     const badge = document.getElementById('hoy-badge');
@@ -1512,10 +1366,10 @@ function generarLinkCalendar(evento) {
     if (!inicio) return null;
     const fin = formatearFechaCalendar(evento.fecha_fin) || inicio;
     const params = new URLSearchParams({
-        action:   'TEMPLATE',
-        text:     evento.nombre,
-        dates:    `${inicio}/${fin}`,
-        details:  `${evento.descripcion || ''}\n\nMás info: ${evento.url || ''}`,
+        action: 'TEMPLATE',
+        text: evento.nombre,
+        dates: `${inicio}/${fin}`,
+        details: `${evento.descripcion || ''}\n\nMás info: ${evento.url || ''}`,
         location: evento.lugar || 'Madrid'
     });
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
@@ -1523,72 +1377,42 @@ function generarLinkCalendar(evento) {
 
 function ocultarLoader(numEventos) {
     const loader = document.getElementById('loader');
-    const count  = document.getElementById('loader-count');
+    const count = document.getElementById('loader-count');
     if (count) count.textContent = `✅ ${numEventos} eventos cargados`;
     setTimeout(() => {
         if (loader) loader.classList.add('oculto');
     }, 600);
 }
 
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/eventos-madrid/sw.js')
-            .then(reg => console.log('✅ SW registrado:', reg.scope))
-            .catch(err => console.log('❌ SW error:', err));
+// ===== ✅ GRUPOS COLAPSABLES DE FILTROS =====
+function initCollapseGroups() {
+    const headers = document.querySelectorAll('.filter-group-header');
+    
+    headers.forEach(header => {
+        const groupId = header.id.replace('-header', '-content');
+        const content = document.getElementById(groupId);
+        
+        if (!content) return;
+        
+        // Al inicial, están expandidos (contenido visible)
+        header.addEventListener('click', () => {
+            content.classList.toggle('collapsed');
+            const icon = header.querySelector('i');
+            icon.classList.toggle('collapsed');
+        });
     });
 }
 
-// ===== ✅ CORREGIDO: COLLAPSE LUGARES =====
-function initLugaresCollapse() {
-    const collapseBtn = document.getElementById('lugares-collapse-btn');
-    const categoriasDiv = document.getElementById('lugares-categorias');
-    
-    if (!collapseBtn || !categoriasDiv) {
-        console.log('⚠️ No se encontró botón o div de categorías');
-        return;
-    }
-    
-    console.log('✅ Collapse de lugares inicializado');
-    let isCollapsed = false;
-    
-    collapseBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        isCollapsed = !isCollapsed;
-        console.log(`Collapse: ${isCollapsed ? 'cerrado' : 'abierto'}`);
-        
-        if (isCollapsed) {
-            categoriasDiv.style.maxHeight = '0';
-            categoriasDiv.style.opacity = '0';
-            categoriasDiv.style.marginTop = '0';
-            collapseBtn.querySelector('i').className = 'fas fa-chevron-down';
-        } else {
-            categoriasDiv.style.maxHeight = '500px';
-            categoriasDiv.style.opacity = '1';
-            categoriasDiv.style.marginTop = '12px';
-            collapseBtn.querySelector('i').className = 'fas fa-chevron-up';
-        }
-    });
-}
-
-// ===== ✅ CORREGIDO: SELECT ALL LUGARES =====
+// ===== ✅ SELECT ALL LUGARES =====
 function initLugaresSelectAll() {
     const selectAllCb = document.getElementById('lugares-select-all');
     const categoriaCbs = document.querySelectorAll('.lugar-categoria-cb');
     
-    if (!selectAllCb) {
-        console.log('⚠️ No se encontró checkbox select-all');
-        return;
-    }
-    
-    console.log(`✅ Select All inicializado con ${categoriaCbs.length} checkboxes`);
+    if (!selectAllCb) return;
     
     selectAllCb.addEventListener('change', () => {
-        const checked = selectAllCb.checked;
-        console.log(`✅ Select all: ${checked}`);
         categoriaCbs.forEach(cb => {
-            cb.checked = checked;
+            cb.checked = selectAllCb.checked;
         });
         applyFilters();
     });
@@ -1608,7 +1432,6 @@ function initLugaresSelectAll() {
                 selectAllCb.indeterminate = true;
             }
             
-            console.log('✅ Categoría cambiada, aplicando filtros...');
             applyFilters();
         });
     });
@@ -1638,7 +1461,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadEvents();
     initGeolocate();
     initSliderPrecio();
-    initLugaresCollapse();
+    initCollapseGroups();
     initLugaresSelectAll();
     initLugaresListToggle();
 
@@ -1667,9 +1490,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-clear').addEventListener('click', clearFilters);
     document.getElementById('view-map-btn').addEventListener('click', () => switchView('map'));
     document.getElementById('view-list-btn').addEventListener('click', () => switchView('list'));
-
-    document.getElementById('btn-toggle-lugares')
-        ?.addEventListener('click', toggleLugares);
+    document.getElementById('btn-toggle-lugares')?.addEventListener('click', toggleLugares);
 
     document.getElementById('sort-by').addEventListener('change', e => {
         currentSort = e.target.value;
@@ -1694,3 +1515,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape') cerrarModalCompartir();
     });
 });
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/eventos-madrid/sw.js')
+            .then(reg => console.log('✅ SW registrado:', reg.scope))
+            .catch(err => console.log('❌ SW error:', err));
+    });
+}

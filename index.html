@@ -33,16 +33,30 @@
 <!-- HEADER -->
 <header class="top-bar">
     <div class="logo">
-        <div class="logo-icon">🎉</div>
-        EventosMadrid
+        <span class="logo-icon">🎉</span>
+        <span class="logo-text">EventosMadrid</span>
     </div>
+
+    <div class="top-bar-center">
+        <div class="view-toggle">
+            <button class="view-btn active" id="view-map-btn">
+                <i class="fas fa-map"></i>
+                <span>Mapa</span>
+            </button>
+            <button class="view-btn" id="view-list-btn">
+                <i class="fas fa-list"></i>
+                <span>Lista</span>
+            </button>
+        </div>
+    </div>
+
     <div class="top-bar-actions">
         <button class="hoy-badge" id="hoy-badge" style="display:none">
             <span class="hoy-badge-dot"></span>
-            <span id="hoy-badge-count">0</span> hoy
+            <span id="hoy-badge-count">0</span>
+            <span class="desktop-only">hoy</span>
         </button>
-        <button class="btn-lugares active" id="btn-toggle-lugares"
-                title="Mostrar/ocultar lugares de interés">
+        <button class="btn-lugares active" id="btn-toggle-lugares" title="Mostrar/ocultar lugares">
             <i class="fas fa-landmark"></i>
             <span class="desktop-only">Lugares</span>
         </button>
@@ -57,32 +71,20 @@
     </div>
 </header>
 
-<!-- Toggle de vistas -->
-<div class="view-toggle">
-    <button class="view-btn active" id="view-map-btn">
-        <i class="fas fa-map"></i> Mapa
-    </button>
-    <button class="view-btn" id="view-list-btn">
-        <i class="fas fa-list"></i> Lista
-    </button>
-</div>
-
-<!-- Botón geolocalización -->
-<button class="btn-geolocate" id="btn-geolocate">
-    <i class="fas fa-location-arrow"></i>
-</button>
-
-<!-- Vista Mapa -->
+<!-- MAPA -->
 <div id="map" class="view-container active"></div>
 
-<!-- Vista Lista -->
+<!-- VISTA LISTA -->
 <div id="list-view" class="view-container">
     <div class="list-container">
         <div class="list-header">
-            <h2>Eventos</h2>
-            <div class="list-sort">
-                <label>Ordenar:</label>
-                <select id="sort-by">
+            <div class="list-header-left">
+                <h2>📅 Eventos en Madrid</h2>
+                <p class="list-subtitle" id="list-subtitle">Mostrando todos los eventos</p>
+            </div>
+            <div class="list-header-right">
+                <label class="sort-label">Ordenar:</label>
+                <select id="sort-by" class="sort-select">
                     <option value="date">📅 Fecha</option>
                     <option value="name">🔤 Nombre</option>
                     <option value="type">🎭 Tipo</option>
@@ -91,8 +93,6 @@
             </div>
         </div>
         <div id="events-list" class="events-list"></div>
-
-        <!-- NUEVA SECCIÓN: Lugares de interés -->
         <div class="lugares-section" id="lugares-section">
             <div class="lugares-header" id="lugares-header">
                 <h2>🏛️ Lugares de Interés</h2>
@@ -114,7 +114,7 @@
 <!-- PANEL FILTROS -->
 <aside class="filters-panel" id="filters-panel">
     <div class="panel-header">
-        <h2>Filtros</h2>
+        <h2>🔍 Filtros</h2>
         <button class="close-panel" id="close-panel">
             <i class="fas fa-times"></i>
         </button>
@@ -124,29 +124,155 @@
 
         <!-- BÚSQUEDA -->
         <div class="filter-section">
-            <input
-                type="text"
-                id="search"
-                class="search-box"
-                placeholder="🔍 Buscar eventos, lugares, zonas..."
-            >
+            <input type="text" id="search" class="search-box" 
+                   placeholder="🔍 Buscar eventos, lugares...">
         </div>
 
-        <!-- CUÁNDO -->
-        <div class="filter-section">
-            <label class="filter-label">Cuándo</label>
-            <select id="filtro-fecha" class="filter-select">
-                <option value="todos">Todos</option>
-                <option value="hoy">Hoy</option>
-                <option value="finde">Este fin de semana</option>
-                <option value="semana">Próximos 7 días</option>
-                <option value="mes">Este mes</option>
-            </select>
+        <!-- GRUPO: FILTROS DE EVENTOS -->
+        <div class="filter-group">
+            <button class="filter-group-header" id="eventos-header">
+                <span class="filter-group-title">🎭 Filtros de Eventos</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="filter-group-content" id="eventos-content">
+
+                <!-- Cuándo -->
+                <div class="filter-section">
+                    <label class="filter-label">Cuándo</label>
+                    <select id="filtro-fecha" class="filter-select">
+                        <option value="todos">Todos</option>
+                        <option value="hoy">Hoy</option>
+                        <option value="finde">Este fin de semana</option>
+                        <option value="semana">Próximos 7 días</option>
+                        <option value="mes">Este mes</option>
+                    </select>
+                </div>
+
+                <!-- Tipo de evento -->
+                <div class="filter-section">
+                    <label class="filter-label">Tipo de Evento</label>
+                    <div class="filter-chips">
+                        <label class="chip">
+                            <input type="checkbox" value="concierto" checked>
+                            <span class="chip-content concierto">🎵 Conciertos</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="fiesta" checked>
+                            <span class="chip-content fiesta">🎪 Fiestas</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="mercado" checked>
+                            <span class="chip-content mercado">🛍️ Mercados</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="cultural" checked>
+                            <span class="chip-content cultural">🎭 Cultural</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="gastronomia" checked>
+                            <span class="chip-content gastronomia">🍽️ Gastro</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="deporte" checked>
+                            <span class="chip-content deporte">⚽ Deportes</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="infantil" checked>
+                            <span class="chip-content infantil">👶 Infantil</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Precio -->
+                <div class="filter-section">
+                    <label class="filter-label">Precio</label>
+                    <div class="filter-chips">
+                        <label class="chip">
+                            <input type="checkbox" value="gratis" checked>
+                            <span class="chip-content gratis">💚 Gratis</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="pago" checked>
+                            <span class="chip-content pago">💰 De pago</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Precio máximo -->
+                <div class="filter-section">
+                    <label class="filter-label">
+                        Precio máximo
+                        <span class="precio-valor" id="precio-valor-label">Cualquiera</span>
+                    </label>
+                    <input type="range" id="filtro-precio-max" class="precio-slider"
+                           min="0" max="100" value="100" step="5">
+                    <div class="precio-marks">
+                        <span>Gratis</span>
+                        <span>50€</span>
+                        <span>100€+</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- GRUPO: FILTROS DE LUGARES -->
+        <div class="filter-group">
+            <button class="filter-group-header" id="lugares-header-filter">
+                <span class="filter-group-title">🏛️ Filtros de Lugares</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="filter-group-content" id="lugares-content">
+
+                <!-- Select All Lugares -->
+                <div class="filter-section">
+                    <label class="chip">
+                        <input type="checkbox" id="lugares-select-all" checked>
+                        <span class="chip-content lugares-all">✓ Todos</span>
+                    </label>
+                </div>
+
+                <!-- Categorías de lugares -->
+                <div class="filter-section">
+                    <label class="filter-label">Categorías</label>
+                    <div class="filter-chips">
+                        <label class="chip">
+                            <input type="checkbox" class="lugar-categoria-cb" value="museo" checked>
+                            <span class="chip-content lugar-museo">🏛️ Museos</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" class="lugar-categoria-cb" value="monumento" checked>
+                            <span class="chip-content lugar-monumento">🗿 Monumentos</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" class="lugar-categoria-cb" value="teatro" checked>
+                            <span class="chip-content lugar-teatro">🎭 Teatros</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" class="lugar-categoria-cb" value="sala" checked>
+                            <span class="chip-content lugar-sala">🎵 Salas</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" class="lugar-categoria-cb" value="parque" checked>
+                            <span class="chip-content lugar-parque">🌳 Parques</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" class="lugar-categoria-cb" value="galeria" checked>
+                            <span class="chip-content lugar-galeria">🖼️ Galerías</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" class="lugar-categoria-cb" value="mercado" checked>
+                            <span class="chip-content lugar-mercado">🛍️ Mercados</span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
         </div>
 
         <!-- ZONA -->
         <div class="filter-section">
-            <label class="filter-label">Zona</label>
+            <label class="filter-label">📍 Zona</label>
             <select id="filtro-zona" class="filter-select">
                 <option value="todas">📍 Toda la Comunidad</option>
                 <optgroup label="🏙️ Madrid Capital">
@@ -199,131 +325,7 @@
             </select>
         </div>
 
-        <!-- TIPO DE EVENTO -->
-        <div class="filter-section">
-            <label class="filter-label">Tipo de Evento</label>
-            <div class="filter-chips">
-                <label class="chip">
-                    <input type="checkbox" value="concierto" checked>
-                    <span class="chip-content concierto">🎵 Conciertos</span>
-                </label>
-                <label class="chip">
-                    <input type="checkbox" value="fiesta" checked>
-                    <span class="chip-content fiesta">🎪 Fiestas</span>
-                </label>
-                <label class="chip">
-                    <input type="checkbox" value="mercado" checked>
-                    <span class="chip-content mercado">🛍️ Mercados</span>
-                </label>
-                <label class="chip">
-                    <input type="checkbox" value="cultural" checked>
-                    <span class="chip-content cultural">🎭 Cultural</span>
-                </label>
-                <label class="chip">
-                    <input type="checkbox" value="gastronomia" checked>
-                    <span class="chip-content gastronomia">🍽️ Gastro</span>
-                </label>
-                <label class="chip">
-                    <input type="checkbox" value="deporte" checked>
-                    <span class="chip-content deporte">⚽ Deportes</span>
-                </label>
-                <label class="chip">
-                    <input type="checkbox" value="infantil" checked>
-                    <span class="chip-content infantil">👶 Infantil</span>
-                </label>
-            </div>
-        </div>
-
-        <!-- ✅ LUGARES DE INTERÉS (MOVIDO AQUÍ - DEBAJO DE TIPO) -->
-        <div class="filter-section filter-section-lugares">
-            <label class="filter-label lugares-label">
-                <span>🏛️ Lugares de Interés</span>
-                <button class="lugares-collapse-btn" id="lugares-collapse-btn" type="button">
-                    <i class="fas fa-chevron-up"></i>
-                </button>
-            </label>
-            
-            <!-- Checkbox "Seleccionar todos" -->
-            <div class="lugares-select-all">
-                <label class="chip">
-                    <input type="checkbox" id="lugares-select-all" checked>
-                    <span class="chip-content lugares-all">✓ Todos los lugares</span>
-                </label>
-            </div>
-
-            <!-- Contenedor colapsable de categorías -->
-            <div class="lugares-categorias" id="lugares-categorias">
-                <div class="filter-chips">
-                    <label class="chip">
-                        <input type="checkbox" class="lugar-categoria-cb" value="museo" checked>
-                        <span class="chip-content lugar-museo">🏛️ Museos</span>
-                    </label>
-                    <label class="chip">
-                        <input type="checkbox" class="lugar-categoria-cb" value="monumento" checked>
-                        <span class="chip-content lugar-monumento">🗿 Monumentos</span>
-                    </label>
-                    <label class="chip">
-                        <input type="checkbox" class="lugar-categoria-cb" value="teatro" checked>
-                        <span class="chip-content lugar-teatro">🎭 Teatros</span>
-                    </label>
-                    <label class="chip">
-                        <input type="checkbox" class="lugar-categoria-cb" value="sala" checked>
-                        <span class="chip-content lugar-sala">🎵 Salas</span>
-                    </label>
-                    <label class="chip">
-                        <input type="checkbox" class="lugar-categoria-cb" value="parque" checked>
-                        <span class="chip-content lugar-parque">🌳 Parques</span>
-                    </label>
-                    <label class="chip">
-                        <input type="checkbox" class="lugar-categoria-cb" value="galeria" checked>
-                        <span class="chip-content lugar-galeria">🖼️ Galerías</span>
-                    </label>
-                    <label class="chip">
-                        <input type="checkbox" class="lugar-categoria-cb" value="mercado" checked>
-                        <span class="chip-content lugar-mercado">🛍️ Mercados</span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <!-- PRECIO CHIPS -->
-        <div class="filter-section">
-            <label class="filter-label">Precio</label>
-            <div class="filter-chips">
-                <label class="chip">
-                    <input type="checkbox" value="gratis" checked>
-                    <span class="chip-content gratis">✓ Gratis</span>
-                </label>
-                <label class="chip">
-                    <input type="checkbox" value="pago" checked>
-                    <span class="chip-content pago">€ De pago</span>
-                </label>
-            </div>
-        </div>
-
-        <!-- PRECIO MÁXIMO SLIDER -->
-        <div class="filter-section">
-            <label class="filter-label">
-                Precio máximo
-                <span class="precio-valor" id="precio-valor-label">Cualquiera</span>
-            </label>
-            <input
-                type="range"
-                id="filtro-precio-max"
-                class="precio-slider"
-                min="0"
-                max="100"
-                value="100"
-                step="5"
-            >
-            <div class="precio-marks">
-                <span>Gratis</span>
-                <span>50€</span>
-                <span>100€+</span>
-            </div>
-        </div>
-
-        <!-- LIMPIAR -->
+        <!-- LIMPIAR FILTROS -->
         <button class="btn-clear" id="btn-clear">
             <i class="fas fa-redo"></i> Limpiar filtros
         </button>
@@ -334,7 +336,7 @@
 <!-- PANEL STATS -->
 <aside class="stats-panel" id="stats-panel">
     <div class="panel-header">
-        <h2>Estadísticas</h2>
+        <h2>📊 Estadísticas</h2>
         <button class="close-panel" id="close-stats">
             <i class="fas fa-times"></i>
         </button>
@@ -385,6 +387,12 @@
     </div>
 </aside>
 
+<!-- GEOLOCALIZACIÓN -->
+<button class="btn-geolocate" id="btn-geolocate" title="Mi ubicación">
+    <i class="fas fa-location-arrow"></i>
+</button>
+
+<!-- SCRIPTS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script src="js/app.js"></script>
