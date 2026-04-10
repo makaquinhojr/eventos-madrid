@@ -1310,11 +1310,22 @@ function updateCounter(count) {
     document.getElementById('event-count').textContent = count;
 }
 
-function toggleTheme() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
+function toggleTheme(force = null) {
+    const isDark = force !== null ? force : !document.body.classList.contains('dark-mode');
+    
+    if (isDark) {
+        document.body.classList.add('dark-mode');
+    } else {
+        document.body.classList.remove('dark-mode');
+    }
+    
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    document.querySelector('.theme-toggle i').className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+    
+    // Actualizar toggle en panel
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.checked = isDark;
+    }
 }
 
 function iniciarBannerHoy() {
@@ -1463,6 +1474,82 @@ function initLanguageSelector() {
     });
 }
 
+function initSettingsPanel() {
+    const settingsToggle = document.getElementById('settings-toggle');
+    const settingsPanel = document.getElementById('settings-panel');
+    const closeSettings = document.getElementById('close-settings');
+    
+    if (!settingsToggle || !settingsPanel) return;
+    
+    // Abrir panel
+    settingsToggle.addEventListener('click', () => {
+        settingsPanel.classList.add('active');
+    });
+    
+    // Cerrar panel
+    closeSettings.addEventListener('click', () => {
+        settingsPanel.classList.remove('active');
+    });
+    
+    // Tema toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        // Establecer estado inicial
+        const isDark = document.body.classList.contains('dark-mode');
+        themeToggle.checked = isDark;
+        
+        // Escuchar cambios
+        themeToggle.addEventListener('change', (e) => {
+            toggleTheme(e.target.checked);
+        });
+    }
+    
+    // Notificaciones toggle
+    const notificationsToggle = document.getElementById('notifications-toggle');
+    if (notificationsToggle) {
+        const savedNotifications = localStorage.getItem('notifications');
+        if (savedNotifications !== null) {
+            notificationsToggle.checked = savedNotifications === 'true';
+        }
+        
+        notificationsToggle.addEventListener('change', (e) => {
+            localStorage.setItem('notifications', e.target.checked);
+            mostrarToast(e.target.checked ? '🔔 Notificaciones activadas' : '🔔 Notificaciones desactivadas');
+        });
+    }
+    
+    // Guardar búsquedas toggle
+    const saveSearchesToggle = document.getElementById('save-searches-toggle');
+    if (saveSearchesToggle) {
+        const savedSearches = localStorage.getItem('saveSearches');
+        if (savedSearches !== null) {
+            saveSearchesToggle.checked = savedSearches === 'true';
+        }
+        
+        saveSearchesToggle.addEventListener('change', (e) => {
+            localStorage.setItem('saveSearches', e.target.checked);
+            mostrarToast(e.target.checked ? '💾 Se guardarán tus búsquedas' : '🗑️ Las búsquedas no se guardarán');
+        });
+    }
+    
+    // Limpiar datos
+    const clearCacheBtn = document.getElementById('btn-clear-cache');
+    if (clearCacheBtn) {
+        clearCacheBtn.addEventListener('click', () => {
+            if (confirm('¿Estás seguro de que deseas limpiar todos los datos?')) {
+                localStorage.clear();
+                mostrarToast('🗑️ Datos limpiados');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+        });
+    }
+    
+    // Idioma
+    initLanguageSelector();
+}
+
 // ===== DOMContentLoaded =====
 document.addEventListener('DOMContentLoaded', () => {
     console.log('✅ DOM cargado, iniciando app...');
@@ -1491,10 +1578,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tema
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        document.querySelector('.theme-toggle i').className = 'fas fa-moon';
+        toggleTheme(true);
     } else {
-        document.querySelector('.theme-toggle i').className = 'fas fa-sun';
+        toggleTheme(false);
     }
 
     // Panels
@@ -1517,6 +1603,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('view-map-btn').addEventListener('click', () => switchView('map'));
     document.getElementById('view-list-btn').addEventListener('click', () => switchView('list'));
     document.getElementById('btn-toggle-lugares')?.addEventListener('click', toggleLugares);
+        // Panel de ajustes
+    initSettingsPanel();
 
     document.getElementById('sort-by').addEventListener('change', e => {
         currentSort = e.target.value;
