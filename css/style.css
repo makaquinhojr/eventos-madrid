@@ -1985,7 +1985,7 @@ body {
     right: 0;
     bottom: 0;
     background: var(--bg-1);
-    overflow: hidden; /* ✅ Sin scroll en el contenedor principal */
+    overflow: hidden; /* ✅ SIN scroll en el contenedor principal */
 }
 
 /* ✅ NUEVO: Contenedor fijo para el header del mes */
@@ -2002,7 +2002,7 @@ body {
     -webkit-backdrop-filter: blur(12px);
 }
 
-/* ✅ MODIFICADO: Header del mes ahora dentro del contenedor fijo */
+/* ✅ Header del mes dentro del contenedor fijo */
 .calendar-header {
     max-width: 900px;
     margin: 0 auto;
@@ -2043,12 +2043,12 @@ body {
     background: var(--bg-4);
 }
 
-/* ✅ MODIFICADO: Container con scroll propio */
+/* ✅ Container con scroll propio */
 .calendar-container {
     max-width: 900px;
     margin: 0 auto;
     padding: 96px 20px 40px; /* 96px para dejar espacio al header fijo */
-    height: calc(100vh - 52px); /* Altura total menos el header principal */
+    height: calc(100vh - 52px);
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -2184,7 +2184,7 @@ body {
 /* ===== RESPONSIVE CALENDARIO ===== */
 @media (max-width: 640px) {
     .calendar-header-fixed {
-        top: 124px; /* 52px header + 72px toggle vistas */
+        top: 124px; /* 52px header + 72px toggle vistas en móvil */
         padding: 0 12px;
     }
     
