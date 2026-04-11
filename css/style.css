@@ -1985,28 +1985,24 @@ body {
     right: 0;
     bottom: 0;
     background: var(--bg-1);
+    overflow: hidden;
 }
 
-/* ✅ Contenedor con scroll */
-.calendar-scroll-container {
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding-top: 64px; /* ✅ Espacio para el toggle de vistas */
-}
-
-/* ✅ Wrapper del header que hace sticky */
-.calendar-header-wrapper {
-    position: sticky;
-    top: 0;
+/* ✅ Contenedor fijo para el header del mes */
+.calendar-header-fixed {
+    position: fixed;
+    top: 116px; /* 52px header + 64px toggle vistas */
+    left: 0;
+    right: 0;
     z-index: 100;
+    padding: 0 20px;
     background: var(--bg-1);
-    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
 }
 
+/* ✅ Header del mes dentro del contenedor fijo */
 .calendar-header {
     max-width: 900px;
     margin: 0 auto;
@@ -2017,7 +2013,7 @@ body {
     background: var(--bg-2);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow);
 }
 
 .calendar-header h2 {
@@ -2047,11 +2043,14 @@ body {
     background: var(--bg-4);
 }
 
-/* ✅ Container del contenido */
+/* ✅ Container con scroll propio */
 .calendar-container {
     max-width: 900px;
     margin: 0 auto;
-    padding: 20px 20px 40px;
+    padding: 96px 20px 40px; /* 96px para dejar espacio al header fijo */
+    height: calc(100vh - 52px);
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .calendar-weekdays {
@@ -2183,12 +2182,9 @@ body {
 
 /* ===== RESPONSIVE CALENDARIO ===== */
 @media (max-width: 640px) {
-    .calendar-scroll-container {
-        padding-top: 72px;
-    }
-    
-    .calendar-header-wrapper {
-        padding: 12px;
+    .calendar-header-fixed {
+        top: 124px; /* 52px header + 72px toggle vistas en móvil */
+        padding: 0 12px;
     }
     
     .calendar-header {
@@ -2200,7 +2196,7 @@ body {
     }
     
     .calendar-container {
-        padding: 12px 12px 40px;
+        padding: 96px 12px 40px;
     }
     
     .calendar-day {

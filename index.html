@@ -120,38 +120,36 @@
 
 <!-- VISTA CALENDARIO -->
 <div id="calendar-view" class="view-container">
-    <div class="calendar-scroll-container">
-        <!-- ✅ Header sticky DENTRO del scroll -->
-        <div class="calendar-header-wrapper">
-            <div class="calendar-header">
-                <button class="calendar-nav" id="calendar-prev">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <h2 id="calendar-month-year">Enero 2025</h2>
-                <button class="calendar-nav" id="calendar-next">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
+    <!-- ✅ HEADER FIJO FUERA DEL SCROLL -->
+    <div class="calendar-header-fixed">
+        <div class="calendar-header">
+            <button class="calendar-nav" id="calendar-prev">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h2 id="calendar-month-year">Enero 2025</h2>
+            <button class="calendar-nav" id="calendar-next">
+                <i class="fas fa-chevron-right"></i>
+            </button>
         </div>
+    </div>
+    
+    <!-- ✅ CONTENIDO CON SCROLL -->
+    <div class="calendar-container">
+        <div class="calendar-weekdays">
+            <div class="weekday">L</div>
+            <div class="weekday">M</div>
+            <div class="weekday">X</div>
+            <div class="weekday">J</div>
+            <div class="weekday">V</div>
+            <div class="weekday">S</div>
+            <div class="weekday">D</div>
+        </div>
+        <div class="calendar-grid" id="calendar-grid"></div>
         
-        <!-- ✅ Contenido del calendario -->
-        <div class="calendar-container">
-            <div class="calendar-weekdays">
-                <div class="weekday">L</div>
-                <div class="weekday">M</div>
-                <div class="weekday">X</div>
-                <div class="weekday">J</div>
-                <div class="weekday">V</div>
-                <div class="weekday">S</div>
-                <div class="weekday">D</div>
-            </div>
-            <div class="calendar-grid" id="calendar-grid"></div>
-            
-            <!-- Eventos del día seleccionado -->
-            <div class="calendar-day-events" id="calendar-day-events" style="display:none;">
-                <h3 id="calendar-day-title"></h3>
-                <div id="calendar-day-list"></div>
-            </div>
+        <!-- Eventos del día seleccionado -->
+        <div class="calendar-day-events" id="calendar-day-events" style="display:none;">
+            <h3 id="calendar-day-title"></h3>
+            <div id="calendar-day-list"></div>
         </div>
     </div>
 </div>
