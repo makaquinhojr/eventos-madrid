@@ -1985,32 +1985,35 @@ body {
     right: 0;
     bottom: 0;
     background: var(--bg-1);
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden; /* ✅ Sin scroll en el contenedor principal */
 }
 
-.calendar-container {
+/* ✅ NUEVO: Contenedor fijo para el header del mes */
+.calendar-header-fixed {
+    position: fixed;
+    top: 116px; /* 52px header + 64px toggle vistas */
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 0 20px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* ✅ MODIFICADO: Header del mes ahora dentro del contenedor fijo */
+.calendar-header {
     max-width: 900px;
     margin: 0 auto;
-    padding: 80px 20px 40px; /* ✅ Reducido para que el header quede más arriba */
-}
-
-/* ✅ ARREGLADO: Header fijo que NO se mueve al scrollear */
-.calendar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
     padding: 16px 12px;
-    background: var(--bg-1);
+    background: var(--bg-2);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    position: sticky;
-    top: 72px; /* ✅ Justo debajo del toggle de vistas (52px header + 20px margen) */
-    z-index: 100; /* ✅ Por encima de todo */
-    box-shadow: var(--shadow-lg);
-    backdrop-filter: blur(12px); /* ✅ Efecto glassmorphism */
-    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow);
 }
 
 .calendar-header h2 {
@@ -2020,7 +2023,7 @@ body {
 }
 
 .calendar-nav {
-    background: var(--bg-2);
+    background: var(--bg-3);
     border: 1px solid var(--border);
     color: var(--text-2);
     width: 36px;
@@ -2037,7 +2040,17 @@ body {
 .calendar-nav:hover {
     border-color: var(--border-light);
     color: var(--text);
-    background: var(--bg-3);
+    background: var(--bg-4);
+}
+
+/* ✅ MODIFICADO: Container con scroll propio */
+.calendar-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 96px 20px 40px; /* 96px para dejar espacio al header fijo */
+    height: calc(100vh - 52px); /* Altura total menos el header principal */
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .calendar-weekdays {
@@ -2131,30 +2144,29 @@ body {
 .calendar-dot.deporte { background: #16A34A; }
 .calendar-dot.infantil { background: #F59E0B; }
 
-/* ✅ ARREGLADO: Lista de eventos del día con scroll perfecto */
+/* ✅ Lista de eventos del día con scroll perfecto */
 .calendar-day-events {
     background: var(--bg-2);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 0; /* ✅ Sin padding general, lo ponemos en el contenido */
+    padding: 0;
     margin-top: 24px;
     max-height: 500px;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
-/* ✅ ARREGLADO: Título del día sticky con espacio correcto */
 .calendar-day-events h3 {
     font-size: 16px;
     font-weight: 600;
     color: var(--text);
     margin: 0;
-    padding: 20px 20px 16px 20px; /* ✅ Padding interno */
+    padding: 20px 20px 16px 20px;
     display: flex;
     align-items: center;
     gap: 8px;
     position: sticky;
-    top: -1px; /* ✅ Pequeño offset para que se vea el borde al scrollear */
+    top: -1px;
     background: var(--bg-2);
     border-bottom: 1px solid var(--border);
     z-index: 10;
@@ -2166,22 +2178,26 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 20px; /* ✅ Padding solo en la lista */
+    padding: 20px;
 }
 
 /* ===== RESPONSIVE CALENDARIO ===== */
 @media (max-width: 640px) {
-    .calendar-container {
-        padding: 70px 12px 40px; /* ✅ Menos espacio en móvil */
+    .calendar-header-fixed {
+        top: 124px; /* 52px header + 72px toggle vistas */
+        padding: 0 12px;
     }
     
     .calendar-header {
-        top: 68px; /* ✅ Ajustado para móvil (52px header + 16px margen) */
         padding: 12px;
     }
     
     .calendar-header h2 {
         font-size: 16px;
+    }
+    
+    .calendar-container {
+        padding: 96px 12px 40px;
     }
     
     .calendar-day {
@@ -2210,6 +2226,7 @@ body {
         padding: 16px;
     }
 }
+
 /* ===== CHARTS ===== */
 .charts-section {
     margin-top: 32px;
