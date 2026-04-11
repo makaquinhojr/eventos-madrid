@@ -1978,10 +1978,21 @@ body {
 }
 
 /* ===== VISTA CALENDARIO ===== */
+#calendar-view {
+    position: fixed;
+    top: 52px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-1);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 .calendar-container {
     max-width: 900px;
     margin: 0 auto;
-    padding: 80px 20px 40px;
+    padding: 120px 20px 40px;
 }
 
 .calendar-header {
@@ -1989,7 +2000,14 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
-    padding: 0 12px;
+    padding: 16px 12px;
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    position: sticky;
+    top: 120px;
+    z-index: 10;
+    box-shadow: var(--shadow);
 }
 
 .calendar-header h2 {
@@ -2110,11 +2128,15 @@ body {
 .calendar-dot.deporte { background: #16A34A; }
 .calendar-dot.infantil { background: #F59E0B; }
 
+/* ✅ ARREGLADO: Lista de eventos del día con scroll */
 .calendar-day-events {
     background: var(--bg-2);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     padding: 20px;
+    margin-top: 24px;
+    max-height: 500px;
+    overflow-y: auto;
 }
 
 .calendar-day-events h3 {
@@ -2125,14 +2147,53 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    position: sticky;
+    top: 0;
+    background: var(--bg-2);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    z-index: 1;
 }
 
 #calendar-day-list {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    margin-top: 12px;
 }
 
+/* ===== RESPONSIVE CALENDARIO ===== */
+@media (max-width: 640px) {
+    .calendar-container {
+        padding: 140px 12px 40px;
+    }
+    
+    .calendar-header {
+        top: 130px;
+        padding: 12px;
+    }
+    
+    .calendar-header h2 {
+        font-size: 16px;
+    }
+    
+    .calendar-day {
+        min-height: 60px;
+        padding: 6px;
+    }
+    
+    .calendar-day-number {
+        font-size: 11px;
+    }
+    
+    .weekday {
+        font-size: 10px;
+    }
+    
+    .calendar-day-events {
+        max-height: 400px;
+    }
+}
 /* ===== CHARTS ===== */
 .charts-section {
     margin-top: 32px;
@@ -2160,7 +2221,16 @@ body {
 /* ===== RESPONSIVE CALENDARIO ===== */
 @media (max-width: 640px) {
     .calendar-container {
-        padding: 60px 12px 40px;
+        padding: 140px 12px 40px; /* ✅ Más espacio en móvil */
+    }
+    
+    .calendar-header {
+        top: 130px; /* ✅ Ajuste para móvil */
+        padding: 12px;
+    }
+    
+    .calendar-header h2 {
+        font-size: 16px;
     }
     
     .calendar-day {
@@ -2174,6 +2244,10 @@ body {
     
     .weekday {
         font-size: 10px;
+    }
+    
+    .calendar-day-events {
+        max-height: 400px; /* ✅ Menos altura en móvil */
     }
 }
 /* ===== MODO ALTO CONTRASTE ===== */
