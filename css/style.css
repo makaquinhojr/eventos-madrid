@@ -1985,24 +1985,22 @@ body {
     right: 0;
     bottom: 0;
     background: var(--bg-1);
-    overflow: hidden; /* ✅ SIN scroll en el contenedor principal */
+    display: flex;
+    flex-direction: column;
 }
 
-/* ✅ NUEVO: Contenedor fijo para el header del mes */
+/* ✅ Header fijo con position absolute */
 .calendar-header-fixed {
-    position: fixed;
-    top: 116px; /* 52px header + 64px toggle vistas */
+    position: absolute;
+    top: 64px; /* Debajo del toggle de vistas */
     left: 0;
     right: 0;
     z-index: 100;
     padding: 0 20px;
     background: var(--bg-1);
-    border-bottom: 1px solid var(--border);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    pointer-events: none; /* Para que no bloquee clicks */
 }
 
-/* ✅ Header del mes dentro del contenedor fijo */
 .calendar-header {
     max-width: 900px;
     margin: 0 auto;
@@ -2013,7 +2011,8 @@ body {
     background: var(--bg-2);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-lg);
+    pointer-events: all; /* Reactivar clicks en el header */
 }
 
 .calendar-header h2 {
@@ -2043,14 +2042,18 @@ body {
     background: var(--bg-4);
 }
 
-/* ✅ Container con scroll propio */
+/* ✅ Container con scroll independiente */
 .calendar-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 96px 20px 40px; /* 96px para dejar espacio al header fijo */
-    height: calc(100vh - 52px);
+    flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
+    padding: 140px 20px 40px; /* Espacio para el header fijo */
+}
+
+.calendar-container > * {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .calendar-weekdays {
@@ -2144,7 +2147,6 @@ body {
 .calendar-dot.deporte { background: #16A34A; }
 .calendar-dot.infantil { background: #F59E0B; }
 
-/* ✅ Lista de eventos del día con scroll perfecto */
 .calendar-day-events {
     background: var(--bg-2);
     border: 1px solid var(--border);
@@ -2184,7 +2186,7 @@ body {
 /* ===== RESPONSIVE CALENDARIO ===== */
 @media (max-width: 640px) {
     .calendar-header-fixed {
-        top: 124px; /* 52px header + 72px toggle vistas en móvil */
+        top: 72px; /* Ajuste para móvil */
         padding: 0 12px;
     }
     
@@ -2197,7 +2199,7 @@ body {
     }
     
     .calendar-container {
-        padding: 96px 12px 40px;
+        padding: 148px 12px 40px;
     }
     
     .calendar-day {
