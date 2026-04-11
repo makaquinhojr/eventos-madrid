@@ -2106,16 +2106,40 @@ function initSettingsPanel() {
     }
     
     // ===== IDIOMA =====
-    const langSelect = document.getElementById('lang-select');
-    if (langSelect && typeof i18n !== 'undefined') {
-        langSelect.value = i18n.getLanguage();
+const langSelect = document.getElementById('lang-select');
+if (langSelect && typeof i18n !== 'undefined') {
+    langSelect.value = i18n.getLanguage();
+    
+    langSelect.addEventListener('change', (e) => {
+        const newLang = e.target.value;
+        i18n.setLanguage(newLang);
+        mostrarToast(i18n.t('toast.lang_changed'));
         
-        langSelect.addEventListener('change', (e) => {
-            const newLang = e.target.value;
-            i18n.setLanguage(newLang);
-            mostrarToast(i18n.t('toast.lang_changed'));
-        });
-    }
+        // ✅ Recargar eventos si traducción está activa
+        if (i18n.translateEvents) {
+            displayEvents(currentFilteredEvents);
+        }
+    });
+}
+
+// ✅ NUEVO: Toggle de traducción de eventos
+const translateToggle = document.getElementById('translate-events-toggle');
+if (translateToggle) {
+    const saved = localStorage.getItem('translateEvents') === 'true';
+    translateToggle.checked = saved;
+    i18n.translateEvents = saved;
+    
+    translateToggle.addEventListener('change', (e) => {
+        i18n.translateEvents = e.target.checked;
+        localStorage.setItem('translateEvents', e.target.checked);
+        
+        const mensaje = i18n.t(e.target.checked ? 'toast.translate_on' : 'toast.translate_off');
+        mostrarToast(mensaje);
+        
+        // Recargar eventos con/sin traducción
+        displayEvents(currentFilteredEvents);
+    });
+}
     
     // ===== NOTIFICACIONES =====
     const notificationsToggle = document.getElementById('notifications-toggle');
