@@ -1985,18 +1985,26 @@ body {
     right: 0;
     bottom: 0;
     background: var(--bg-1);
-    overflow-y: auto; /* ✅ Scroll en el contenedor principal */
-    overflow-x: hidden;
 }
 
-/* ✅ Header sticky que se queda pegado al top */
-.calendar-header-fixed {
+/* ✅ Contenedor con scroll */
+.calendar-scroll-container {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-top: 64px; /* ✅ Espacio para el toggle de vistas */
+}
+
+/* ✅ Wrapper del header que hace sticky */
+.calendar-header-wrapper {
     position: sticky;
-    top: 64px; /* ✅ 64px del toggle de vistas */
+    top: 0;
     z-index: 100;
-    padding: 16px 20px;
     background: var(--bg-1);
-    margin: 0;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .calendar-header {
@@ -2175,8 +2183,11 @@ body {
 
 /* ===== RESPONSIVE CALENDARIO ===== */
 @media (max-width: 640px) {
-    .calendar-header-fixed {
-        top: 72px;
+    .calendar-scroll-container {
+        padding-top: 72px;
+    }
+    
+    .calendar-header-wrapper {
         padding: 12px;
     }
     
