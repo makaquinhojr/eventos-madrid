@@ -10,8 +10,8 @@ let currentView = 'map';
 let currentSort = 'date';
 let userMarker = null;
 let userLocation = null;
-let distanceCircle = null; // Círculo de distancia en el mapa
-let maxDistance = 20; // Distancia máxima por defecto (km)
+let distanceCircle = null;
+let maxDistance = 20;
 let mostrarLugares = true;
 let mostrarLugaresEnLista = true;
 let favorites = [];
@@ -153,7 +153,6 @@ function toggleFavorite(eventoId) {
     saveFavorites();
     renderFavoritesList();
     
-    // Actualizar botones de favoritos
     document.querySelectorAll(`[data-event-id="${eventoId}"]`).forEach(btn => {
         btn.classList.toggle('active', favorites.includes(eventoId));
     });
@@ -220,7 +219,6 @@ async function compartirEventoNativo(eventoId) {
     const url = generarUrlCompartir(evento);
     const texto = generarTextoCompartir(evento);
 
-    // Verificar si Web Share API está disponible
     if (navigator.share) {
         try {
             await navigator.share({
@@ -228,16 +226,13 @@ async function compartirEventoNativo(eventoId) {
                 text: texto,
                 url: url
             });
-            mostrarToast('✅ Compartido correctamente');
+            mostrarToast('✅ ' + i18n.t('event.link_copied'));
         } catch (err) {
-            // Usuario canceló o error
             if (err.name !== 'AbortError') {
-                // Fallback al modal si falla
                 compartirEvento(eventoId);
             }
         }
     } else {
-        // Fallback al modal si no soporta Web Share API
         compartirEvento(eventoId);
     }
 }
@@ -247,16 +242,13 @@ function renderCalendar() {
     const year = currentCalendarDate.getFullYear();
     const month = currentCalendarDate.getMonth();
     
-    // Actualizar título
     const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
                         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
     document.getElementById('calendar-month-year').textContent = `${monthNames[month]} ${year}`;
     
-    // Obtener primer y último día del mes
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     
-    // Ajustar para que la semana empiece en lunes
     let startDay = firstDay.getDay() - 1;
     if (startDay === -1) startDay = 6;
     
@@ -266,20 +258,17 @@ function renderCalendar() {
     const grid = document.getElementById('calendar-grid');
     grid.innerHTML = '';
     
-    // Días del mes anterior
     for (let i = startDay - 1; i >= 0; i--) {
         const day = prevMonthDays - i;
         const cell = createCalendarDay(day, month - 1, year, true);
         grid.appendChild(cell);
     }
     
-    // Días del mes actual
     for (let day = 1; day <= daysInMonth; day++) {
         const cell = createCalendarDay(day, month, year, false);
         grid.appendChild(cell);
     }
     
-    // Días del mes siguiente
     const remainingCells = 42 - (startDay + daysInMonth);
     for (let day = 1; day <= remainingCells; day++) {
         const cell = createCalendarDay(day, month + 1, year, true);
@@ -300,7 +289,6 @@ function createCalendarDay(day, month, year, isOtherMonth) {
         cell.classList.add('today');
     }
     
-    // Obtener eventos de este día
     const eventsOnDay = allEvents.filter(e => {
         const eventStart = new Date(e.fecha);
         const eventEnd = e.fecha_fin ? new Date(e.fecha_fin) : eventStart;
@@ -342,8 +330,8 @@ function showDayEvents(date, events) {
     list.innerHTML = events.map(evento => {
         const emoji = icons[evento.tipo] || '📍';
         const precioBadge = evento.precio === 'gratis'
-            ? '<span class="event-badge gratis">💚 GRATIS</span>'
-            : `<span class="event-badge pago">💰 ${evento.precio_desde || 'Pago'}</span>`;
+            ? `<span class="event-badge gratis">💚 ${i18n.t('badge.free')}</span>`
+            : `<span class="event-badge pago">💰 ${evento.precio_desde ? i18n.t('badge.from') + ' ' + evento.precio_desde : i18n.t('badge.paid')}</span>`;
         
         return `
             <div class="event-card" style="margin-bottom: 8px;">
@@ -364,7 +352,7 @@ function showDayEvents(date, events) {
                 </div>
                 <div class="event-actions">
                     <button class="event-btn event-btn-primary" onclick="verEnMapa(${evento.id})">
-                        <i class="fas fa-map-marked-alt"></i> Ver
+                        <i class="fas fa-map-marked-alt"></i> ${i18n.t('event.view_map')}
                     </button>
                 </div>
             </div>
@@ -374,14 +362,12 @@ function showDayEvents(date, events) {
     container.style.display = 'block';
     container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     
-    // Marcar día seleccionado
     document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
     event.currentTarget.classList.add('selected');
 }
 
 // ===== DASHBOARD DE ANALYTICS =====
 function initCharts() {
-    // Destruir gráficos anteriores si existen
     Object.values(charts).forEach(chart => chart?.destroy());
     
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -391,9 +377,16 @@ function initCharts() {
     Chart.defaults.color = textColor;
     Chart.defaults.borderColor = gridColor;
     
-    // Gráfico de eventos por tipo
     const tiposData = {
-        labels: ['Conciertos', 'Fiestas', 'Mercados', 'Cultural', 'Gastro', 'Deportes', 'Infantil'],
+        labels: [
+            i18n.t('stats.concerts'), 
+            i18n.t('stats.parties'), 
+            i18n.t('stats.markets'), 
+            i18n.t('stats.cultural'), 
+            i18n.t('stats.gastro'), 
+            i18n.t('stats.sports'), 
+            i18n.t('stats.kids')
+        ],
         datasets: [{
             label: 'Eventos',
             data: [
@@ -434,7 +427,6 @@ function initCharts() {
         });
     }
     
-    // Gráfico de eventos por zona (top 10)
     const zonasCounts = {};
     currentFilteredEvents.forEach(e => {
         const zona = getZonaEvento(e);
@@ -446,7 +438,7 @@ function initCharts() {
         .slice(0, 10);
     
     const zonasData = {
-        labels: topZonas.map(z => z[0]),
+        labels: topZonas.map(z => i18n.t('zone.' + z[0], z[0])),
         datasets: [{
             label: 'Eventos',
             data: topZonas.map(z => z[1]),
@@ -481,7 +473,6 @@ function initCharts() {
         });
     }
     
-    // Gráfico de eventos en el tiempo (próximos 30 días)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const timelineData = [];
@@ -588,11 +579,9 @@ async function loadEvents() {
         ocultarLoader(allEvents.length);
         procesarUrlEvento();
         
-        // Cargar favoritos
         loadFavorites();
         renderFavoritesList();
         
-        // Renderizar calendario
         if (currentView === 'calendar') {
             renderCalendar();
         }
@@ -624,8 +613,8 @@ function displayLugares(lugares) {
         marker.lugarId = lugar.id;
 
         const precioHTML = lugar.precio === 'gratis'
-            ? '<strong style="color:#059669;">Gratis</strong>'
-            : lugar.precio_desde || 'De pago';
+            ? `<strong style="color:#059669;">${i18n.t('badge.free')}</strong>`
+            : lugar.precio_desde || i18n.t('badge.paid');
 
         const distanciaHTML = userLocation
             ? `<p><strong>🚶</strong> ${getDistanciaHTMLCoords(lugar.lat, lugar.lng)}</p>`
@@ -638,20 +627,20 @@ function displayLugares(lugares) {
                 </div>
                 <h3>${lugar.nombre}</h3>
                 <p><strong>📍</strong> ${lugar.lugar}</p>
-                <p><strong>🗺️</strong> ${lugar.zona || inferirZona(lugar.lat, lugar.lng)}</p>
+                <p><strong>🗺️</strong> ${i18n.t('zone.' + (lugar.zona || inferirZona(lugar.lat, lugar.lng)))}</p>
                 <p><strong>💰</strong> ${precioHTML}</p>
                 <p><strong>🕐</strong> ${lugar.horario || 'Consultar horario'}</p>
                 ${distanciaHTML}
                 ${lugar.descripcion ? `<p style="color:#6B7280;font-size:13px;margin-top:8px;line-height:1.4;">${lugar.descripcion}</p>` : ''}
                 <div class="popup-actions">
-                    <a href="${lugar.url}" target="_blank" class="popup-link">Ver más información →</a>
+                    <a href="${lugar.url}" target="_blank" class="popup-link">${i18n.t('event.more_info')} →</a>
                 </div>
                 <div class="popup-acciones-extra">
-                    <button class="popup-btn-extra" onclick="comoLlegarCoords(${lugar.lat}, ${lugar.lng}, '${lugar.nombre.replace(/'/g, "\\'")}')" >
-                        <i class="fas fa-route"></i> Cómo llegar
+                    <button class="popup-btn-extra" onclick="comoLlegarCoords(${lugar.lat}, ${lugar.lng}, '${lugar.nombre.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-route"></i> ${i18n.t('event.how_to_get')}
                     </button>
                     <button class="popup-btn-extra compartir" onclick="compartirLugar('${lugar.id}')">
-                        <i class="fas fa-share-alt"></i> Compartir
+                        <i class="fas fa-share-alt"></i> ${i18n.t('event.share')}
                     </button>
                 </div>
             </div>
@@ -709,7 +698,7 @@ function compartirLugar(lugarId) {
     modal.innerHTML = `
         <div class="modal-compartir">
             <div class="modal-compartir-header">
-                <span>${emoji} Compartir lugar</span>
+                <span>${emoji} ${i18n.t('share.title_place')}</span>
                 <button class="modal-compartir-close" onclick="cerrarModalCompartir()">
                     <i class="fas fa-times"></i>
                 </button>
@@ -719,15 +708,15 @@ function compartirLugar(lugarId) {
                 <a class="modal-compartir-btn whatsapp"
                    href="https://wa.me/?text=${encodeURIComponent(texto + '\n\n🗺️ Ver en EventosMadrid: ' + url)}"
                    target="_blank" onclick="cerrarModalCompartir()">
-                    <i class="fab fa-whatsapp"></i> WhatsApp
+                    <i class="fab fa-whatsapp"></i> ${i18n.t('event.share_whatsapp')}
                 </a>
                 <a class="modal-compartir-btn twitter"
                    href="https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(url)}"
                    target="_blank" onclick="cerrarModalCompartir()">
-                    <i class="fab fa-x-twitter"></i> Twitter
+                    <i class="fab fa-x-twitter"></i> ${i18n.t('event.share_twitter')}
                 </a>
                 <button class="modal-compartir-btn copiar" onclick="copiarLinkEvento('${url}', this)">
-                    <i class="fas fa-link"></i> Copiar link
+                    <i class="fas fa-link"></i> ${i18n.t('event.copy_link')}
                 </button>
             </div>
         </div>
@@ -767,21 +756,21 @@ function esLinkUtil(url) {
 
 function getLinkHTML(evento) {
     if (esLinkUtil(evento.url)) {
-        return `<a href="${evento.url}" target="_blank" class="popup-link">Ver más información →</a>`;
+        return `<a href="${evento.url}" target="_blank" class="popup-link">${i18n.t('event.more_info')} →</a>`;
     }
     const busqueda = encodeURIComponent(`${evento.nombre} Madrid`);
-    return `<a href="https://www.google.com/search?q=${busqueda}" target="_blank" class="popup-link popup-link-google">🔍 Buscar en Google</a>`;
+    return `<a href="https://www.google.com/search?q=${busqueda}" target="_blank" class="popup-link popup-link-google">🔍 ${i18n.t('event.search_google')}</a>`;
 }
 
 function getBotonMasInfo(evento) {
     const busqueda = encodeURIComponent(`${evento.nombre} Madrid`);
     if (esLinkUtil(evento.url)) {
         return `<a href="${evento.url}" target="_blank" class="event-btn event-btn-secondary">
-                    <i class="fas fa-external-link-alt"></i> Más info
+                    <i class="fas fa-external-link-alt"></i> ${i18n.t('event.more_info')}
                 </a>`;
     }
     return `<a href="https://www.google.com/search?q=${busqueda}" target="_blank" class="event-btn event-btn-google">
-                <i class="fas fa-search"></i> Buscar
+                <i class="fas fa-search"></i> ${i18n.t('event.search_google')}
             </a>`;
 }
 
@@ -792,7 +781,7 @@ function generarUrlCompartir(evento) {
 
 function generarTextoCompartir(evento) {
     const fecha = formatDate(evento.fecha);
-    const precio = evento.precio === 'gratis' ? '¡GRATIS!' : (evento.precio_desde || 'De pago');
+    const precio = evento.precio === 'gratis' ? i18n.t('badge.free') : (evento.precio_desde || i18n.t('badge.paid'));
     const emoji = icons[evento.tipo] || '📍';
     return `${emoji} *${evento.nombre}*\n📅 ${fecha}\n📍 ${evento.lugar}\n💰 ${precio}`;
 }
@@ -813,7 +802,7 @@ function compartirEvento(eventoId) {
     modal.innerHTML = `
         <div class="modal-compartir">
             <div class="modal-compartir-header">
-                <span>${emoji} Compartir evento</span>
+                <span>${emoji} ${i18n.t('share.title_event')}</span>
                 <button class="modal-compartir-close" onclick="cerrarModalCompartir()">
                     <i class="fas fa-times"></i>
                 </button>
@@ -823,15 +812,15 @@ function compartirEvento(eventoId) {
                 <a class="modal-compartir-btn whatsapp"
                    href="https://wa.me/?text=${encodeURIComponent(texto + '\n\n🗺️ Ver en EventosMadrid: ' + url)}"
                    target="_blank" onclick="cerrarModalCompartir()">
-                    <i class="fab fa-whatsapp"></i> WhatsApp
+                    <i class="fab fa-whatsapp"></i> ${i18n.t('event.share_whatsapp')}
                 </a>
                 <a class="modal-compartir-btn twitter"
                    href="https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(url)}"
                    target="_blank" onclick="cerrarModalCompartir()">
-                    <i class="fab fa-x-twitter"></i> Twitter
+                    <i class="fab fa-x-twitter"></i> ${i18n.t('event.share_twitter')}
                 </a>
                 <button class="modal-compartir-btn copiar" onclick="copiarLinkEvento('${url}', this)">
-                    <i class="fas fa-link"></i> Copiar link
+                    <i class="fas fa-link"></i> ${i18n.t('event.copy_link')}
                 </button>
             </div>
         </div>
@@ -856,7 +845,7 @@ async function copiarLinkEvento(url, btn) {
     try {
         await navigator.clipboard.writeText(url);
         const original = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+        btn.innerHTML = `<i class="fas fa-check"></i> ${i18n.t('event.link_copied')}`;
         btn.classList.add('copiado');
         setTimeout(() => {
             btn.innerHTML = original;
@@ -981,7 +970,7 @@ function displayEvents(events) {
 
         const calendarLink = generarLinkCalendar(event);
         const calendarHTML = calendarLink
-            ? `<a href="${calendarLink}" target="_blank" class="popup-link popup-link-calendar">📅 Añadir al calendario</a>`
+            ? `<a href="${calendarLink}" target="_blank" class="popup-link popup-link-calendar">📅 ${i18n.t('event.add_calendar')}</a>`
             : '';
 
         const distanciaHTML = userLocation
@@ -991,10 +980,10 @@ function displayEvents(events) {
         const popupAccionesExtra = `
             <div class="popup-acciones-extra">
                 <button class="popup-btn-extra" onclick="comoLlegar(${event.id})">
-                    <i class="fas fa-route"></i> Cómo llegar
+                    <i class="fas fa-route"></i> ${i18n.t('event.how_to_get')}
                 </button>
                 <button class="popup-btn-extra compartir" onclick="compartirEventoNativo(${event.id})">
-                    <i class="fas fa-share-alt"></i> Compartir
+                    <i class="fas fa-share-alt"></i> ${i18n.t('event.share')}
                 </button>
             </div>
         `;
@@ -1004,11 +993,11 @@ function displayEvents(events) {
                 <h3>${event.nombre}</h3>
                 <p><strong>📅</strong> ${dateText}</p>
                 <p><strong>📍</strong> ${event.lugar}</p>
-                <p><strong>🗺️</strong> ${zona}</p>
+                <p><strong>🗺️</strong> ${i18n.t('zone.' + zona, zona)}</p>
                 <p><strong>💰</strong> ${
                     event.precio === 'gratis'
-                        ? '<strong style="color:#059669;">Gratis</strong>'
-                        : event.precio_desde || 'De pago'
+                        ? `<strong style="color:#059669;">${i18n.t('badge.free')}</strong>`
+                        : event.precio_desde ? i18n.t('badge.from') + ' ' + event.precio_desde : i18n.t('badge.paid')
                 }</p>
                 ${distanciaHTML}
                 ${descripcion
@@ -1098,15 +1087,15 @@ function renderListView(events) {
         const esMañana = fechaEvento.toDateString() === new Date(hoy.getTime() + 86400000).toDateString();
 
         let proximidadBadge = '';
-        if (esHoy) proximidadBadge = '<span class="event-badge hoy">🔥 HOY</span>';
-        else if (esMañana) proximidadBadge = '<span class="event-badge hoy">⚡ MAÑANA</span>';
+        if (esHoy) proximidadBadge = `<span class="event-badge hoy">🔥 ${i18n.t('badge.today')}</span>`;
+        else if (esMañana) proximidadBadge = `<span class="event-badge hoy">⚡ ${i18n.t('badge.tomorrow')}</span>`;
 
         const precioBadge = evento.precio === 'gratis'
-            ? '<span class="event-badge gratis">💚 GRATIS</span>'
-            : `<span class="event-badge pago">💰 ${evento.precio_desde || 'Pago'}</span>`;
+            ? `<span class="event-badge gratis">💚 ${i18n.t('badge.free')}</span>`
+            : `<span class="event-badge pago">💰 ${evento.precio_desde ? i18n.t('badge.from') + ' ' + evento.precio_desde : i18n.t('badge.paid')}</span>`;
 
         const zona = getZonaEvento(evento);
-        const zonaBadge = `<span class="event-badge zona">📍 ${zona}</span>`;
+        const zonaBadge = `<span class="event-badge zona">📍 ${i18n.t('zone.' + zona, zona)}</span>`;
 
         const fechaTexto = evento.fecha_fin
             ? `${formatDate(evento.fecha)} - ${formatDate(evento.fecha_fin)}`
@@ -1121,7 +1110,7 @@ function renderListView(events) {
         const botonMasInfo = getBotonMasInfo(evento);
         const calendarLink = generarLinkCalendar(evento);
         const botonCalendar = calendarLink
-            ? `<a href="${calendarLink}" target="_blank" class="event-btn event-btn-calendar" title="Añadir al calendario">
+            ? `<a href="${calendarLink}" target="_blank" class="event-btn event-btn-calendar" title="${i18n.t('event.add_calendar')}">
                     <i class="fas fa-calendar-plus"></i>
                </a>`
             : '';
@@ -1129,13 +1118,13 @@ function renderListView(events) {
         const descripcion = limpiarDescripcion(evento.descripcion, 200);
 
         const botonComoLlegar = `
-            <button class="event-btn event-btn-llegar" onclick="comoLlegar(${evento.id})" title="Cómo llegar">
+            <button class="event-btn event-btn-llegar" onclick="comoLlegar(${evento.id})" title="${i18n.t('event.how_to_get')}">
                 <i class="fas fa-route"></i>
             </button>
         `;
 
         const botonCompartir = `
-            <button class="event-btn event-btn-compartir" onclick="compartirEventoNativo(${evento.id})" title="Compartir">
+            <button class="event-btn event-btn-compartir" onclick="compartirEventoNativo(${evento.id})" title="${i18n.t('event.share')}">
                 <i class="fas fa-share-alt"></i>
             </button>
         `;
@@ -1144,7 +1133,7 @@ function renderListView(events) {
             <button class="btn-favorite ${isFavorite(evento.id) ? 'active' : ''}" 
                     data-event-id="${evento.id}" 
                     onclick="toggleFavorite(${evento.id})" 
-                    title="Añadir a favoritos">
+                    title="${i18n.t('favorites.title')}">
                 <i class="fas fa-heart"></i>
             </button>
         `;
@@ -1175,13 +1164,13 @@ function renderListView(events) {
                     ${descripcion
                         ? `<div class="event-description">${descripcion}</div>`
                         : `<div class="event-description sin-descripcion">
-                               📍 ${evento.lugar} · ${evento.precio === 'gratis' ? 'Entrada gratuita' : evento.precio_desde || 'De pago'}
+                               📍 ${evento.lugar} · ${evento.precio === 'gratis' ? i18n.t('badge.free') : evento.precio_desde || i18n.t('badge.paid')}
                            </div>`
                     }
                 </div>
                 <div class="event-actions">
                     <button class="event-btn event-btn-primary" onclick="verEnMapa(${evento.id})">
-                        <i class="fas fa-map-marked-alt"></i> Ver en mapa
+                        <i class="fas fa-map-marked-alt"></i> ${i18n.t('event.view_map')}
                     </button>
                     ${botonMasInfo}
                     <div class="event-actions-row">
@@ -1227,10 +1216,10 @@ function renderLugaresList(lugares) {
         const zona = lugar.zona || inferirZona(lugar.lat, lugar.lng);
 
         const precioBadge = lugar.precio === 'gratis'
-            ? '<span class="event-badge gratis">💚 GRATIS</span>'
-            : `<span class="event-badge pago">💰 ${lugar.precio_desde || 'Pago'}</span>`;
+            ? `<span class="event-badge gratis">💚 ${i18n.t('badge.free')}</span>`
+            : `<span class="event-badge pago">💰 ${lugar.precio_desde || i18n.t('badge.paid')}</span>`;
 
-        const zonaBadge = `<span class="event-badge zona">📍 ${zona}</span>`;
+        const zonaBadge = `<span class="event-badge zona">📍 ${i18n.t('zone.' + zona, zona)}</span>`;
         const categoriaBadge = `<span class="lugar-categoria-badge" style="background:${color}20;color:${color};">${emoji} ${categoriaNom}</span>`;
 
         const distanciaItem = userLocation ? `
@@ -1266,16 +1255,16 @@ function renderLugaresList(lugares) {
                 </div>
                 <div class="event-actions">
                     <button class="event-btn event-btn-primary" onclick="verLugarEnMapa('${lugar.id}')">
-                        <i class="fas fa-map-marked-alt"></i> Ver en mapa
+                        <i class="fas fa-map-marked-alt"></i> ${i18n.t('event.view_map')}
                     </button>
                     <a href="${lugar.url}" target="_blank" class="event-btn event-btn-secondary">
-                        <i class="fas fa-external-link-alt"></i> Más info
+                        <i class="fas fa-external-link-alt"></i> ${i18n.t('event.more_info')}
                     </a>
                     <div class="event-actions-row">
-                        <button class="event-btn event-btn-llegar" onclick="comoLlegarCoords(${lugar.lat}, ${lugar.lng}, '${lugar.nombre.replace(/'/g, "\\'")}')" title="Cómo llegar">
+                        <button class="event-btn event-btn-llegar" onclick="comoLlegarCoords(${lugar.lat}, ${lugar.lng}, '${lugar.nombre.replace(/'/g, "\\'")}')" title="${i18n.t('event.how_to_get')}">
                             <i class="fas fa-route"></i>
                         </button>
-                        <button class="event-btn event-btn-compartir" onclick="compartirLugar('${lugar.id}')" title="Compartir">
+                        <button class="event-btn event-btn-compartir" onclick="compartirLugar('${lugar.id}')" title="${i18n.t('event.share')}">
                             <i class="fas fa-share-alt"></i>
                         </button>
                     </div>
@@ -1333,12 +1322,10 @@ function applyFilters() {
         .filter(cb => cb.checked)
         .map(cb => cb.value);
 
-    // FILTRAR EVENTOS
     let filtered = allEvents.filter(e => {
         if (types.length && !types.includes(e.tipo)) return false;
         if (prices.length && !prices.includes(e.precio)) return false;
-            // ✅ NUEVO: Filtro de distancia
-    if (userLocation && !isEventInDistance(e)) return false;
+        if (userLocation && !isEventInDistance(e)) return false;
 
         if (search) {
             const zona = getZonaEvento(e);
@@ -1360,7 +1347,6 @@ function applyFilters() {
         return true;
     });
 
-    // Filtro de fecha
     if (dateFilter !== 'todos') {
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
@@ -1406,7 +1392,6 @@ function applyFilters() {
         });
     }
 
-    // FILTRAR LUGARES
     let filteredLugares = allLugares.filter(l => {
         if (lugarCategorias.length === 0) return false;
         if (!lugarCategorias.includes(l.categoria)) return false;
@@ -1449,7 +1434,7 @@ function mostrarZonaActiva(zona) {
         badge.className = 'zona-badge-activa';
         badge.innerHTML = `
             <i class="fas fa-map-marker-alt"></i>
-            ${zona}
+            ${i18n.t('zone.' + zona, zona)}
             <i class="fas fa-times"></i>
         `;
         badge.addEventListener('click', () => {
@@ -1526,7 +1511,7 @@ function initSliderPrecio() {
         if (val >= 100) {
             label.textContent = i18n.t('filters.price.any');
         } else if (val === 0) {
-            label.textContent = 'Solo gratis';
+            label.textContent = 'Solo ' + i18n.t('badge.free').toLowerCase();
         } else {
             label.textContent = `hasta ${val}€`;
         }
@@ -1643,7 +1628,7 @@ function initGeolocate() {
         });
     });
 }
-// ===== FILTRO DE DISTANCIA =====
+
 function initDistanceFilter() {
     const slider = document.getElementById('filtro-distancia');
     const label = document.getElementById('distancia-valor-label');
@@ -1652,7 +1637,6 @@ function initDistanceFilter() {
     
     if (!slider || !label || !section) return;
 
-    // Mostrar/ocultar según geolocalización
     function updateDistanceFilterVisibility() {
         if (userLocation) {
             section.style.display = 'block';
@@ -1663,19 +1647,16 @@ function initDistanceFilter() {
         }
     }
 
-    // Actualizar slider
     function actualizarSlider() {
         const val = parseInt(slider.value);
         maxDistance = val;
         slider.style.setProperty('--pct', ((val - 1) / 19 * 100) + '%');
         label.textContent = `${val} km`;
         
-        // Actualizar círculo en el mapa
         if (userLocation) {
             updateDistanceCircle();
             applyFilters();
             
-            // Actualizar info
             const count = currentFilteredEvents.length;
             info.innerHTML = `<i class="fas fa-check-circle"></i> ${count} ${count === 1 ? 'evento' : 'eventos'} a menos de ${val} km`;
         }
@@ -1683,30 +1664,25 @@ function initDistanceFilter() {
 
     slider.addEventListener('input', actualizarSlider);
     
-    // Inicializar
     updateDistanceFilterVisibility();
     actualizarSlider();
     
-    // Actualizar cuando cambie la geolocalización
     window.addEventListener('geolocationChanged', updateDistanceFilterVisibility);
 }
 
 function updateDistanceCircle() {
-    // Eliminar círculo anterior
     if (distanceCircle) {
         map.removeLayer(distanceCircle);
         distanceCircle = null;
     }
     
-    // Si no hay ubicación, salir
     if (!userLocation) return;
     
-    // Crear nuevo círculo
     distanceCircle = L.circle([userLocation.lat, userLocation.lng], {
         color: '#3b82f6',
         fillColor: '#3b82f6',
         fillOpacity: 0.1,
-        radius: maxDistance * 1000, // Convertir km a metros
+        radius: maxDistance * 1000,
         weight: 2,
         dashArray: '5, 5',
         className: 'distance-circle'
@@ -1714,7 +1690,7 @@ function updateDistanceCircle() {
 }
 
 function isEventInDistance(evento) {
-    if (!userLocation) return true; // Si no hay ubicación, mostrar todos
+    if (!userLocation) return true;
     
     const distancia = calcularDistancia(
         userLocation.lat, 
@@ -1730,34 +1706,25 @@ function onGeoSuccess(position) {
     const { latitude, longitude } = position.coords;
     const btn = document.getElementById('btn-geolocate');
     
-    // ✅ Guardar ubicación
     userLocation = { lat: latitude, lng: longitude };
     
-    // ✅ Actualizar botón
     btn.classList.remove('loading');
     btn.classList.add('active');
     btn.innerHTML = '<i class="fas fa-location-arrow"></i>';
     
-    // ✅ Centrar mapa
     map.setView([latitude, longitude], 14);
     
-    // ✅ Colocar marcador del usuario
     colocarMarkerUsuario(latitude, longitude);
     
-    // ✅ NUEVO: Crear círculo de distancia
     updateDistanceCircle();
     
-    // ✅ NUEVO: Disparar evento para que el filtro aparezca
     window.dispatchEvent(new Event('geolocationChanged'));
     
-    // ✅ Actualizar eventos (recalcular distancias)
     displayEvents(currentFilteredEvents.length ? currentFilteredEvents : allEvents);
     displayLugares(currentFilteredLugares.length ? currentFilteredLugares : allLugares);
     
-    // ✅ Aplicar filtros (incluye el de distancia)
     applyFilters();
     
-    // ✅ Mostrar toast
     mostrarToast('✅ Ubicación encontrada');
 }
 
@@ -1791,39 +1758,30 @@ function colocarMarkerUsuario(lat, lng) {
 function desactivarGeolocalizacion() {
     const btn = document.getElementById('btn-geolocate');
     
-    // ✅ Resetear botón
     btn.classList.remove('active');
     btn.innerHTML = '<i class="fas fa-location-arrow"></i>';
     
-    // ✅ Eliminar marcador del usuario
     if (userMarker) {
         map.removeLayer(userMarker);
         userMarker = null;
     }
     
-    // ✅ Eliminar círculo de distancia
     if (distanceCircle) {
         map.removeLayer(distanceCircle);
         distanceCircle = null;
     }
     
-    // ✅ Resetear ubicación
     userLocation = null;
     
-    // ✅ Disparar evento para que el filtro se oculte
     window.dispatchEvent(new Event('geolocationChanged'));
     
-    // ✅ Volver a la vista por defecto
     map.setView([40.4168, -3.7038], 12);
     
-    // ✅ Recargar eventos sin distancias
     displayEvents(allEvents);
     displayLugares(allLugares);
     
-    // ✅ Aplicar filtros
     applyFilters();
     
-    // ✅ Toast
     mostrarToast('📍 Geolocalización desactivada');
 }
 
@@ -1935,7 +1893,6 @@ function ocultarLoader(numEventos) {
     }, 600);
 }
 
-// ===== GRUPOS COLAPSABLES =====
 function initCollapseGroups() {
     const headers = document.querySelectorAll('.filter-group-header');
     
@@ -1953,7 +1910,6 @@ function initCollapseGroups() {
     });
 }
 
-// ===== SELECT ALL LUGARES =====
 function initLugaresSelectAll() {
     const selectAllCb = document.getElementById('lugares-select-all');
     const categoriaCbs = document.querySelectorAll('.lugar-categoria-cb');
@@ -2006,7 +1962,6 @@ function initLugaresListToggle() {
     });
 }
 
-// ===== PANEL DE AJUSTES =====
 function initSettingsPanel() {
     const settingsToggle = document.getElementById('settings-toggle');
     const settingsPanel = document.getElementById('settings-panel');
@@ -2014,17 +1969,14 @@ function initSettingsPanel() {
     
     if (!settingsToggle || !settingsPanel) return;
     
-    // ✅ Abrir panel
     settingsToggle.addEventListener('click', () => {
         settingsPanel.classList.add('active');
     });
     
-    // ✅ Cerrar panel
     closeSettings.addEventListener('click', () => {
         settingsPanel.classList.remove('active');
     });
     
-    // ===== TEMA (DARK/LIGHT) =====
     const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
         const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -2045,7 +1997,6 @@ function initSettingsPanel() {
         });
     }
     
-    // ===== ✅ NUEVO: ALTO CONTRASTE =====
     const contrastToggle = document.getElementById('contrast-toggle');
     if (contrastToggle) {
         const savedContrast = localStorage.getItem('contrast') || 'normal';
@@ -2062,14 +2013,12 @@ function initSettingsPanel() {
                 : '♿ Alto contraste desactivado';
             mostrarToast(mensaje);
             
-            // Reiniciar gráficos con nuevo contraste
             if (document.getElementById('stats-panel').classList.contains('active')) {
                 initCharts();
             }
         });
     }
     
-    // ===== ✅ NUEVO: TEXTOS GRANDES =====
     const largeTextToggle = document.getElementById('large-text-toggle');
     if (largeTextToggle) {
         const savedLargeText = localStorage.getItem('largeText') === 'true';
@@ -2087,7 +2036,6 @@ function initSettingsPanel() {
         });
     }
     
-    // ===== ✅ NUEVO: REDUCIR ANIMACIONES =====
     const reduceMotionToggle = document.getElementById('reduce-motion-toggle');
     if (reduceMotionToggle) {
         const savedReduceMotion = localStorage.getItem('reduceMotion') === 'true';
@@ -2105,43 +2053,38 @@ function initSettingsPanel() {
         });
     }
     
-    // ===== IDIOMA =====
-const langSelect = document.getElementById('lang-select');
-if (langSelect && typeof i18n !== 'undefined') {
-    langSelect.value = i18n.getLanguage();
-    
-    langSelect.addEventListener('change', (e) => {
-        const newLang = e.target.value;
-        i18n.setLanguage(newLang);
-        mostrarToast(i18n.t('toast.lang_changed'));
+    const langSelect = document.getElementById('lang-select');
+    if (langSelect && typeof i18n !== 'undefined') {
+        langSelect.value = i18n.getLanguage();
         
-        // ✅ Recargar eventos si traducción está activa
-        if (i18n.translateEvents) {
+        langSelect.addEventListener('change', (e) => {
+            const newLang = e.target.value;
+            i18n.setLanguage(newLang);
+            mostrarToast(i18n.t('toast.lang_changed'));
+            
+            if (i18n.translateEvents) {
+                displayEvents(currentFilteredEvents);
+            }
+        });
+    }
+    
+    const translateToggle = document.getElementById('translate-events-toggle');
+    if (translateToggle) {
+        const saved = localStorage.getItem('translateEvents') === 'true';
+        translateToggle.checked = saved;
+        i18n.translateEvents = saved;
+        
+        translateToggle.addEventListener('change', (e) => {
+            i18n.translateEvents = e.target.checked;
+            localStorage.setItem('translateEvents', e.target.checked);
+            
+            const mensaje = i18n.t(e.target.checked ? 'toast.translate_on' : 'toast.translate_off');
+            mostrarToast(mensaje);
+            
             displayEvents(currentFilteredEvents);
-        }
-    });
-}
-
-// ✅ NUEVO: Toggle de traducción de eventos
-const translateToggle = document.getElementById('translate-events-toggle');
-if (translateToggle) {
-    const saved = localStorage.getItem('translateEvents') === 'true';
-    translateToggle.checked = saved;
-    i18n.translateEvents = saved;
+        });
+    }
     
-    translateToggle.addEventListener('change', (e) => {
-        i18n.translateEvents = e.target.checked;
-        localStorage.setItem('translateEvents', e.target.checked);
-        
-        const mensaje = i18n.t(e.target.checked ? 'toast.translate_on' : 'toast.translate_off');
-        mostrarToast(mensaje);
-        
-        // Recargar eventos con/sin traducción
-        displayEvents(currentFilteredEvents);
-    });
-}
-    
-    // ===== NOTIFICACIONES =====
     const notificationsToggle = document.getElementById('notifications-toggle');
     if (notificationsToggle) {
         const saved = localStorage.getItem('notifications');
@@ -2154,7 +2097,6 @@ if (translateToggle) {
         });
     }
     
-    // ===== GUARDAR BÚSQUEDAS =====
     const saveSearchesToggle = document.getElementById('save-searches-toggle');
     if (saveSearchesToggle) {
         const saved = localStorage.getItem('saveSearches');
@@ -2167,7 +2109,6 @@ if (translateToggle) {
         });
     }
     
-    // ===== LIMPIAR DATOS =====
     const clearCacheBtn = document.getElementById('btn-clear-cache');
     if (clearCacheBtn) {
         clearCacheBtn.addEventListener('click', () => {
@@ -2186,12 +2127,10 @@ if (translateToggle) {
     }
 }
 
-// ===== DOMContentLoaded =====
 document.addEventListener('DOMContentLoaded', () => {
-    // ✅ Aplicar tema guardado ANTES de inicializar
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
-        // ✅ NUEVO: Aplicar preferencias de accesibilidad
+    
     const savedContrast = localStorage.getItem('contrast') || 'normal';
     document.documentElement.setAttribute('data-contrast', savedContrast);
     
@@ -2201,19 +2140,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedReduceMotion = localStorage.getItem('reduceMotion') === 'true';
     document.documentElement.setAttribute('data-reduce-motion', savedReduceMotion);
 
-    
-    // Inicializar app
     initMap();
     loadEvents();
     initGeolocate();
     initSliderPrecio();
-        initDistanceFilter();
+    initDistanceFilter();
     initCollapseGroups();
     initLugaresSelectAll();
     initLugaresListToggle();
     initSettingsPanel();
 
-    // Panels
     document.getElementById('fab-filters').addEventListener('click', () => {
         document.getElementById('filters-panel').classList.add('active');
     });
@@ -2228,7 +2164,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('stats-panel').classList.remove('active');
     });
     
-    // Panel Favoritos
     document.getElementById('favorites-toggle').addEventListener('click', () => {
         document.getElementById('favorites-panel').classList.add('active');
     });
@@ -2236,14 +2171,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('favorites-panel').classList.remove('active');
     });
 
-    // Eventos
     document.getElementById('btn-clear').addEventListener('click', clearFilters);
     document.getElementById('view-map-btn').addEventListener('click', () => switchView('map'));
     document.getElementById('view-list-btn').addEventListener('click', () => switchView('list'));
     document.getElementById('view-calendar-btn').addEventListener('click', () => switchView('calendar'));
     document.getElementById('btn-toggle-lugares')?.addEventListener('click', toggleLugares);
     
-    // Navegación del calendario
     document.getElementById('calendar-prev')?.addEventListener('click', () => {
         currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
         renderCalendar();
