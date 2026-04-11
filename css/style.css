@@ -1985,20 +1985,18 @@ body {
     right: 0;
     bottom: 0;
     background: var(--bg-1);
-    display: flex;
-    flex-direction: column;
+    overflow-y: auto; /* ✅ Scroll en el contenedor principal */
+    overflow-x: hidden;
 }
 
-/* ✅ Header fijo con position absolute */
+/* ✅ Header sticky que se queda pegado al top */
 .calendar-header-fixed {
-    position: absolute;
-    top: 64px; /* Debajo del toggle de vistas */
-    left: 0;
-    right: 0;
+    position: sticky;
+    top: 64px; /* ✅ 64px del toggle de vistas */
     z-index: 100;
-    padding: 0 20px;
+    padding: 16px 20px;
     background: var(--bg-1);
-    pointer-events: none; /* Para que no bloquee clicks */
+    margin: 0;
 }
 
 .calendar-header {
@@ -2012,7 +2010,6 @@ body {
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
-    pointer-events: all; /* Reactivar clicks en el header */
 }
 
 .calendar-header h2 {
@@ -2042,18 +2039,11 @@ body {
     background: var(--bg-4);
 }
 
-/* ✅ Container con scroll independiente */
+/* ✅ Container del contenido */
 .calendar-container {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 140px 20px 40px; /* Espacio para el header fijo */
-}
-
-.calendar-container > * {
     max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto;
+    padding: 20px 20px 40px;
 }
 
 .calendar-weekdays {
@@ -2186,8 +2176,8 @@ body {
 /* ===== RESPONSIVE CALENDARIO ===== */
 @media (max-width: 640px) {
     .calendar-header-fixed {
-        top: 72px; /* Ajuste para móvil */
-        padding: 0 12px;
+        top: 72px;
+        padding: 12px;
     }
     
     .calendar-header {
@@ -2199,7 +2189,7 @@ body {
     }
     
     .calendar-container {
-        padding: 148px 12px 40px;
+        padding: 12px 12px 40px;
     }
     
     .calendar-day {
