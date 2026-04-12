@@ -2361,15 +2361,27 @@ body {
 
 .setting-item {
     display: flex;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
     justify-content: space-between;
     gap: var(--space-4);
-    padding: var(--space-3) 0;
+    padding: var(--space-4) 0;
 }
 
 .setting-item:not(:last-child) {
     border-bottom: 0.5px solid var(--separator);
-    padding-bottom: var(--space-4);
+}
+
+/* Items con select — layout en columna */
+.setting-item--column {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+}
+
+.setting-item--column .setting-info {
+    flex: none;
+    width: 100%;
 }
 
 .setting-info { flex: 1; min-width: 0; }
@@ -2436,6 +2448,8 @@ body {
     cursor: pointer;
     transition: all 0.2s var(--ease-out);
     outline: none;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .settings-select:hover { background: var(--bg-elevated-2); }
@@ -2465,11 +2479,28 @@ body {
 .skip-link:focus { top: var(--space-2); }
 
 /* ===== REDUCED MOTION ===== */
+
+/* 🔧 FIX: El toggle guarda data-reduce-motion="true" en <html>
+   pero el CSS solo escuchaba la preferencia del sistema operativo.
+   Añadimos el selector de atributo para conectar ambos. */
+[data-reduce-motion="true"] *,
+[data-reduce-motion="true"] *::before,
+[data-reduce-motion="true"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+}
+
+/* Preferencia del sistema operativo — se mantiene */
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }
 
