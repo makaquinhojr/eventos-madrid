@@ -2577,7 +2577,7 @@ body {
     .calendar-day        { min-height: 70px; padding: var(--space-2); }
     .calendar-day-number { font-size: 12px; }
     .weekday             { font-size: 10px; }
-    .calendar-day-events { max-height: 400px; }
+    .calendar-day-events { max-height: 400px; } 
     .calendar-day-events h3 { font-size: 15px; padding: var(--space-4); }
     #calendar-day-list   { padding: var(--space-4); }
 
@@ -2586,3 +2586,662 @@ body {
 
     .desktop-only { display: none; }
 }
+/* ================================================================
+   EVENTOSMADRID - FEATURES PREMIUM
+   Temas Personalizados + Exploración Interactiva + Rutas
+   ================================================================ */
+
+/* ===== TEMAS PERSONALIZADOS ===== */
+.theme-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+}
+
+.theme-card {
+    background: var(--bg-elevated);
+    border: 2px solid var(--separator);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    cursor: pointer;
+    transition: all 0.3s var(--ease-out);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.theme-card:hover {
+    background: var(--bg-elevated-2);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.theme-card.active {
+    border-color: var(--accent);
+    background: var(--accent-subtle);
+    box-shadow: 0 0 0 4px var(--accent-subtle);
+}
+
+.theme-preview {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.theme-color {
+    width: 100%;
+    height: 100%;
+}
+
+.theme-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.theme-card.active .theme-name {
+    color: var(--accent);
+}
+
+.color-picker {
+    width: 100%;
+    height: 50px;
+    border: 0.5px solid var(--separator);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    outline: none;
+    background: var(--bg-elevated);
+    transition: all 0.2s var(--ease-out);
+}
+
+.color-picker:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-subtle);
+}
+
+/* ===== PRESET THEMES ===== */
+[data-theme-preset="sunset"] {
+    --accent: #FF6B6B;
+    --accent-hover: #FF8787;
+    --accent-subtle: rgba(255, 107, 107, 0.15);
+    --purple: #FFA500;
+    --purple-subtle: rgba(255, 165, 0, 0.15);
+}
+
+[data-theme-preset="forest"] {
+    --accent: #2ECC71;
+    --accent-hover: #27AE60;
+    --accent-subtle: rgba(46, 204, 113, 0.15);
+    --purple: #16A085;
+    --purple-subtle: rgba(22, 160, 133, 0.15);
+}
+
+[data-theme-preset="ocean"] {
+    --accent: #3498DB;
+    --accent-hover: #2980B9;
+    --accent-subtle: rgba(52, 152, 219, 0.15);
+    --purple: #1ABC9C;
+    --purple-subtle: rgba(26, 188, 156, 0.15);
+}
+
+[data-theme-preset="berry"] {
+    --accent: #E91E63;
+    --accent-hover: #C2185B;
+    --accent-subtle: rgba(233, 30, 99, 0.15);
+    --purple: #9C27B0;
+    --purple-subtle: rgba(156, 39, 176, 0.15);
+}
+
+/* ===== HEATMAP LAYER ===== */
+.leaflet-heatmap-layer {
+    opacity: 0.6;
+    transition: opacity 0.3s var(--ease-out);
+}
+
+.heatmap-legend {
+    position: fixed;
+    bottom: 100px;
+    left: var(--space-5);
+    background: rgba(28, 28, 30, 0.82);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border: 0.5px solid var(--separator);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    z-index: calc(var(--z-fixed) - 1);
+    box-shadow: var(--shadow-lg);
+    display: none;
+}
+
+.heatmap-legend.active {
+    display: block;
+    animation: slideInLeft 0.3s var(--spring);
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+[data-theme="light"] .heatmap-legend {
+    background: rgba(255, 255, 255, 0.82);
+}
+
+.heatmap-legend-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--space-2);
+}
+
+.heatmap-gradient {
+    height: 12px;
+    width: 120px;
+    background: linear-gradient(90deg, 
+        rgba(0, 0, 255, 0.5) 0%,
+        rgba(0, 255, 0, 0.5) 50%,
+        rgba(255, 255, 0, 0.5) 75%,
+        rgba(255, 0, 0, 0.5) 100%
+    );
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-1);
+}
+
+.heatmap-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-quaternary);
+}
+
+/* ===== ROUTE PLANNER PANEL ===== */
+.route-planner-toggle {
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s var(--ease-out);
+    font-family: var(--font-system);
+    position: relative;
+}
+
+.route-planner-toggle:hover {
+    background: var(--accent-subtle);
+}
+
+.route-planner-toggle:active {
+    transform: scale(0.95);
+}
+
+.route-planner-toggle.active {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
+}
+
+.route-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--red);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.route-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    max-width: 400px;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--bg);
+    z-index: var(--z-modal);
+    transform: translateX(100%);
+    transition: transform 0.4s var(--spring);
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+}
+
+.route-panel.active {
+    transform: translateX(0);
+}
+
+.route-info-box {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    margin-bottom: var(--space-5);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+    box-shadow: var(--shadow-sm);
+}
+
+.route-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    text-align: center;
+}
+
+.route-stat-label {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.route-stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+}
+
+.route-events-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+}
+
+.route-event-item {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    display: grid;
+    grid-template-columns: 32px 1fr auto auto;
+    gap: var(--space-3);
+    align-items: center;
+    transition: all 0.2s var(--ease-out);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+}
+
+.route-event-item:hover {
+    transform: translateX(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.route-event-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 70%;
+    background: var(--accent);
+    border-radius: 0 var(--radius-full) var(--radius-full) 0;
+}
+
+.route-event-number {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: var(--shadow-sm);
+}
+
+.route-event-info {
+    min-width: 0;
+}
+
+.route-event-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.route-event-time {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.route-event-distance {
+    font-size: 12px;
+    color: var(--text-secondary);
+    background: var(--bg-elevated-2);
+    padding: 4px 8px;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.route-event-remove {
+    background: var(--bg-elevated-2);
+    border: none;
+    color: var(--text-tertiary);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.2s var(--ease-out);
+}
+
+.route-event-remove:hover {
+    background: var(--red-subtle);
+    color: var(--red);
+    transform: rotate(90deg);
+}
+
+.route-event-remove:active {
+    transform: scale(0.9) rotate(90deg);
+}
+
+.route-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: auto;
+    padding-top: var(--space-4);
+    border-top: 0.5px solid var(--separator);
+}
+
+.route-actions .event-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Línea conectora entre eventos */
+.route-event-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 19px;
+    bottom: -12px;
+    width: 2px;
+    height: 12px;
+    background: var(--separator);
+}
+
+/* ===== ROUTE MARKERS ===== */
+.route-marker {
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    border: 3px solid white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.4);
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    animation: markerPop 0.4s var(--spring);
+    position: relative;
+}
+
+.route-marker::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    opacity: 0;
+    animation: pulse-route 2s var(--ease-in-out) infinite;
+}
+
+@keyframes pulse-route {
+    0%, 100% { opacity: 0; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(1.3); }
+}
+
+.route-marker:hover {
+    transform: translate(-50%, -50%) scale(1.2);
+}
+
+/* Líneas de ruta en el mapa */
+.route-line {
+    stroke: var(--accent);
+    stroke-width: 4;
+    stroke-dasharray: 10, 5;
+    fill: none;
+    opacity: 0.8;
+    animation: dash 30s linear infinite;
+}
+
+@keyframes dash {
+    to { stroke-dashoffset: -1000; }
+}
+
+/* ===== MODO SELECCIÓN DE RUTA ===== */
+body.route-mode .custom-marker {
+    cursor: crosshair;
+}
+
+body.route-mode .custom-marker:hover {
+    transform: translate(-50%, -50%) scale(1.2);
+    filter: brightness(1.2);
+}
+
+/* ===== TOAST DE RUTA ===== */
+.route-toast {
+    position: fixed;
+    bottom: 150px;
+    right: var(--space-5);
+    background: var(--accent);
+    color: white;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 600;
+    z-index: var(--z-toast);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s var(--spring);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.route-toast.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ===== RESPONSIVE - MOBILE ===== */
+@media (max-width: 640px) {
+    .route-panel {
+        max-width: 100%;
+    }
+
+    .route-info-box {
+        grid-template-columns: 1fr;
+        gap: var(--space-2);
+    }
+
+    .route-stat {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: var(--space-2) 0;
+    }
+
+    .route-stat:not(:last-child) {
+        border-bottom: 0.5px solid var(--separator);
+    }
+
+    .heatmap-legend {
+        left: var(--space-3);
+        bottom: 76px;
+    }
+
+    .theme-selector {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .route-planner-toggle {
+        display: none !important;
+    }
+
+    .route-planner-toggle.active {
+        display: flex !important;
+    }
+}
+
+/* ===== ANIMACIONES DE TRANSICIÓN DE TEMA ===== */
+@media (prefers-reduced-motion: no-preference) {
+    :root {
+        transition: 
+            --accent 0.3s var(--ease-out),
+            --accent-hover 0.3s var(--ease-out),
+            --accent-subtle 0.3s var(--ease-out);
+    }
+}
+
+/* ===== CUSTOM SCROLLBAR PARA PANEL DE RUTA ===== */
+.route-panel .panel-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.route-panel .panel-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.route-panel .panel-content::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: var(--radius-full);
+}
+
+.route-panel .panel-content::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-hover);
+}
+
+/* ===== EXPORT ROUTE MODAL ===== */
+.route-export-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: saturate(180%) blur(20px);
+    z-index: calc(var(--z-modal) + 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s var(--ease-out);
+}
+
+.route-export-modal.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.route-export-content {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 400px;
+    padding: var(--space-6);
+    transform: scale(0.9);
+    transition: transform 0.4s var(--spring);
+    box-shadow: var(--shadow-xl);
+}
+
+.route-export-modal.visible .route-export-content {
+    transform: scale(1);
+}
+
+.route-export-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+}
+
+.route-export-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.route-export-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.route-export-btn {
+    padding: var(--space-4);
+    background: var(--bg-elevated-2);
+    border: 0.5px solid var(--separator);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s var(--ease-out);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--text);
+    font-family: var(--font-system);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.route-export-btn:hover {
+    background: var(--accent-subtle);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.route-export-btn:active {
+    transform: translateY(0);
+}
+
+.route-export-btn i {
+    font-size: 20px;
+    width: 32px;
+    text-align: center;
+}
+
+/* ===== FIN DE FEATURES PREMIUM ===== */

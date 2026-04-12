@@ -2834,6 +2834,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+    // ── NUEVAS FEATURES PREMIUM ────────────────────────────
+    initPremiumFeatures();
 
 // ===== SERVICE WORKER =====
 if ('serviceWorker' in navigator) {
@@ -2843,3 +2845,652 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.log('❌ SW error:', err));
     });
 }
+/* ================================================================
+   EVENTOSMADRID - FEATURES PREMIUM LOGIC
+   Temas + Heatmap + Route Planner
+   ================================================================ */
+
+// ===== VARIABLES GLOBALES PARA NUEVAS FEATURES =====
+let currentThemePreset = 'default';
+let customAccentColor = null;
+let heatmapLayer = null;
+let heatmapData = [];
+let heatmapRadius = 25;
+let routePlannerMode = false;
+let selectedRouteEvents = [];
+let routePolyline = null;
+let routeMarkers = [];
+
+// ===== SISTEMA DE TEMAS PERSONALIZADOS =====
+function initThemeSystem() {
+    const themeCards = document.querySelectorAll('.theme-card');
+    const customColorToggle = document.getElementById('custom-color-toggle');
+    const customColorSection = document.getElementById('custom-color-picker-section');
+    const accentColorPicker = document.getElementById('accent-color-picker');
+
+    // Cargar tema guardado
+    const savedTheme = localStorage.getItem('themePreset') || 'default';
+    const savedCustomColor = localStorage.getItem('customAccentColor');
+
+    if (savedCustomColor) {
+        customColorToggle.checked = true;
+        customColorSection.style.display = 'block';
+        accentColorPicker.value = savedCustomColor;
+        applyCustomColor(savedCustomColor);
+    } else {
+        applyThemePreset(savedTheme);
+    }
+
+    // Event listeners para theme cards
+    themeCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const preset = card.dataset.themePreset;
+            
+            // Desactivar custom color si está activo
+            if (customColorToggle.checked) {
+                customColorToggle.checked = false;
+                customColorSection.style.display = 'none';
+                localStorage.removeItem('customAccentColor');
+            }
+
+            // Activar tema
+            themeCards.forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+            applyThemePreset(preset);
+            
+            localStorage.setItem('themePreset', preset);
+            mostrarToast(`✨ Tema "${card.querySelector('.theme-name').textContent}" activado`);
+            
+            // Refresh charts si están visibles
+            const statsPanel = document.getElementById('stats-panel');
+            if (statsPanel && statsPanel.classList.contains('active')) {
+                setTimeout(() => initCharts(), 100);
+            }
+        });
+    });
+
+    // Toggle custom color
+    if (customColorToggle) {
+        customColorToggle.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                customColorSection.style.display = 'block';
+                themeCards.forEach(c => c.classList.remove('active'));
+                applyCustomColor(accentColorPicker.value);
+                mostrarToast('🎨 Color personalizado activado');
+            } else {
+                customColorSection.style.display = 'none';
+                localStorage.removeItem('customAccentColor');
+                applyThemePreset('default');
+                document.querySelector('[data-theme-preset="default"]').classList.add('active');
+                mostrarToast('🎨 Tema por defecto restaurado');
+            }
+        });
+    }
+
+    // Color picker
+    if (accentColorPicker) {
+        accentColorPicker.addEventListener('input', (e) => {
+            applyCustomColor(e.target.value);
+        });
+
+        accentColorPicker.addEventListener('change', (e) => {
+            localStorage.setItem('customAccentColor', e.target.value);
+            mostrarToast('🎨 Color guardado');
+        });
+    }
+}
+
+function applyThemePreset(preset) {
+    currentThemePreset = preset;
+    document.documentElement.setAttribute('data-theme-preset', preset);
+    customAccentColor = null;
+}
+
+function applyCustomColor(color) {
+    customAccentColor = color;
+    const root = document.documentElement;
+    
+    // Remover preset
+    root.removeAttribute('data-theme-preset');
+    
+    // Calcular colores derivados
+    const rgb = hexToRgb(color);
+    const hoverColor = lightenColor(color, 20);
+    
+    root.style.setProperty('--accent', color);
+    root.style.setProperty('--accent-hover', hoverColor);
+    root.style.setProperty('--accent-subtle', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15)`);
+}
+
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : { r: 10, g: 132, b: 255 };
+}
+
+function lightenColor(hex, percent) {
+    const num = parseInt(hex.replace('#', ''), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = (num >> 8 & 0x00FF) + amt;
+    const B = (num & 0x0000FF) + amt;
+    return '#' + (
+        0x1000000 +
+        (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+        (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+        (B < 255 ? (B < 1 ? 0 : B) : 255)
+    ).toString(16).slice(1);
+}
+
+// ===== MODO EXPLORACIÓN INTERACTIVA (HEATMAP) =====
+function initHeatmapMode() {
+    const heatmapToggle = document.getElementById('heatmap-toggle');
+    const heatmapControls = document.getElementById('heatmap-controls');
+    const heatmapRadiusSlider = document.getElementById('heatmap-radius');
+
+    if (!heatmapToggle) return;
+
+    heatmapToggle.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            heatmapControls.style.display = 'block';
+            activateHeatmap();
+            mostrarToast('🌈 Mapa de calor activado');
+        } else {
+            heatmapControls.style.display = 'none';
+            deactivateHeatmap();
+            mostrarToast('🌈 Mapa de calor desactivado');
+        }
+    });
+
+    if (heatmapRadiusSlider) {
+        heatmapRadiusSlider.addEventListener('input', (e) => {
+            heatmapRadius = parseInt(e.target.value);
+            if (heatmapLayer) {
+                updateHeatmap();
+            }
+        });
+    }
+}
+
+function activateHeatmap() {
+    // Preparar datos para el heatmap
+    heatmapData = currentFilteredEvents.map(evento => ({
+        lat: evento.lat,
+        lng: evento.lng,
+        intensity: 1
+    }));
+
+    // Crear capa de heatmap usando canvas
+    if (!heatmapLayer) {
+        heatmapLayer = L.layerGroup().addTo(map);
+    }
+
+    updateHeatmap();
+    showHeatmapLegend();
+}
+
+function updateHeatmap() {
+    if (!heatmapLayer) return;
+
+    heatmapLayer.clearLayers();
+
+    // Crear círculos con gradiente para simular heatmap
+    heatmapData.forEach(point => {
+        L.circle([point.lat, point.lng], {
+            radius: heatmapRadius * 50,
+            fillColor: getHeatColor(point.intensity),
+            fillOpacity: 0.4,
+            stroke: false,
+            className: 'heatmap-circle'
+        }).addTo(heatmapLayer);
+    });
+}
+
+function getHeatColor(intensity) {
+    const colors = [
+        '#0000FF', // Azul (baja densidad)
+        '#00FF00', // Verde
+        '#FFFF00', // Amarillo
+        '#FF0000'  // Rojo (alta densidad)
+    ];
+    const index = Math.min(Math.floor(intensity * colors.length), colors.length - 1);
+    return colors[index];
+}
+
+function deactivateHeatmap() {
+    if (heatmapLayer) {
+        map.removeLayer(heatmapLayer);
+        heatmapLayer = null;
+    }
+    hideHeatmapLegend();
+}
+
+function showHeatmapLegend() {
+    let legend = document.querySelector('.heatmap-legend');
+    if (!legend) {
+        legend = document.createElement('div');
+        legend.className = 'heatmap-legend';
+        legend.innerHTML = `
+            <div class="heatmap-legend-title">Densidad de eventos</div>
+            <div class="heatmap-gradient"></div>
+            <div class="heatmap-labels">
+                <span>Baja</span>
+                <span>Alta</span>
+            </div>
+        `;
+        document.body.appendChild(legend);
+    }
+    legend.classList.add('active');
+}
+
+function hideHeatmapLegend() {
+    const legend = document.querySelector('.heatmap-legend');
+    if (legend) {
+        legend.classList.remove('active');
+    }
+}
+
+// ===== PLANIFICADOR DE RUTAS =====
+function initRoutePlanner() {
+    const routeModeToggle = document.getElementById('route-mode-toggle');
+    const routePlannerToggle = document.getElementById('route-planner-toggle');
+    const routePanel = document.getElementById('route-panel');
+    const closeRoute = document.getElementById('close-route');
+    const optimizeRouteBtn = document.getElementById('optimize-route');
+    const exportRouteBtn = document.getElementById('export-route');
+    const clearRouteBtn = document.getElementById('clear-route');
+
+    if (!routeModeToggle) return;
+
+    // Activar/desactivar modo planificador
+    routeModeToggle.addEventListener('change', (e) => {
+        routePlannerMode = e.target.checked;
+        
+        if (routePlannerMode) {
+            document.body.classList.add('route-mode');
+            if (routePlannerToggle) {
+                routePlannerToggle.style.display = 'flex';
+            }
+            mostrarToast('🗺️ Modo planificador activado - Click en eventos para añadir', 'success');
+            
+            // Hacer marcadores clickeables para añadir a ruta
+            enableRouteSelection();
+        } else {
+            document.body.classList.remove('route-mode');
+            if (routePlannerToggle) {
+                routePlannerToggle.style.display = 'none';
+            }
+            disableRouteSelection();
+            mostrarToast('🗺️ Modo planificador desactivado');
+        }
+    });
+
+    // Abrir panel de ruta
+    if (routePlannerToggle) {
+        routePlannerToggle.addEventListener('click', () => {
+            if (routePanel) {
+                routePanel.classList.add('active');
+                routePanel.setAttribute('aria-modal', 'true');
+            }
+        });
+    }
+
+    // Cerrar panel
+    if (closeRoute) {
+        closeRoute.addEventListener('click', () => {
+            if (routePanel) {
+                routePanel.classList.remove('active');
+                routePanel.setAttribute('aria-modal', 'false');
+            }
+        });
+    }
+
+    // Optimizar ruta
+    if (optimizeRouteBtn) {
+        optimizeRouteBtn.addEventListener('click', optimizeRoute);
+    }
+
+    // Exportar ruta
+    if (exportRouteBtn) {
+        exportRouteBtn.addEventListener('click', exportRoute);
+    }
+
+    // Limpiar ruta
+    if (clearRouteBtn) {
+        clearRouteBtn.addEventListener('click', clearRoute);
+    }
+}
+
+function enableRouteSelection() {
+    markersLayer.eachLayer(marker => {
+        marker.off('click'); // Remover handler anterior
+        marker.on('click', (e) => {
+            L.DomEvent.stopPropagation(e);
+            const eventoId = marker.eventoId;
+            addEventToRoute(eventoId);
+        });
+    });
+}
+
+function disableRouteSelection() {
+    // Restaurar comportamiento original de markers
+    markersLayer.eachLayer(marker => {
+        marker.off('click');
+        // El popup se abrirá automáticamente por defecto de Leaflet
+    });
+}
+
+function addEventToRoute(eventoId) {
+    const evento = allEvents.find(e => e.id === eventoId);
+    if (!evento) return;
+
+    // Verificar si ya está en la ruta
+    if (selectedRouteEvents.find(e => e.id === eventoId)) {
+        mostrarToast('⚠️ Este evento ya está en tu ruta', 'error');
+        return;
+    }
+
+    selectedRouteEvents.push(evento);
+    updateRoutePanel();
+    updateRouteOnMap();
+    
+    mostrarToast(`✅ "${evento.nombre.substring(0, 30)}..." añadido a la ruta`);
+    
+    if ('vibrate' in navigator) {
+        navigator.vibrate(50);
+    }
+}
+
+function removeEventFromRoute(eventoId) {
+    selectedRouteEvents = selectedRouteEvents.filter(e => e.id !== eventoId);
+    updateRoutePanel();
+    updateRouteOnMap();
+    mostrarToast('🗑️ Evento eliminado de la ruta');
+}
+
+function updateRoutePanel() {
+    const routeEventsList = document.getElementById('route-events-list');
+    const routeEmpty = document.getElementById('route-empty');
+    const routeEventsCount = document.getElementById('route-events-count');
+    const routeCount = document.getElementById('route-count');
+    const optimizeBtn = document.getElementById('optimize-route');
+    const exportBtn = document.getElementById('export-route');
+
+    if (!routeEventsList) return;
+
+    const count = selectedRouteEvents.length;
+    
+    if (routeEventsCount) routeEventsCount.textContent = count;
+    
+    if (routeCount) {
+        if (count > 0) {
+            routeCount.textContent = count;
+            routeCount.style.display = 'flex';
+        } else {
+            routeCount.style.display = 'none';
+        }
+    }
+
+    if (count === 0) {
+        routeEventsList.innerHTML = '';
+        if (routeEmpty) routeEmpty.style.display = 'block';
+        if (optimizeBtn) optimizeBtn.disabled = true;
+        if (exportBtn) exportBtn.disabled = true;
+        return;
+    }
+
+    if (routeEmpty) routeEmpty.style.display = 'none';
+    if (optimizeBtn) optimizeBtn.disabled = count < 2;
+    if (exportBtn) exportBtn.disabled = false;
+
+    // Calcular distancias
+    let totalDistance = 0;
+    let totalTime = 0;
+
+    routeEventsList.innerHTML = selectedRouteEvents.map((evento, index) => {
+        let distanceText = '-';
+        
+        if (index > 0) {
+            const prevEvento = selectedRouteEvents[index - 1];
+            const distance = calcularDistancia(
+                prevEvento.lat, prevEvento.lng,
+                evento.lat, evento.lng
+            );
+            totalDistance += distance;
+            // Estimar 30 min por km caminando + 15 min de buffer
+            const timeMinutes = Math.round((distance * 30) + 15);
+            totalTime += timeMinutes;
+            distanceText = formatearDistancia(distance);
+        }
+
+        return `
+            <div class="route-event-item" style="animation-delay: ${index * 0.05}s;">
+                <div class="route-event-number">${index + 1}</div>
+                <div class="route-event-info">
+                    <div class="route-event-name">${evento.nombre}</div>
+                    <div class="route-event-time">
+                        <i class="fas fa-calendar"></i>
+                        ${formatDate(evento.fecha)}
+                    </div>
+                </div>
+                <div class="route-event-distance">${distanceText}</div>
+                <button class="route-event-remove" 
+                        onclick="removeEventFromRoute(${evento.id})"
+                        aria-label="Eliminar de ruta">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+    }).join('');
+
+    // Actualizar stats
+    const totalDistanceEl = document.getElementById('route-total-distance');
+    const totalTimeEl = document.getElementById('route-total-time');
+    
+    if (totalDistanceEl) {
+        totalDistanceEl.textContent = totalDistance > 0 
+            ? formatearDistancia(totalDistance) 
+            : '0 km';
+    }
+    
+    if (totalTimeEl) {
+        totalTimeEl.textContent = totalTime > 0 
+            ? `${totalTime} min` 
+            : '0 min';
+    }
+}
+
+function updateRouteOnMap() {
+    // Limpiar marcadores y líneas anteriores
+    routeMarkers.forEach(marker => map.removeLayer(marker));
+    routeMarkers = [];
+    
+    if (routePolyline) {
+        map.removeLayer(routePolyline);
+        routePolyline = null;
+    }
+
+    if (selectedRouteEvents.length === 0) return;
+
+    // Crear marcadores numerados
+    selectedRouteEvents.forEach((evento, index) => {
+        const icon = L.divIcon({
+            html: `<div class="route-marker">${index + 1}</div>`,
+            className: '',
+            iconSize: [36, 36],
+            iconAnchor: [18, 18]
+        });
+
+        const marker = L.marker([evento.lat, evento.lng], { icon })
+            .addTo(map)
+            .bindPopup(`
+                <div class="popup-evento">
+                    <h3>🗺️ Parada ${index + 1}</h3>
+                    <p><strong>📍</strong> ${evento.nombre}</p>
+                    <p><strong>📅</strong> ${formatDate(evento.fecha)}</p>
+                </div>
+            `);
+        
+        routeMarkers.push(marker);
+    });
+
+    // Dibujar línea conectando eventos
+    if (selectedRouteEvents.length >= 2) {
+        const latlngs = selectedRouteEvents.map(e => [e.lat, e.lng]);
+        routePolyline = L.polyline(latlngs, {
+            color: getComputedStyle(document.documentElement)
+                .getPropertyValue('--accent').trim(),
+            weight: 4,
+            opacity: 0.8,
+            dashArray: '10, 5',
+            className: 'route-line'
+        }).addTo(map);
+
+        // Ajustar vista para mostrar toda la ruta
+        map.fitBounds(routePolyline.getBounds(), { padding: [50, 50] });
+    }
+}
+
+function optimizeRoute() {
+    if (selectedRouteEvents.length < 2) return;
+
+    // Algoritmo simple: Nearest Neighbor (greedy)
+    const optimized = [selectedRouteEvents[0]];
+    const remaining = selectedRouteEvents.slice(1);
+
+    while (remaining.length > 0) {
+        const current = optimized[optimized.length - 1];
+        let nearestIndex = 0;
+        let minDistance = Infinity;
+
+        remaining.forEach((evento, index) => {
+            const distance = calcularDistancia(
+                current.lat, current.lng,
+                evento.lat, evento.lng
+            );
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearestIndex = index;
+            }
+        });
+
+        optimized.push(remaining[nearestIndex]);
+        remaining.splice(nearestIndex, 1);
+    }
+
+    selectedRouteEvents = optimized;
+    updateRoutePanel();
+    updateRouteOnMap();
+    
+    mostrarToast('✨ Ruta optimizada - Distancia mínima calculada', 'success');
+}
+
+function exportRoute() {
+    if (selectedRouteEvents.length === 0) return;
+
+    const routeText = selectedRouteEvents.map((evento, index) => 
+        `${index + 1}. ${evento.nombre}\n   📅 ${formatDate(evento.fecha)}\n   📍 ${evento.lugar}\n`
+    ).join('\n');
+
+    const fullText = `🗺️ MI RUTA EN EVENTOSMADRID\n\n${routeText}\n🌐 Creada en: ${window.location.href}`;
+
+    // Mostrar modal de exportación
+    showExportModal(fullText);
+}
+
+function showExportModal(text) {
+    const modal = document.createElement('div');
+    modal.className = 'route-export-modal';
+    modal.innerHTML = `
+        <div class="route-export-content">
+            <div class="route-export-header">
+                <h3>📤 Compartir ruta</h3>
+                <button class="close-panel" onclick="this.closest('.route-export-modal').remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="route-export-options">
+                <button class="route-export-btn" onclick="shareViaWhatsApp('${encodeURIComponent(text)}')">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </button>
+                <button class="route-export-btn" onclick="copyRouteText('${text.replace(/'/g, "\\'")}')">
+                    <i class="fas fa-copy"></i>
+                    <span>Copiar texto</span>
+                </button>
+                <button class="route-export-btn" onclick="downloadRouteJSON()">
+                    <i class="fas fa-download"></i>
+                    <span>Descargar JSON</span>
+                </button>
+            </div>
+        </div>
+    `;
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+
+    document.body.appendChild(modal);
+    requestAnimationFrame(() => modal.classList.add('visible'));
+}
+
+function shareViaWhatsApp(text) {
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+    document.querySelector('.route-export-modal')?.remove();
+}
+
+async function copyRouteText(text) {
+    try {
+        await navigator.clipboard.writeText(text);
+        mostrarToast('✅ Ruta copiada al portapapeles', 'success');
+        document.querySelector('.route-export-modal')?.remove();
+    } catch {
+        mostrarToast('❌ No se pudo copiar', 'error');
+    }
+}
+
+function downloadRouteJSON() {
+    const routeData = {
+        eventos: selectedRouteEvents,
+        fecha_creacion: new Date().toISOString(),
+        total_eventos: selectedRouteEvents.length
+    };
+
+    const blob = new Blob([JSON.stringify(routeData, null, 2)], { 
+        type: 'application/json' 
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ruta-eventos-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    mostrarToast('💾 Ruta descargada', 'success');
+    document.querySelector('.route-export-modal')?.remove();
+}
+
+function clearRoute() {
+    if (selectedRouteEvents.length === 0) return;
+
+    if (confirm('¿Seguro que quieres limpiar la ruta?')) {
+        selectedRouteEvents = [];
+        updateRoutePanel();
+        updateRouteOnMap();
+        mostrarToast('🗑️ Ruta limpiada');
+    }
+}
+
+// ===== INICIALIZACIÓN DE FEATURES PREMIUM =====
+function initPremiumFeatures() {
+    initThemeSystem();
+    initHeatmapMode();
+    initRoutePlanner();
+}
+
+// ===== MODIFICAR DOMContentLoaded EXISTENTE =====
+// Añade esta línea al final de tu DOMContentLoaded actual:
+// initPremiumFeatures();
