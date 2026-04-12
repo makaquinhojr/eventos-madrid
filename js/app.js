@@ -1,3 +1,9 @@
+/* ========================================
+   EVENTOSMADRID - APP.JS COMPLETO
+   Apple-style Redesign + New Features
+   Performance-optimized Vanilla JS
+   ======================================== */
+
 // ===== VARIABLES GLOBALES =====
 let map;
 let allEvents = [];
@@ -8,6 +14,7 @@ let markersLayer;
 let lugaresLayer;
 let currentView = 'map';
 let currentSort = 'date';
+let currentDensity = 'comfortable'; // NUEVO: comfortable | compact
 let userMarker = null;
 let userLocation = null;
 let distanceCircle = null;
@@ -18,6 +25,20 @@ let favorites = [];
 let currentCalendarDate = new Date();
 let charts = {};
 
+// NUEVO: Infinite scroll
+let currentPage = 0;
+let eventsPerPage = 50;
+let isLoadingMore = false;
+let scrollObserver = null;
+
+// NUEVO: Performance tracking
+let performanceMetrics = {
+    loadStart: performance.now(),
+    eventsLoaded: 0,
+    renderTime: 0
+};
+
+// ===== ICONOS Y COLORES =====
 const icons = {
     concierto: '🎵',
     fiesta: '🎪',
@@ -104,7 +125,7 @@ const ZONAS_COORDS = {
     'Arganda del Rey': { lat: 40.3008, lng: -3.4394, radio: 4.0 },
 };
 
-// ===== FUNCIÓN T (traducción) =====
+// ===== FUNCIÓN T (TRADUCCIÓN) =====
 function t(key) {
     if (typeof i18n !== 'undefined') {
         return i18n.t(key);
@@ -112,6 +133,7 @@ function t(key) {
     return key;
 }
 
+// ===== HELPER: INFERIR ZONA =====
 function inferirZona(lat, lng) {
     let mejorZona = null;
     let mejorDistancia = Infinity;
@@ -143,19 +165,31 @@ function saveFavorites() {
 
 function toggleFavorite(eventoId) {
     const index = favorites.indexOf(eventoId);
+    const wasAdded = index === -1;
+    
     if (index > -1) {
         favorites.splice(index, 1);
-        mostrarToast(i18n.t('favorites.removed'));
     } else {
         favorites.push(eventoId);
-        mostrarToast(i18n.t('favorites.added'));
+        // NUEVO: Haptic feedback en móvil
+        if ('vibrate' in navigator) {
+            navigator.vibrate(50);
+        }
     }
+    
     saveFavorites();
     renderFavoritesList();
     
+    // Actualizar todos los botones de favorito
     document.querySelectorAll(`[data-event-id="${eventoId}"]`).forEach(btn => {
         btn.classList.toggle('active', favorites.includes(eventoId));
     });
+    
+    // NUEVO: Toast con undo
+    mostrarToastConUndo(
+        wasAdded ? i18n.t('favorites.added') : i18n.t('favorites.removed'),
+        () => toggleFavorite(eventoId) // Callback de undo
+    );
 }
 
 function isFavorite(eventoId) {
@@ -164,17 +198,28 @@ function isFavorite(eventoId) {
 
 function updateFavoritesCount() {
     const badge = document.getElementById('favorites-count');
+    const bottomBadge = document.getElementById('bottom-favorites-badge');
+    
     if (favorites.length > 0) {
-        badge.textContent = favorites.length;
-        badge.style.display = 'flex';
+        if (badge) {
+            badge.textContent = favorites.length;
+            badge.style.display = 'flex';
+        }
+        if (bottomBadge) {
+            bottomBadge.textContent = favorites.length;
+            bottomBadge.style.display = 'flex';
+        }
     } else {
-        badge.style.display = 'none';
+        if (badge) badge.style.display = 'none';
+        if (bottomBadge) bottomBadge.style.display = 'none';
     }
 }
 
 function renderFavoritesList() {
     const container = document.getElementById('favorites-list');
     const emptyState = document.getElementById('favorites-empty');
+    
+    if (!container || !emptyState) return;
     
     if (favorites.length === 0) {
         container.innerHTML = '';
@@ -192,8 +237,8 @@ function renderFavoritesList() {
         const fecha = formatDate(evento.fecha);
         
         return `
-            <div class="favorite-item">
-                <div class="favorite-item-icon ${evento.tipo}" style="background:${color}20;">
+            <div class="favorite-item" style="animation: fadeUp 0.3s ease-out;">
+                <div class="favorite-item-icon ${evento.tipo}" style="background:linear-gradient(135deg, ${color}dd 0%, ${color} 100%);">
                     ${emoji}
                 </div>
                 <div class="favorite-item-info">
@@ -203,7 +248,7 @@ function renderFavoritesList() {
                         <span>📍 ${evento.lugar}</span>
                     </div>
                 </div>
-                <button class="btn-remove-favorite" onclick="toggleFavorite(${evento.id})">
+                <button class="btn-remove-favorite" onclick="toggleFavorite(${evento.id})" aria-label="Quitar de favoritos">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -237,449 +282,89 @@ async function compartirEventoNativo(eventoId) {
     }
 }
 
-// ===== VISTA DE CALENDARIO =====
-function renderCalendar() {
-    const year = currentCalendarDate.getFullYear();
-    const month = currentCalendarDate.getMonth();
-    
-    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    document.getElementById('calendar-month-year').textContent = `${monthNames[month]} ${year}`;
-    
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    
-    let startDay = firstDay.getDay() - 1;
-    if (startDay === -1) startDay = 6;
-    
-    const daysInMonth = lastDay.getDate();
-    const prevMonthDays = new Date(year, month, 0).getDate();
-    
-    const grid = document.getElementById('calendar-grid');
-    grid.innerHTML = '';
-    
-    for (let i = startDay - 1; i >= 0; i--) {
-        const day = prevMonthDays - i;
-        const cell = createCalendarDay(day, month - 1, year, true);
-        grid.appendChild(cell);
-    }
-    
-    for (let day = 1; day <= daysInMonth; day++) {
-        const cell = createCalendarDay(day, month, year, false);
-        grid.appendChild(cell);
-    }
-    
-    const remainingCells = 42 - (startDay + daysInMonth);
-    for (let day = 1; day <= remainingCells; day++) {
-        const cell = createCalendarDay(day, month + 1, year, true);
-        grid.appendChild(cell);
-    }
+function generarUrlCompartir(evento) {
+    const base = window.location.origin + window.location.pathname;
+    return `${base}?evento=${evento.id}`;
 }
 
-function createCalendarDay(day, month, year, isOtherMonth) {
-    const cell = document.createElement('div');
-    cell.className = 'calendar-day';
-    if (isOtherMonth) cell.classList.add('other-month');
-    
-    const date = new Date(year, month, day);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    if (date.toDateString() === today.toDateString()) {
-        cell.classList.add('today');
-    }
-    
-    const eventsOnDay = allEvents.filter(e => {
-        const eventStart = new Date(e.fecha);
-        const eventEnd = e.fecha_fin ? new Date(e.fecha_fin) : eventStart;
-        eventStart.setHours(0, 0, 0, 0);
-        eventEnd.setHours(0, 0, 0, 0);
-        return date >= eventStart && date <= eventEnd;
-    });
-    
-    cell.innerHTML = `
-        <div class="calendar-day-number">${day}</div>
-        ${eventsOnDay.length > 0 ? `
-            <div class="calendar-day-events-count">
-                <i class="fas fa-circle" style="font-size:4px;"></i>
-                ${eventsOnDay.length} ${eventsOnDay.length === 1 ? 'evento' : 'eventos'}
+function generarTextoCompartir(evento) {
+    const fecha = formatDate(evento.fecha);
+    const precio = evento.precio === 'gratis' ? i18n.t('badge.free') : (evento.precio_desde || i18n.t('badge.paid'));
+    const emoji = icons[evento.tipo] || '📍';
+    return `${emoji} *${evento.nombre}*\n📅 ${fecha}\n📍 ${evento.lugar}\n💰 ${precio}`;
+}
+
+function compartirEvento(eventoId) {
+    const evento = allEvents.find(e => e.id === eventoId);
+    if (!evento) return;
+
+    const url = generarUrlCompartir(evento);
+    const texto = generarTextoCompartir(evento);
+    const emoji = icons[evento.tipo] || '📍';
+
+    document.getElementById('modal-compartir')?.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'modal-compartir';
+    modal.className = 'modal-compartir-overlay';
+    modal.innerHTML = `
+        <div class="modal-compartir">
+            <div class="modal-compartir-header">
+                <span>${emoji} ${i18n.t('share.title_event')}</span>
+                <button class="modal-compartir-close" onclick="cerrarModalCompartir()" aria-label="Cerrar">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div class="calendar-day-dots">
-                ${eventsOnDay.slice(0, 5).map(e => 
-                    `<div class="calendar-dot ${e.tipo}"></div>`
-                ).join('')}
+            <div class="modal-compartir-nombre">${evento.nombre}</div>
+            <div class="modal-compartir-acciones">
+                <a class="modal-compartir-btn whatsapp"
+                   href="https://wa.me/?text=${encodeURIComponent(texto + '\n\n🗺️ Ver en EventosMadrid: ' + url)}"
+                   target="_blank" onclick="cerrarModalCompartir()">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>${i18n.t('event.share_whatsapp')}</span>
+                </a>
+                <a class="modal-compartir-btn twitter"
+                   href="https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(url)}"
+                   target="_blank" onclick="cerrarModalCompartir()">
+                    <i class="fab fa-x-twitter"></i>
+                    <span>${i18n.t('event.share_twitter')}</span>
+                </a>
+                <button class="modal-compartir-btn copiar" onclick="copiarLinkEvento('${url}', this)">
+                    <i class="fas fa-link"></i>
+                    <span>${i18n.t('event.copy_link')}</span>
+                </button>
             </div>
-        ` : ''}
+        </div>
     `;
-    
-    if (!isOtherMonth && eventsOnDay.length > 0) {
-        cell.addEventListener('click', () => showDayEvents(date, eventsOnDay));
-    }
-    
-    return cell;
-}
 
-function showDayEvents(date, events) {
-    const container = document.getElementById('calendar-day-events');
-    const title = document.getElementById('calendar-day-title');
-    const list = document.getElementById('calendar-day-list');
-    
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    title.textContent = date.toLocaleDateString('es-ES', options);
-    
-    list.innerHTML = events.map(evento => {
-        const emoji = icons[evento.tipo] || '📍';
-        const precioBadge = evento.precio === 'gratis'
-            ? `<span class="event-badge gratis">💚 ${i18n.t('badge.free')}</span>`
-            : `<span class="event-badge pago">💰 ${evento.precio_desde ? i18n.t('badge.from') + ' ' + evento.precio_desde : i18n.t('badge.paid')}</span>`;
-        
-        return `
-            <div class="event-card" style="margin-bottom: 8px;">
-                <div class="event-icon ${evento.tipo}">
-                    ${emoji}
-                </div>
-                <div class="event-info">
-                    <div class="event-title">
-                        ${evento.nombre}
-                        ${precioBadge}
-                    </div>
-                    <div class="event-meta">
-                        <div class="event-meta-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            ${evento.lugar}
-                        </div>
-                    </div>
-                </div>
-                <div class="event-actions">
-                    <button class="event-btn event-btn-primary" onclick="verEnMapa(${evento.id})">
-                        <i class="fas fa-map-marked-alt"></i> ${i18n.t('event.view_map')}
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
-    
-    container.style.display = 'block';
-    container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    
-    document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
-    event.currentTarget.classList.add('selected');
-}
-
-// ===== DASHBOARD DE ANALYTICS =====
-function initCharts() {
-    Object.values(charts).forEach(chart => chart?.destroy());
-    
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const textColor = isDark ? '#ededed' : '#0a0a0a';
-    const gridColor = isDark ? '#2a2a2a' : '#e5e5e5';
-    
-    Chart.defaults.color = textColor;
-    Chart.defaults.borderColor = gridColor;
-    
-    const tiposData = {
-        labels: [
-            i18n.t('stats.concerts'), 
-            i18n.t('stats.parties'), 
-            i18n.t('stats.markets'), 
-            i18n.t('stats.cultural'), 
-            i18n.t('stats.gastro'), 
-            i18n.t('stats.sports'), 
-            i18n.t('stats.kids')
-        ],
-        datasets: [{
-            label: 'Eventos',
-            data: [
-                currentFilteredEvents.filter(e => e.tipo === 'concierto').length,
-                currentFilteredEvents.filter(e => e.tipo === 'fiesta').length,
-                currentFilteredEvents.filter(e => e.tipo === 'mercado').length,
-                currentFilteredEvents.filter(e => e.tipo === 'cultural').length,
-                currentFilteredEvents.filter(e => e.tipo === 'gastronomia').length,
-                currentFilteredEvents.filter(e => e.tipo === 'deporte').length,
-                currentFilteredEvents.filter(e => e.tipo === 'infantil').length,
-            ],
-            backgroundColor: [
-                colors.concierto,
-                colors.fiesta,
-                colors.mercado,
-                colors.cultural,
-                colors.gastronomia,
-                colors.deporte,
-                colors.infantil
-            ]
-        }]
-    };
-    
-    const ctxTipos = document.getElementById('chart-tipos');
-    if (ctxTipos) {
-        charts.tipos = new Chart(ctxTipos, {
-            type: 'doughnut',
-            data: tiposData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
-    }
-    
-    const zonasCounts = {};
-    currentFilteredEvents.forEach(e => {
-        const zona = getZonaEvento(e);
-        zonasCounts[zona] = (zonasCounts[zona] || 0) + 1;
+    modal.addEventListener('click', e => {
+        if (e.target === modal) cerrarModalCompartir();
     });
-    
-    const topZonas = Object.entries(zonasCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10);
-    
-    const zonasData = {
-        labels: topZonas.map(z => i18n.t('zone.' + z[0], z[0])),
-        datasets: [{
-            label: 'Eventos',
-            data: topZonas.map(z => z[1]),
-            backgroundColor: '#C60B1E',
-            borderColor: '#C60B1E',
-            borderWidth: 1
-        }]
-    };
-    
-    const ctxZonas = document.getElementById('chart-zonas');
-    if (ctxZonas) {
-        charts.zonas = new Chart(ctxZonas, {
-            type: 'bar',
-            data: zonasData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                }
-            }
-        });
-    }
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const timelineData = [];
-    const timelineLabels = [];
-    
-    for (let i = 0; i < 30; i++) {
-        const date = new Date(today);
-        date.setDate(today.getDate() + i);
-        
-        const count = currentFilteredEvents.filter(e => {
-            const eventStart = new Date(e.fecha);
-            const eventEnd = e.fecha_fin ? new Date(e.fecha_fin) : eventStart;
-            eventStart.setHours(0, 0, 0, 0);
-            eventEnd.setHours(0, 0, 0, 0);
-            return date >= eventStart && date <= eventEnd;
-        }).length;
-        
-        timelineLabels.push(date.getDate() + '/' + (date.getMonth() + 1));
-        timelineData.push(count);
-    }
-    
-    const ctxTimeline = document.getElementById('chart-timeline');
-    if (ctxTimeline) {
-        charts.timeline = new Chart(ctxTimeline, {
-            type: 'line',
-            data: {
-                labels: timelineLabels,
-                datasets: [{
-                    label: 'Eventos activos',
-                    data: timelineData,
-                    borderColor: '#C60B1E',
-                    backgroundColor: 'rgba(198, 11, 30, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                }
-            }
-        });
-    }
+
+    document.body.appendChild(modal);
+    requestAnimationFrame(() => modal.classList.add('visible'));
 }
 
-function initMap() {
-    map = L.map('map').setView([40.4168, -3.7038], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    markersLayer = L.markerClusterGroup({
-        chunkedLoading: true,
-        chunkInterval: 100,
-        maxClusterRadius: 60,
-        spiderfyOnMaxZoom: true,
-        showCoverageOnHover: false,
-        zoomToBoundsOnClick: true,
-        animate: true,
-        animateAddingMarkers: false,
-    }).addTo(map);
-
-    lugaresLayer = L.layerGroup().addTo(map);
+function cerrarModalCompartir() {
+    const modal = document.getElementById('modal-compartir');
+    if (!modal) return;
+    modal.classList.remove('visible');
+    setTimeout(() => modal.remove(), 200);
 }
 
-async function loadEvents() {
+async function copiarLinkEvento(url, btn) {
     try {
-        const [eventosRes, lugaresRes] = await Promise.all([
-            fetch('data/eventos.json'),
-            fetch('data/lugares.json')
-        ]);
-
-        const events = await eventosRes.json();
-        const lugares = await lugaresRes.json();
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        allEvents = events.filter(e => {
-            if (!e.nombre || e.nombre.trim() === '') return false;
-            const eventDate = new Date(e.fecha_fin || e.fecha);
-            return eventDate >= today;
-        }).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-
-        allLugares = lugares;
-
-        updateCounter(allEvents.length);
-        displayEvents(allEvents);
-        displayLugares(allLugares);
-        actualizarEstadisticas(allEvents);
-        iniciarBannerHoy();
-        ocultarLoader(allEvents.length);
-        procesarUrlEvento();
-        
-        loadFavorites();
-        renderFavoritesList();
-        
-        if (currentView === 'calendar') {
-            renderCalendar();
-        }
-
-    } catch (error) {
-        console.error('❌ Error cargando datos:', error);
-        ocultarLoader(0);
+        await navigator.clipboard.writeText(url);
+        const original = btn.innerHTML;
+        btn.innerHTML = `<i class="fas fa-check"></i><span>${i18n.t('event.link_copied')}</span>`;
+        btn.classList.add('copiado');
+        setTimeout(() => {
+            btn.innerHTML = original;
+            btn.classList.remove('copiado');
+        }, 2000);
+    } catch {
+        mostrarToast('❌ No se pudo copiar', 'error');
     }
-}
-
-function displayLugares(lugares) {
-    lugaresLayer.clearLayers();
-
-    if (!mostrarLugares) return;
-
-    lugares.forEach(lugar => {
-        const color = lugaresColors[lugar.categoria] || '#6B7280';
-        const emoji = lugaresIcons[lugar.categoria] || '📍';
-
-        const icon = L.divIcon({
-            html: `<div class="lugar-marker" style="background:${color};">${emoji}</div>`,
-            className: '',
-            iconSize: [36, 36],
-            iconAnchor: [18, 18],
-            popupAnchor: [0, -20]
-        });
-
-        const marker = L.marker([lugar.lat, lugar.lng], { icon, riseOnHover: true });
-        marker.lugarId = lugar.id;
-
-        const precioHTML = lugar.precio === 'gratis'
-            ? `<strong style="color:#059669;">${i18n.t('badge.free')}</strong>`
-            : lugar.precio_desde || i18n.t('badge.paid');
-
-        const distanciaHTML = userLocation
-            ? `<p><strong>🚶</strong> ${getDistanciaHTMLCoords(lugar.lat, lugar.lng)}</p>`
-            : '';
-
-        marker.bindPopup(`
-            <div class="popup-evento popup-lugar">
-                <div class="popup-lugar-badge">
-                    ${emoji} ${categoriaNombre(lugar.categoria)}
-                </div>
-                <h3>${lugar.nombre}</h3>
-                <p><strong>📍</strong> ${lugar.lugar}</p>
-                <p><strong>🗺️</strong> ${i18n.t('zone.' + (lugar.zona || inferirZona(lugar.lat, lugar.lng)))}</p>
-                <p><strong>💰</strong> ${precioHTML}</p>
-                <p><strong>🕐</strong> ${lugar.horario || 'Consultar horario'}</p>
-                ${distanciaHTML}
-                ${lugar.descripcion ? `<p style="color:#6B7280;font-size:13px;margin-top:8px;line-height:1.4;">${lugar.descripcion}</p>` : ''}
-                <div class="popup-actions">
-                    <a href="${lugar.url}" target="_blank" class="popup-link">${i18n.t('event.more_info')} →</a>
-                </div>
-                <div class="popup-acciones-extra">
-                    <button class="popup-btn-extra" onclick="comoLlegarCoords(${lugar.lat}, ${lugar.lng}, '${lugar.nombre.replace(/'/g, "\\'")}')">
-                        <i class="fas fa-route"></i> ${i18n.t('event.how_to_get')}
-                    </button>
-                    <button class="popup-btn-extra compartir" onclick="compartirLugar('${lugar.id}')">
-                        <i class="fas fa-share-alt"></i> ${i18n.t('event.share')}
-                    </button>
-                </div>
-            </div>
-        `);
-
-        lugaresLayer.addLayer(marker);
-    });
-
-    currentFilteredLugares = lugares;
-    if (currentView === 'list') {
-        renderLugaresList(lugares);
-    }
-}
-
-function toggleLugares() {
-    mostrarLugares = !mostrarLugares;
-    const btn = document.getElementById('btn-toggle-lugares');
-    if (mostrarLugares) {
-        displayLugares(currentFilteredLugares.length ? currentFilteredLugares : allLugares);
-        btn.classList.add('active');
-        mostrarToast('🏛️ Lugares visibles');
-    } else {
-        lugaresLayer.clearLayers();
-        btn.classList.remove('active');
-        mostrarToast('🏛️ Lugares ocultos');
-    }
-}
-
-function categoriaNombre(categoria) {
-    const nombres = {
-        museo: 'Museo',
-        monumento: 'Monumento',
-        teatro: 'Teatro',
-        sala: 'Sala',
-        parque: 'Parque',
-        galeria: 'Galería',
-        mercado: 'Mercado'
-    };
-    return nombres[categoria] || 'Lugar de interés';
 }
 
 function compartirLugar(lugarId) {
@@ -699,7 +384,7 @@ function compartirLugar(lugarId) {
         <div class="modal-compartir">
             <div class="modal-compartir-header">
                 <span>${emoji} ${i18n.t('share.title_place')}</span>
-                <button class="modal-compartir-close" onclick="cerrarModalCompartir()">
+                <button class="modal-compartir-close" onclick="cerrarModalCompartir()" aria-label="Cerrar">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -708,15 +393,18 @@ function compartirLugar(lugarId) {
                 <a class="modal-compartir-btn whatsapp"
                    href="https://wa.me/?text=${encodeURIComponent(texto + '\n\n🗺️ Ver en EventosMadrid: ' + url)}"
                    target="_blank" onclick="cerrarModalCompartir()">
-                    <i class="fab fa-whatsapp"></i> ${i18n.t('event.share_whatsapp')}
+                    <i class="fab fa-whatsapp"></i>
+                    <span>${i18n.t('event.share_whatsapp')}</span>
                 </a>
                 <a class="modal-compartir-btn twitter"
                    href="https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(url)}"
                    target="_blank" onclick="cerrarModalCompartir()">
-                    <i class="fab fa-x-twitter"></i> ${i18n.t('event.share_twitter')}
+                    <i class="fab fa-x-twitter"></i>
+                    <span>${i18n.t('event.share_twitter')}</span>
                 </a>
                 <button class="modal-compartir-btn copiar" onclick="copiarLinkEvento('${url}', this)">
-                    <i class="fas fa-link"></i> ${i18n.t('event.copy_link')}
+                    <i class="fas fa-link"></i>
+                    <span>${i18n.t('event.copy_link')}</span>
                 </button>
             </div>
         </div>
@@ -730,6 +418,7 @@ function compartirLugar(lugarId) {
     requestAnimationFrame(() => modal.classList.add('visible'));
 }
 
+// ===== HELPERS DE EVENTOS =====
 function esLinkUtil(url) {
     if (!url || typeof url !== 'string' || url.trim() === '') return false;
     if (!url.startsWith('http://') && !url.startsWith('https://')) return false;
@@ -774,86 +463,27 @@ function getBotonMasInfo(evento) {
             </a>`;
 }
 
-function generarUrlCompartir(evento) {
-    const base = window.location.origin + window.location.pathname;
-    return `${base}?evento=${evento.id}`;
-}
-
-function generarTextoCompartir(evento) {
-    const fecha = formatDate(evento.fecha);
-    const precio = evento.precio === 'gratis' ? i18n.t('badge.free') : (evento.precio_desde || i18n.t('badge.paid'));
-    const emoji = icons[evento.tipo] || '📍';
-    return `${emoji} *${evento.nombre}*\n📅 ${fecha}\n📍 ${evento.lugar}\n💰 ${precio}`;
-}
-
-function compartirEvento(eventoId) {
-    const evento = allEvents.find(e => e.id === eventoId);
-    if (!evento) return;
-
-    const url = generarUrlCompartir(evento);
-    const texto = generarTextoCompartir(evento);
-    const emoji = icons[evento.tipo] || '📍';
-
-    document.getElementById('modal-compartir')?.remove();
-
-    const modal = document.createElement('div');
-    modal.id = 'modal-compartir';
-    modal.className = 'modal-compartir-overlay';
-    modal.innerHTML = `
-        <div class="modal-compartir">
-            <div class="modal-compartir-header">
-                <span>${emoji} ${i18n.t('share.title_event')}</span>
-                <button class="modal-compartir-close" onclick="cerrarModalCompartir()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-compartir-nombre">${evento.nombre}</div>
-            <div class="modal-compartir-acciones">
-                <a class="modal-compartir-btn whatsapp"
-                   href="https://wa.me/?text=${encodeURIComponent(texto + '\n\n🗺️ Ver en EventosMadrid: ' + url)}"
-                   target="_blank" onclick="cerrarModalCompartir()">
-                    <i class="fab fa-whatsapp"></i> ${i18n.t('event.share_whatsapp')}
-                </a>
-                <a class="modal-compartir-btn twitter"
-                   href="https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(url)}"
-                   target="_blank" onclick="cerrarModalCompartir()">
-                    <i class="fab fa-x-twitter"></i> ${i18n.t('event.share_twitter')}
-                </a>
-                <button class="modal-compartir-btn copiar" onclick="copiarLinkEvento('${url}', this)">
-                    <i class="fas fa-link"></i> ${i18n.t('event.copy_link')}
-                </button>
-            </div>
-        </div>
-    `;
-
-    modal.addEventListener('click', e => {
-        if (e.target === modal) cerrarModalCompartir();
+function generarLinkCalendar(evento) {
+    const formatearFechaCalendar = (fechaStr) => {
+        if (!fechaStr) return null;
+        const fecha = new Date(fechaStr + 'T00:00:00');
+        if (isNaN(fecha.getTime())) return null;
+        return fecha.toISOString().replace(/-|:|\.d{3}/g, '').slice(0, 8);
+    };
+    
+    const inicio = formatearFechaCalendar(evento.fecha);
+    if (!inicio) return null;
+    const fin = formatearFechaCalendar(evento.fecha_fin) || inicio;
+    
+    const params = new URLSearchParams({
+        action: 'TEMPLATE',
+        text: evento.nombre,
+        dates: `${inicio}/${fin}`,
+        details: `${evento.descripcion || ''}\n\nMás info: ${evento.url || ''}`,
+        location: evento.lugar || 'Madrid'
     });
-
-    document.body.appendChild(modal);
-    requestAnimationFrame(() => modal.classList.add('visible'));
-}
-
-function cerrarModalCompartir() {
-    const modal = document.getElementById('modal-compartir');
-    if (!modal) return;
-    modal.classList.remove('visible');
-    setTimeout(() => modal.remove(), 200);
-}
-
-async function copiarLinkEvento(url, btn) {
-    try {
-        await navigator.clipboard.writeText(url);
-        const original = btn.innerHTML;
-        btn.innerHTML = `<i class="fas fa-check"></i> ${i18n.t('event.link_copied')}`;
-        btn.classList.add('copiado');
-        setTimeout(() => {
-            btn.innerHTML = original;
-            btn.classList.remove('copiado');
-        }, 2000);
-    } catch {
-        mostrarToast('❌ No se pudo copiar', 'error');
-    }
+    
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
 function comoLlegar(eventoId) {
@@ -872,6 +502,7 @@ function comoLlegarCoords(lat, lng, nombre) {
     window.open(url, '_blank');
 }
 
+// ===== PROCESAMIENTO DE URL =====
 function procesarUrlEvento() {
     const params = new URLSearchParams(window.location.search);
 
@@ -929,7 +560,77 @@ function procesarUrlEvento() {
         }
     }, 200);
 }
+// ===== INICIALIZACIÓN DEL MAPA =====
+function initMap() {
+    map = L.map('map').setView([40.4168, -3.7038], 12);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
 
+    markersLayer = L.markerClusterGroup({
+        chunkedLoading: true,
+        chunkInterval: 100,
+        maxClusterRadius: 60,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        animate: true,
+        animateAddingMarkers: false,
+    }).addTo(map);
+
+    lugaresLayer = L.layerGroup().addTo(map);
+}
+
+// ===== CARGA DE EVENTOS =====
+async function loadEvents() {
+    try {
+        const [eventosRes, lugaresRes] = await Promise.all([
+            fetch('data/eventos.json'),
+            fetch('data/lugares.json')
+        ]);
+
+        const events = await eventosRes.json();
+        const lugares = await lugaresRes.json();
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        allEvents = events.filter(e => {
+            if (!e.nombre || e.nombre.trim() === '') return false;
+            const eventDate = new Date(e.fecha_fin || e.fecha);
+            return eventDate >= today;
+        }).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+        allLugares = lugares;
+
+        performanceMetrics.eventsLoaded = allEvents.length;
+
+        updateCounter(allEvents.length);
+        displayEvents(allEvents);
+        displayLugares(allLugares);
+        actualizarEstadisticas(allEvents);
+        iniciarBannerHoy();
+        ocultarLoader(allEvents.length);
+        procesarUrlEvento();
+        
+        loadFavorites();
+        renderFavoritesList();
+        
+        if (currentView === 'calendar') {
+            renderCalendar();
+        }
+
+        performanceMetrics.renderTime = performance.now() - performanceMetrics.loadStart;
+        console.log(`⚡ Performance: ${performanceMetrics.eventsLoaded} eventos cargados en ${Math.round(performanceMetrics.renderTime)}ms`);
+
+    } catch (error) {
+        console.error('❌ Error cargando datos:', error);
+        ocultarLoader(0);
+    }
+}
+
+// ===== DISPLAY EVENTOS (MAPA) =====
 function displayEvents(events) {
     markersLayer.clearLayers();
 
@@ -996,12 +697,12 @@ function displayEvents(events) {
                 <p><strong>🗺️</strong> ${i18n.t('zone.' + zona, zona)}</p>
                 <p><strong>💰</strong> ${
                     event.precio === 'gratis'
-                        ? `<strong style="color:#059669;">${i18n.t('badge.free')}</strong>`
+                        ? `<strong style="color:#30D158;">${i18n.t('badge.free')}</strong>`
                         : event.precio_desde ? i18n.t('badge.from') + ' ' + event.precio_desde : i18n.t('badge.paid')
                 }</p>
                 ${distanciaHTML}
                 ${descripcion
-                    ? `<p style="color:#6B7280;font-size:13px;margin-top:8px;line-height:1.4;">${descripcion}</p>`
+                    ? `<p style="color:var(--text-secondary);font-size:13px;margin-top:8px;line-height:1.4;">${descripcion}</p>`
                     : ''}
                 <div class="popup-actions">
                     ${linkHTML}
@@ -1026,12 +727,126 @@ function displayEvents(events) {
     initCharts();
 }
 
+// ===== DISPLAY LUGARES =====
+function displayLugares(lugares) {
+    lugaresLayer.clearLayers();
+
+    if (!mostrarLugares) return;
+
+    lugares.forEach(lugar => {
+        const color = lugaresColors[lugar.categoria] || '#6B7280';
+        const emoji = lugaresIcons[lugar.categoria] || '📍';
+
+        const icon = L.divIcon({
+            html: `<div class="lugar-marker" style="background:${color};">${emoji}</div>`,
+            className: '',
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+            popupAnchor: [0, -20]
+        });
+
+        const marker = L.marker([lugar.lat, lugar.lng], { icon, riseOnHover: true });
+        marker.lugarId = lugar.id;
+
+        const precioHTML = lugar.precio === 'gratis'
+            ? `<strong style="color:#30D158;">${i18n.t('badge.free')}</strong>`
+            : lugar.precio_desde || i18n.t('badge.paid');
+
+        const distanciaHTML = userLocation
+            ? `<p><strong>🚶</strong> ${getDistanciaHTMLCoords(lugar.lat, lugar.lng)}</p>`
+            : '';
+
+        marker.bindPopup(`
+            <div class="popup-evento popup-lugar">
+                <div class="popup-lugar-badge">
+                    ${emoji} ${categoriaNombre(lugar.categoria)}
+                </div>
+                <h3>${lugar.nombre}</h3>
+                <p><strong>📍</strong> ${lugar.lugar}</p>
+                <p><strong>🗺️</strong> ${i18n.t('zone.' + (lugar.zona || inferirZona(lugar.lat, lugar.lng)))}</p>
+                <p><strong>💰</strong> ${precioHTML}</p>
+                <p><strong>🕐</strong> ${lugar.horario || 'Consultar horario'}</p>
+                ${distanciaHTML}
+                ${lugar.descripcion ? `<p style="color:var(--text-secondary);font-size:13px;margin-top:8px;line-height:1.4;">${lugar.descripcion}</p>` : ''}
+                <div class="popup-actions">
+                    <a href="${lugar.url}" target="_blank" class="popup-link">${i18n.t('event.more_info')} →</a>
+                </div>
+                <div class="popup-acciones-extra">
+                    <button class="popup-btn-extra" onclick="comoLlegarCoords(${lugar.lat}, ${lugar.lng}, '${lugar.nombre.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-route"></i> ${i18n.t('event.how_to_get')}
+                    </button>
+                    <button class="popup-btn-extra compartir" onclick="compartirLugar('${lugar.id}')">
+                        <i class="fas fa-share-alt"></i> ${i18n.t('event.share')}
+                    </button>
+                </div>
+            </div>
+        `);
+
+        lugaresLayer.addLayer(marker);
+    });
+
+    currentFilteredLugares = lugares;
+    if (currentView === 'list') {
+        renderLugaresList(lugares);
+    }
+}
+
+function toggleLugares() {
+    mostrarLugares = !mostrarLugares;
+    const btn = document.getElementById('btn-toggle-lugares');
+    if (mostrarLugares) {
+        displayLugares(currentFilteredLugares.length ? currentFilteredLugares : allLugares);
+        btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
+        mostrarToast('🏛️ Lugares visibles');
+    } else {
+        lugaresLayer.clearLayers();
+        btn.classList.remove('active');
+        btn.setAttribute('aria-pressed', 'false');
+        mostrarToast('🏛️ Lugares ocultos');
+    }
+}
+
+function categoriaNombre(categoria) {
+    const nombres = {
+        museo: 'Museo',
+        monumento: 'Monumento',
+        teatro: 'Teatro',
+        sala: 'Sala',
+        parque: 'Parque',
+        galeria: 'Galería',
+        mercado: 'Mercado'
+    };
+    return nombres[categoria] || 'Lugar de interés';
+}
+
+// ===== CAMBIO DE VISTA =====
 function switchView(view) {
     currentView = view;
 
-    document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(`view-${view}-btn`).classList.add('active');
+    // Actualizar botones desktop (si existen)
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.removeAttribute('aria-current');
+    });
+    const desktopBtn = document.getElementById(`view-${view}-btn`);
+    if (desktopBtn) {
+        desktopBtn.classList.add('active');
+        desktopBtn.setAttribute('aria-current', 'page');
+    }
 
+    // NUEVO: Actualizar bottom navigation
+    document.querySelectorAll('.bottom-nav-item').forEach(btn => {
+        btn.classList.remove('active');
+        btn.removeAttribute('aria-current');
+    });
+    const bottomBtn = document.getElementById(`bottom-nav-${view}`);
+    if (bottomBtn) {
+        bottomBtn.classList.add('active');
+        bottomBtn.setAttribute('aria-current', 'page');
+    }
+
+    // Cambiar contenedores
     document.querySelectorAll('.view-container').forEach(c => c.classList.remove('active'));
     
     if (view === 'map') {
@@ -1039,6 +854,8 @@ function switchView(view) {
         setTimeout(() => map.invalidateSize(), 100);
     } else if (view === 'list') {
         document.getElementById('list-view').classList.add('active');
+        // NUEVO: Reset infinite scroll
+        currentPage = 0;
         renderListView(currentFilteredEvents);
         renderLugaresList(currentFilteredLugares);
     } else if (view === 'calendar') {
@@ -1047,15 +864,23 @@ function switchView(view) {
     }
 }
 
+// ===== VISTA LISTA CON AGRUPACIÓN POR FECHAS (NUEVO) =====
 function renderListView(events) {
     const listContainer = document.getElementById('events-list');
+    const skeletonList = document.getElementById('skeleton-list');
+
+    if (!listContainer) return;
 
     if (events.length === 0) {
+        if (skeletonList) skeletonList.style.display = 'none';
         listContainer.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-search"></i>
                 <h3>No se encontraron eventos</h3>
                 <p>Prueba a cambiar los filtros</p>
+                <button class="event-btn event-btn-primary" onclick="clearFilters()" style="margin-top:24px;">
+                    <i class="fas fa-redo"></i> Limpiar filtros
+                </button>
             </div>
         `;
         return;
@@ -1078,123 +903,194 @@ function renderListView(events) {
         }
     });
 
+    // NUEVO: Agrupar eventos por fechas
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
+    const manana = new Date(hoy);
+    manana.setDate(hoy.getDate() + 1);
+    const finSemana = new Date(hoy);
+    finSemana.setDate(hoy.getDate() + 7);
 
-    listContainer.innerHTML = sortedEvents.map(evento => {
+    const grupos = {
+        'Hoy': [],
+        'Mañana': [],
+        'Esta semana': [],
+        'Más adelante': []
+    };
+
+    sortedEvents.forEach(evento => {
         const fechaEvento = new Date(evento.fecha);
-        const esHoy = fechaEvento.toDateString() === hoy.toDateString();
-        const esMañana = fechaEvento.toDateString() === new Date(hoy.getTime() + 86400000).toDateString();
+        fechaEvento.setHours(0, 0, 0, 0);
 
-        let proximidadBadge = '';
-        if (esHoy) proximidadBadge = `<span class="event-badge hoy">🔥 ${i18n.t('badge.today')}</span>`;
-        else if (esMañana) proximidadBadge = `<span class="event-badge hoy">⚡ ${i18n.t('badge.tomorrow')}</span>`;
+        if (fechaEvento.getTime() === hoy.getTime()) {
+            grupos['Hoy'].push(evento);
+        } else if (fechaEvento.getTime() === manana.getTime()) {
+            grupos['Mañana'].push(evento);
+        } else if (fechaEvento <= finSemana) {
+            grupos['Esta semana'].push(evento);
+        } else {
+            grupos['Más adelante'].push(evento);
+        }
+    });
 
-        const precioBadge = evento.precio === 'gratis'
-            ? `<span class="event-badge gratis">💚 ${i18n.t('badge.free')}</span>`
-            : `<span class="event-badge pago">💰 ${evento.precio_desde ? i18n.t('badge.from') + ' ' + evento.precio_desde : i18n.t('badge.paid')}</span>`;
+    // NUEVO: Infinite scroll - renderizar solo primeras páginas
+    const eventsToShow = sortedEvents.slice(0, (currentPage + 1) * eventsPerPage);
 
-        const zona = getZonaEvento(evento);
-        const zonaBadge = `<span class="event-badge zona">📍 ${i18n.t('zone.' + zona, zona)}</span>`;
+    listContainer.innerHTML = Object.entries(grupos)
+        .filter(([_, eventos]) => eventos.length > 0)
+        .map(([grupo, eventos]) => {
+            const eventosGrupo = eventos.filter(e => eventsToShow.includes(e));
+            if (eventosGrupo.length === 0) return '';
 
-        const fechaTexto = evento.fecha_fin
-            ? `${formatDate(evento.fecha)} - ${formatDate(evento.fecha_fin)}`
-            : formatDate(evento.fecha);
-
-        const distanciaItem = userLocation ? `
-            <div class="event-meta-item distancia">
-                ${getDistanciaHTML(evento)}
-            </div>
-        ` : '';
-
-        const botonMasInfo = getBotonMasInfo(evento);
-        const calendarLink = generarLinkCalendar(evento);
-        const botonCalendar = calendarLink
-            ? `<a href="${calendarLink}" target="_blank" class="event-btn event-btn-calendar" title="${i18n.t('event.add_calendar')}">
-                    <i class="fas fa-calendar-plus"></i>
-               </a>`
-            : '';
-
-        const descripcion = limpiarDescripcion(evento.descripcion, 200);
-
-        const botonComoLlegar = `
-            <button class="event-btn event-btn-llegar" onclick="comoLlegar(${evento.id})" title="${i18n.t('event.how_to_get')}">
-                <i class="fas fa-route"></i>
-            </button>
-        `;
-
-        const botonCompartir = `
-            <button class="event-btn event-btn-compartir" onclick="compartirEventoNativo(${evento.id})" title="${i18n.t('event.share')}">
-                <i class="fas fa-share-alt"></i>
-            </button>
-        `;
-        
-        const botonFavorito = `
-            <button class="btn-favorite ${isFavorite(evento.id) ? 'active' : ''}" 
-                    data-event-id="${evento.id}" 
-                    onclick="toggleFavorite(${evento.id})" 
-                    title="${i18n.t('favorites.title')}">
-                <i class="fas fa-heart"></i>
-            </button>
-        `;
-
-        return `
-            <div class="event-card">
-                <div class="event-icon ${evento.tipo}">
-                    ${icons[evento.tipo] || '📍'}
-                </div>
-                <div class="event-info">
-                    <div class="event-title">
-                        ${evento.nombre}
-                        ${proximidadBadge}
-                        ${precioBadge}
-                        ${zonaBadge}
+            return `
+                <div class="event-group">
+                    <div class="event-group-header">
+                        <h3>${grupo}</h3>
+                        <span class="event-group-count">${eventosGrupo.length}</span>
                     </div>
-                    <div class="event-meta">
-                        <div class="event-meta-item">
-                            <i class="fas fa-calendar"></i>
-                            ${fechaTexto}
-                        </div>
-                        <div class="event-meta-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            ${evento.lugar}
-                        </div>
-                        ${distanciaItem}
-                    </div>
-                    ${descripcion
-                        ? `<div class="event-description">${descripcion}</div>`
-                        : `<div class="event-description sin-descripcion">
-                               📍 ${evento.lugar} · ${evento.precio === 'gratis' ? i18n.t('badge.free') : evento.precio_desde || i18n.t('badge.paid')}
-                           </div>`
-                    }
-                </div>
-                <div class="event-actions">
-                    <button class="event-btn event-btn-primary" onclick="verEnMapa(${evento.id})">
-                        <i class="fas fa-map-marked-alt"></i> ${i18n.t('event.view_map')}
-                    </button>
-                    ${botonMasInfo}
-                    <div class="event-actions-row">
-                        ${botonCalendar}
-                        ${botonComoLlegar}
-                        ${botonCompartir}
-                        ${botonFavorito}
+                    <div class="events-list">
+                        ${eventosGrupo.map(evento => renderEventCard(evento)).join('')}
                     </div>
                 </div>
-            </div>
-        `;
-    }).join('');
+            `;
+        })
+        .join('');
+
+    // NUEVO: Ocultar skeleton después de renderizar
+    if (skeletonList) skeletonList.style.display = 'none';
+
+    // Actualizar subtitle
+    const subtitle = document.getElementById('list-subtitle');
+    if (subtitle) {
+        const totalShown = eventsToShow.length;
+        const totalEvents = sortedEvents.length;
+        subtitle.textContent = `Mostrando ${totalShown} de ${totalEvents} eventos`;
+    }
 }
 
+// NUEVO: Renderizar tarjeta individual
+function renderEventCard(evento) {
+    const fechaEvento = new Date(evento.fecha);
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const esHoy = fechaEvento.toDateString() === hoy.toDateString();
+    const esMañana = fechaEvento.toDateString() === new Date(hoy.getTime() + 86400000).toDateString();
+
+    let proximidadBadge = '';
+    if (esHoy) proximidadBadge = `<span class="event-badge hoy">🔥 ${i18n.t('badge.today')}</span>`;
+    else if (esMañana) proximidadBadge = `<span class="event-badge hoy">⚡ ${i18n.t('badge.tomorrow')}</span>`;
+
+    const precioBadge = evento.precio === 'gratis'
+        ? `<span class="event-badge gratis">💚 ${i18n.t('badge.free')}</span>`
+        : `<span class="event-badge pago">💰 ${evento.precio_desde ? i18n.t('badge.from') + ' ' + evento.precio_desde : i18n.t('badge.paid')}</span>`;
+
+    const zona = getZonaEvento(evento);
+    const zonaBadge = `<span class="event-badge zona">📍 ${i18n.t('zone.' + zona, zona)}</span>`;
+
+    const fechaTexto = evento.fecha_fin
+        ? `${formatDate(evento.fecha)} - ${formatDate(evento.fecha_fin)}`
+        : formatDate(evento.fecha);
+
+    const distanciaItem = userLocation ? `
+        <div class="event-meta-item distancia">
+            ${getDistanciaHTML(evento)}
+        </div>
+    ` : '';
+
+    const botonMasInfo = getBotonMasInfo(evento);
+    const calendarLink = generarLinkCalendar(evento);
+    const botonCalendar = calendarLink
+        ? `<a href="${calendarLink}" target="_blank" class="event-btn event-btn-calendar" title="${i18n.t('event.add_calendar')}">
+                <i class="fas fa-calendar-plus"></i>
+           </a>`
+        : '';
+
+    const descripcion = limpiarDescripcion(evento.descripcion, 200);
+
+    const botonComoLlegar = `
+        <button class="event-btn event-btn-llegar" onclick="comoLlegar(${evento.id})" title="${i18n.t('event.how_to_get')}">
+            <i class="fas fa-route"></i>
+        </button>
+    `;
+
+    const botonCompartir = `
+        <button class="event-btn event-btn-compartir" onclick="compartirEventoNativo(${evento.id})" title="${i18n.t('event.share')}">
+            <i class="fas fa-share-alt"></i>
+        </button>
+    `;
+    
+    const botonFavorito = `
+        <button class="btn-favorite ${isFavorite(evento.id) ? 'active' : ''}" 
+                data-event-id="${evento.id}" 
+                onclick="toggleFavorite(${evento.id})" 
+                title="${i18n.t('favorites.title')}"
+                aria-label="${isFavorite(evento.id) ? 'Quitar de favoritos' : 'Añadir a favoritos'}">
+            <i class="fas fa-heart"></i>
+        </button>
+    `;
+
+    const emoji = icons[evento.tipo] || '📍';
+    const color = colors[evento.tipo] || '#6B7280';
+
+    // NUEVO: Clases para densidad
+    const densityClass = currentDensity === 'compact' ? 'compact' : '';
+
+    return `
+        <div class="event-card ${densityClass}">
+            <div class="event-icon ${evento.tipo}" style="background:linear-gradient(135deg, ${color}dd 0%, ${color} 100%);">
+                ${emoji}
+            </div>
+            <div class="event-info">
+                <div class="event-title">
+                    ${evento.nombre}
+                    ${proximidadBadge}
+                    ${precioBadge}
+                    ${zonaBadge}
+                </div>
+                <div class="event-meta">
+                    <div class="event-meta-item">
+                        <i class="fas fa-calendar"></i>
+                        ${fechaTexto}
+                    </div>
+                    <div class="event-meta-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        ${evento.lugar}
+                    </div>
+                    ${distanciaItem}
+                </div>
+                ${descripcion
+                    ? `<div class="event-description">${descripcion}</div>`
+                    : `<div class="event-description sin-descripcion">
+                           📍 ${evento.lugar} · ${evento.precio === 'gratis' ? i18n.t('badge.free') : evento.precio_desde || i18n.t('badge.paid')}
+                       </div>`
+                }
+            </div>
+            <div class="event-actions">
+                <button class="event-btn event-btn-primary" onclick="verEnMapa(${evento.id})">
+                    <i class="fas fa-map-marked-alt"></i> ${i18n.t('event.view_map')}
+                </button>
+                ${botonMasInfo}
+                <div class="event-actions-row">
+                    ${botonCalendar}
+                    ${botonComoLlegar}
+                    ${botonCompartir}
+                    ${botonFavorito}
+                </div>
+            </div>
+        </div>
+    `;
+}
+// ===== RENDERIZAR LUGARES EN LISTA =====
 function renderLugaresList(lugares) {
     const lugaresSection = document.getElementById('lugares-section');
     const lugaresList = document.getElementById('lugares-list');
 
     if (!lugares || lugares.length === 0 || !mostrarLugaresEnLista) {
-        lugaresSection.style.display = 'none';
+        if (lugaresSection) lugaresSection.style.display = 'none';
         return;
     }
 
-    lugaresSection.style.display = 'block';
+    if (lugaresSection) lugaresSection.style.display = 'block';
 
     const sortedLugares = [...lugares].sort((a, b) => {
         switch (currentSort) {
@@ -1209,69 +1105,71 @@ function renderLugaresList(lugares) {
         }
     });
 
-    lugaresList.innerHTML = sortedLugares.map(lugar => {
-        const emoji = lugaresIcons[lugar.categoria] || '📍';
-        const color = lugaresColors[lugar.categoria] || '#6B7280';
-        const categoriaNom = categoriaNombre(lugar.categoria);
-        const zona = lugar.zona || inferirZona(lugar.lat, lugar.lng);
+    if (lugaresList) {
+        lugaresList.innerHTML = sortedLugares.map(lugar => {
+            const emoji = lugaresIcons[lugar.categoria] || '📍';
+            const color = lugaresColors[lugar.categoria] || '#6B7280';
+            const categoriaNom = categoriaNombre(lugar.categoria);
+            const zona = lugar.zona || inferirZona(lugar.lat, lugar.lng);
 
-        const precioBadge = lugar.precio === 'gratis'
-            ? `<span class="event-badge gratis">💚 ${i18n.t('badge.free')}</span>`
-            : `<span class="event-badge pago">💰 ${lugar.precio_desde || i18n.t('badge.paid')}</span>`;
+            const precioBadge = lugar.precio === 'gratis'
+                ? `<span class="event-badge gratis">💚 ${i18n.t('badge.free')}</span>`
+                : `<span class="event-badge pago">💰 ${lugar.precio_desde || i18n.t('badge.paid')}</span>`;
 
-        const zonaBadge = `<span class="event-badge zona">📍 ${i18n.t('zone.' + zona, zona)}</span>`;
-        const categoriaBadge = `<span class="lugar-categoria-badge" style="background:${color}20;color:${color};">${emoji} ${categoriaNom}</span>`;
+            const zonaBadge = `<span class="event-badge zona">📍 ${i18n.t('zone.' + zona, zona)}</span>`;
+            const categoriaBadge = `<span class="lugar-categoria-badge" style="background:${color}20;color:${color};">${emoji} ${categoriaNom}</span>`;
 
-        const distanciaItem = userLocation ? `
-            <div class="event-meta-item distancia">
-                ${getDistanciaHTMLCoords(lugar.lat, lugar.lng)}
-            </div>
-        ` : '';
-
-        return `
-            <div class="lugar-card">
-                <div class="lugar-icon" style="background:${color};">
-                    ${emoji}
+            const distanciaItem = userLocation ? `
+                <div class="event-meta-item distancia">
+                    ${getDistanciaHTMLCoords(lugar.lat, lugar.lng)}
                 </div>
-                <div class="event-info">
-                    <div class="event-title">
-                        ${lugar.nombre}
-                        ${categoriaBadge}
-                        ${precioBadge}
-                        ${zonaBadge}
+            ` : '';
+
+            return `
+                <div class="lugar-card">
+                    <div class="lugar-icon" style="background:linear-gradient(135deg, ${color}dd 0%, ${color} 100%);">
+                        ${emoji}
                     </div>
-                    <div class="event-meta">
-                        <div class="event-meta-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            ${lugar.lugar}
+                    <div class="event-info">
+                        <div class="event-title">
+                            ${lugar.nombre}
+                            ${categoriaBadge}
+                            ${precioBadge}
+                            ${zonaBadge}
                         </div>
-                        <div class="event-meta-item">
-                            <i class="fas fa-clock"></i>
-                            ${lugar.horario || 'Consultar horario'}
+                        <div class="event-meta">
+                            <div class="event-meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                ${lugar.lugar}
+                            </div>
+                            <div class="event-meta-item">
+                                <i class="fas fa-clock"></i>
+                                ${lugar.horario || 'Consultar horario'}
+                            </div>
+                            ${distanciaItem}
                         </div>
-                        ${distanciaItem}
+                        ${lugar.descripcion ? `<div class="event-description">${limpiarDescripcion(lugar.descripcion, 200)}</div>` : ''}
                     </div>
-                    ${lugar.descripcion ? `<div class="event-description">${limpiarDescripcion(lugar.descripcion, 200)}</div>` : ''}
-                </div>
-                <div class="event-actions">
-                    <button class="event-btn event-btn-primary" onclick="verLugarEnMapa('${lugar.id}')">
-                        <i class="fas fa-map-marked-alt"></i> ${i18n.t('event.view_map')}
-                    </button>
-                    <a href="${lugar.url}" target="_blank" class="event-btn event-btn-secondary">
-                        <i class="fas fa-external-link-alt"></i> ${i18n.t('event.more_info')}
-                    </a>
-                    <div class="event-actions-row">
-                        <button class="event-btn event-btn-llegar" onclick="comoLlegarCoords(${lugar.lat}, ${lugar.lng}, '${lugar.nombre.replace(/'/g, "\\'")}')" title="${i18n.t('event.how_to_get')}">
-                            <i class="fas fa-route"></i>
+                    <div class="event-actions">
+                        <button class="event-btn event-btn-primary" onclick="verLugarEnMapa('${lugar.id}')">
+                            <i class="fas fa-map-marked-alt"></i> ${i18n.t('event.view_map')}
                         </button>
-                        <button class="event-btn event-btn-compartir" onclick="compartirLugar('${lugar.id}')" title="${i18n.t('event.share')}">
-                            <i class="fas fa-share-alt"></i>
-                        </button>
+                        <a href="${lugar.url}" target="_blank" class="event-btn event-btn-secondary">
+                            <i class="fas fa-external-link-alt"></i> ${i18n.t('event.more_info')}
+                        </a>
+                        <div class="event-actions-row">
+                            <button class="event-btn event-btn-llegar" onclick="comoLlegarCoords(${lugar.lat}, ${lugar.lng}, '${lugar.nombre.replace(/'/g, "\\'")}')" title="${i18n.t('event.how_to_get')}">
+                                <i class="fas fa-route"></i>
+                            </button>
+                            <button class="event-btn event-btn-compartir" onclick="compartirLugar('${lugar.id}')" title="${i18n.t('event.share')}">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-    }).join('');
+            `;
+        }).join('');
+    }
 }
 
 function verEnMapa(eventoId) {
@@ -1300,8 +1198,18 @@ function verLugarEnMapa(lugarId) {
     }, 300);
 }
 
-// ===== FILTROS =====
+// ===== FILTROS (CON DEBOUNCING Y OPTIMIZACIÓN) =====
+let filterDebounceTimer = null;
+
 function applyFilters() {
+    // NUEVO: Debouncing para mejorar performance
+    clearTimeout(filterDebounceTimer);
+    filterDebounceTimer = setTimeout(() => {
+        applyFiltersImmediate();
+    }, 150);
+}
+
+function applyFiltersImmediate() {
     const search = document.getElementById('search').value.toLowerCase().trim();
     const dateFilter = document.getElementById('filtro-fecha').value;
     const zonaFilter = document.getElementById('filtro-zona')?.value || 'todas';
@@ -1413,40 +1321,123 @@ function applyFilters() {
     currentFilteredEvents = filtered;
     currentFilteredLugares = filteredLugares;
 
+    // NUEVO: Reset infinite scroll al filtrar
+    currentPage = 0;
+
     displayEvents(filtered);
     displayLugares(filteredLugares);
     updateCounter(filtered.length);
     actualizarEstadisticas(filtered);
     actualizarContadorFiltros();
     mostrarZonaActiva(zonaFilter);
+    renderActivePills(); // NUEVO
+}
+
+// NUEVO: Renderizar pills de filtros activos
+function renderActivePills() {
+    const container = document.getElementById('active-filters');
+    if (!container) return;
+
+    const pills = [];
+
+    // Fecha
+    const dateFilter = document.getElementById('filtro-fecha')?.value;
+    if (dateFilter && dateFilter !== 'todos') {
+        const labels = {
+            'hoy': '🔥 Hoy',
+            'finde': '🎉 Fin de semana',
+            'semana': '📅 Próximos 7 días',
+            'mes': '📆 Este mes'
+        };
+        pills.push({
+            label: labels[dateFilter] || dateFilter,
+            remove: () => {
+                document.getElementById('filtro-fecha').value = 'todos';
+                applyFilters();
+            }
+        });
+    }
+
+    // Zona
+    const zonaFilter = document.getElementById('filtro-zona')?.value;
+    if (zonaFilter && zonaFilter !== 'todas') {
+        pills.push({
+            label: `📍 ${i18n.t('zone.' + zonaFilter, zonaFilter)}`,
+            remove: () => {
+                document.getElementById('filtro-zona').value = 'todas';
+                applyFilters();
+            }
+        });
+    }
+
+    // Tipos desactivados
+    const allTypes = ['concierto', 'fiesta', 'mercado', 'cultural', 'gastronomia', 'deporte', 'infantil'];
+    const activeTypes = Array.from(document.querySelectorAll('.chip input[type="checkbox"]'))
+        .filter(cb => allTypes.includes(cb.value) && !cb.checked);
+    
+    if (activeTypes.length > 0 && activeTypes.length < allTypes.length) {
+        pills.push({
+            label: `🎭 ${activeTypes.length} tipo${activeTypes.length > 1 ? 's' : ''} oculto${activeTypes.length > 1 ? 's' : ''}`,
+            remove: () => {
+                document.querySelectorAll('.chip input[type="checkbox"]').forEach(cb => {
+                    if (allTypes.includes(cb.value)) cb.checked = true;
+                });
+                applyFilters();
+            }
+        });
+    }
+
+    // Precio
+    const precioMax = parseInt(document.getElementById('filtro-precio-max')?.value || 100);
+    if (precioMax < 100) {
+        pills.push({
+            label: precioMax === 0 ? '💚 Solo gratis' : `💰 Hasta ${precioMax}€`,
+            remove: () => {
+                const slider = document.getElementById('filtro-precio-max');
+                if (slider) {
+                    slider.value = 100;
+                    slider.dispatchEvent(new Event('input'));
+                }
+            }
+        });
+    }
+
+    // Búsqueda
+    const search = document.getElementById('search')?.value;
+    if (search && search.trim()) {
+        pills.push({
+            label: `🔍 "${search.substring(0, 20)}${search.length > 20 ? '...' : ''}"`,
+            remove: () => {
+                document.getElementById('search').value = '';
+                applyFilters();
+            }
+        });
+    }
+
+    // Renderizar
+    if (pills.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+    container.innerHTML = pills.map((pill, index) => `
+        <div class="filter-pill" style="animation-delay: ${index * 0.05}s;">
+            ${pill.label}
+            <button class="remove-filter" onclick="event.preventDefault(); (${pill.remove.toString()})();" aria-label="Quitar filtro">
+                ×
+            </button>
+        </div>
+    `).join('');
 }
 
 function mostrarZonaActiva(zona) {
-    const select = document.getElementById('filtro-zona');
-    const contenedor = select?.parentElement;
-    if (!contenedor) return;
-
-    const anterior = contenedor.querySelector('.zona-badge-activa');
-    anterior?.remove();
-
-    if (zona && zona !== 'todas') {
-        const badge = document.createElement('div');
-        badge.className = 'zona-badge-activa';
-        badge.innerHTML = `
-            <i class="fas fa-map-marker-alt"></i>
-            ${i18n.t('zone.' + zona, zona)}
-            <i class="fas fa-times"></i>
-        `;
-        badge.addEventListener('click', () => {
-            document.getElementById('filtro-zona').value = 'todas';
-            applyFilters();
-        });
-        contenedor.appendChild(badge);
-    }
+    // Esta función ya no es necesaria con las active pills, pero la mantenemos por compatibilidad
 }
 
 function actualizarContadorFiltros() {
-    const fab = document.getElementById('fab-filters');
+    const badge = document.getElementById('filtros-count-badge');
+    if (!badge) return;
+
     let count = 0;
 
     const zona = document.getElementById('filtro-zona')?.value;
@@ -1464,16 +1455,11 @@ function actualizarContadorFiltros() {
     const search = document.getElementById('search')?.value;
     if (search && search.trim()) count++;
 
-    let badge = fab.querySelector('.filtros-count');
     if (count > 0) {
-        if (!badge) {
-            badge = document.createElement('span');
-            badge.className = 'filtros-count';
-            fab.appendChild(badge);
-        }
         badge.textContent = count;
+        badge.style.display = 'flex';
     } else {
-        badge?.remove();
+        badge.style.display = 'none';
     }
 }
 
@@ -1496,9 +1482,49 @@ function clearFilters() {
         selectAllCb.indeterminate = false;
     }
     
+    // NUEVO: Limpiar quick filters
+    document.querySelectorAll('.quick-filter').forEach(btn => btn.classList.remove('active'));
+    
     applyFilters();
 }
 
+// NUEVO: Quick Filters
+function initQuickFilters() {
+    const quickFilters = document.querySelectorAll('.quick-filter');
+    
+    quickFilters.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filter = btn.dataset.filter;
+            const isActive = btn.classList.contains('active');
+            
+            // Toggle active state
+            btn.classList.toggle('active');
+            
+            // Apply corresponding filter
+            switch(filter) {
+                case 'hoy':
+                    document.getElementById('filtro-fecha').value = isActive ? 'todos' : 'hoy';
+                    break;
+                case 'finde':
+                    document.getElementById('filtro-fecha').value = isActive ? 'todos' : 'finde';
+                    break;
+                case 'gratis':
+                    document.querySelectorAll('.chip input[value="pago"]').forEach(cb => {
+                        cb.checked = isActive;
+                    });
+                    break;
+                case 'infantil':
+                    const infantilCb = document.querySelector('.chip input[value="infantil"]');
+                    if (infantilCb) infantilCb.checked = !isActive;
+                    break;
+            }
+            
+            applyFilters();
+        });
+    });
+}
+
+// ===== SLIDERS =====
 function initSliderPrecio() {
     const slider = document.getElementById('filtro-precio-max');
     const label = document.getElementById('precio-valor-label');
@@ -1522,6 +1548,623 @@ function initSliderPrecio() {
     actualizarSlider();
 }
 
+function initDistanceFilter() {
+    const slider = document.getElementById('filtro-distancia');
+    const label = document.getElementById('distancia-valor-label');
+    const section = document.getElementById('distance-filter-section');
+    const info = document.getElementById('distancia-info');
+    
+    if (!slider || !label || !section) return;
+
+    function updateDistanceFilterVisibility() {
+        if (userLocation) {
+            section.style.display = 'block';
+            info.classList.add('success');
+            info.innerHTML = '<i class="fas fa-check-circle"></i> Filtrando eventos cercanos';
+        } else {
+            section.style.display = 'none';
+        }
+    }
+
+    function actualizarSlider() {
+        const val = parseInt(slider.value);
+        maxDistance = val;
+        slider.style.setProperty('--pct', ((val - 1) / 19 * 100) + '%');
+        label.textContent = `${val} km`;
+        
+        if (userLocation) {
+            updateDistanceCircle();
+            applyFilters();
+            
+            const count = currentFilteredEvents.length;
+            info.innerHTML = `<i class="fas fa-check-circle"></i> ${count} ${count === 1 ? 'evento' : 'eventos'} a menos de ${val} km`;
+        }
+    }
+
+    slider.addEventListener('input', actualizarSlider);
+    
+    updateDistanceFilterVisibility();
+    actualizarSlider();
+    
+    window.addEventListener('geolocationChanged', updateDistanceFilterVisibility);
+}
+
+function updateDistanceCircle() {
+    if (distanceCircle) {
+        map.removeLayer(distanceCircle);
+        distanceCircle = null;
+    }
+    
+    if (!userLocation) return;
+    
+    distanceCircle = L.circle([userLocation.lat, userLocation.lng], {
+        color: '#0A84FF',
+        fillColor: '#0A84FF',
+        fillOpacity: 0.1,
+        radius: maxDistance * 1000,
+        weight: 2,
+        dashArray: '5, 5',
+        className: 'distance-circle'
+    }).addTo(map);
+}
+
+function isEventInDistance(evento) {
+    if (!userLocation) return true;
+    
+    const distancia = calcularDistancia(
+        userLocation.lat, 
+        userLocation.lng, 
+        evento.lat, 
+        evento.lng
+    );
+    
+    return distancia <= maxDistance;
+}
+
+// ===== GEOLOCALIZACIÓN =====
+function initGeolocate() {
+    const btn = document.getElementById('btn-geolocate');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+        if (btn.classList.contains('active')) {
+            desactivarGeolocalizacion();
+            return;
+        }
+        if (!navigator.geolocation) {
+            mostrarToast('Tu navegador no soporta geolocalización', 'error');
+            return;
+        }
+        btn.classList.add('loading');
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+        mostrarToast('📍 Buscando tu ubicación...');
+        
+        navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError, {
+            enableHighAccuracy: true, timeout: 8000, maximumAge: 60000
+        });
+    });
+}
+
+function onGeoSuccess(position) {
+    const { latitude, longitude } = position.coords;
+    const btn = document.getElementById('btn-geolocate');
+    
+    userLocation = { lat: latitude, lng: longitude };
+    
+    btn.classList.remove('loading');
+    btn.classList.add('active');
+    btn.innerHTML = '<i class="fas fa-location-arrow"></i>';
+    btn.setAttribute('aria-label', 'Desactivar ubicación');
+    
+    map.setView([latitude, longitude], 14);
+    
+    colocarMarkerUsuario(latitude, longitude);
+    
+    updateDistanceCircle();
+    
+    window.dispatchEvent(new Event('geolocationChanged'));
+    
+    displayEvents(currentFilteredEvents.length ? currentFilteredEvents : allEvents);
+    displayLugares(currentFilteredLugares.length ? currentFilteredLugares : allLugares);
+    
+    applyFilters();
+    
+    mostrarToast('✅ Ubicación encontrada', 'success');
+    
+    // NUEVO: Haptic feedback
+    if ('vibrate' in navigator) {
+        navigator.vibrate(100);
+    }
+}
+
+function onGeoError(error) {
+    const btn = document.getElementById('btn-geolocate');
+    btn.classList.remove('loading');
+    btn.innerHTML = '<i class="fas fa-location-arrow"></i>';
+    
+    const mensajes = {
+        1: '❌ Permiso denegado',
+        2: '❌ Posición no disponible',
+        3: '❌ Tiempo de espera agotado'
+    };
+    
+    mostrarToast(mensajes[error.code] || '❌ Error desconocido', 'error');
+}
+
+function colocarMarkerUsuario(lat, lng) {
+    if (userMarker) map.removeLayer(userMarker);
+    const icon = L.divIcon({
+        html: '<div class="user-marker"></div>',
+        className: '',
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+    });
+    userMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 })
+        .bindPopup('<div class="popup-evento"><h3>📍 Tu ubicación</h3><p>Estás aquí</p></div>')
+        .addTo(map);
+}
+
+function desactivarGeolocalizacion() {
+    const btn = document.getElementById('btn-geolocate');
+    
+    btn.classList.remove('active');
+    btn.innerHTML = '<i class="fas fa-location-arrow"></i>';
+    btn.setAttribute('aria-label', 'Activar mi ubicación');
+    
+    if (userMarker) {
+        map.removeLayer(userMarker);
+        userMarker = null;
+    }
+    
+    if (distanceCircle) {
+        map.removeLayer(distanceCircle);
+        distanceCircle = null;
+    }
+    
+    userLocation = null;
+    
+    window.dispatchEvent(new Event('geolocationChanged'));
+    
+    map.setView([40.4168, -3.7038], 12);
+    
+    displayEvents(allEvents);
+    displayLugares(allLugares);
+    
+    applyFilters();
+    
+    mostrarToast('📍 Geolocalización desactivada');
+}
+
+// ===== TOAST CON UNDO (NUEVO) =====
+let currentUndoCallback = null;
+
+function mostrarToastConUndo(mensaje, undoCallback, tipo = 'normal') {
+    document.querySelector('.geo-toast')?.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = `geo-toast ${tipo === 'error' ? 'error' : tipo === 'success' ? 'success' : ''}`;
+    
+    if (undoCallback) {
+        toast.innerHTML = `
+            <span>${mensaje}</span>
+            <button onclick="ejecutarUndo()" style="background:none;border:none;color:inherit;font-weight:700;margin-left:12px;cursor:pointer;text-decoration:underline;">
+                DESHACER
+            </button>
+        `;
+        currentUndoCallback = undoCallback;
+    } else {
+        toast.textContent = mensaje;
+    }
+    
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add('visible'), 10);
+    
+    setTimeout(() => {
+        toast.classList.remove('visible');
+        setTimeout(() => {
+            toast.remove();
+            currentUndoCallback = null;
+        }, 300);
+    }, 5000);
+}
+
+function ejecutarUndo() {
+    if (currentUndoCallback) {
+        currentUndoCallback();
+        document.querySelector('.geo-toast')?.remove();
+        currentUndoCallback = null;
+    }
+}
+
+function mostrarToast(mensaje, tipo = 'normal') {
+    mostrarToastConUndo(mensaje, null, tipo);
+}
+
+// ===== HELPERS DE DISTANCIA =====
+function calcularDistancia(lat1, lng1, lat2, lng2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function formatearDistancia(km) {
+    return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
+}
+
+function getDistanciaHTML(evento) {
+    return getDistanciaHTMLCoords(evento.lat, evento.lng);
+}
+
+function getDistanciaHTMLCoords(lat, lng) {
+    if (!userLocation) return '';
+    const distancia = calcularDistancia(userLocation.lat, userLocation.lng, lat, lng);
+    const texto = formatearDistancia(distancia);
+    const color = distancia < 1 ? '#30D158' : distancia < 5 ? '#FF9F0A' : '#FF453A';
+    return `<span class="distancia-badge" style="color:${color}">
+        <i class="fas fa-walking"></i> ${texto}
+    </span>`;
+}
+
+// ===== ESTADÍSTICAS =====
+function actualizarEstadisticas(eventos) {
+    const stats = {
+        concierto: 0, fiesta: 0, mercado: 0,
+        cultural: 0, gastronomia: 0,
+        deporte: 0, infantil: 0, gratis: 0
+    };
+    eventos.forEach(evento => {
+        if (stats[evento.tipo] !== undefined) stats[evento.tipo]++;
+        if (evento.precio === 'gratis') stats.gratis++;
+    });
+    animarContador('stat-conciertos', stats.concierto);
+    animarContador('stat-fiestas', stats.fiesta);
+    animarContador('stat-mercados', stats.mercado);
+    animarContador('stat-cultural', stats.cultural);
+    animarContador('stat-gastronomia', stats.gastronomia);
+    animarContador('stat-deporte', stats.deporte);
+    animarContador('stat-infantil', stats.infantil);
+    animarContador('stat-gratis', stats.gratis);
+}
+
+function animarContador(elementId, valorFinal) {
+    const elemento = document.getElementById(elementId);
+    if (!elemento) return;
+    const duracion = 1000;
+    const pasos = 60;
+    const incremento = valorFinal / pasos;
+    let valorActual = 0;
+    const intervalo = setInterval(() => {
+        valorActual += incremento;
+        if (valorActual >= valorFinal) {
+            elemento.textContent = valorFinal;
+            clearInterval(intervalo);
+        } else {
+            elemento.textContent = Math.floor(valorActual);
+        }
+    }, duracion / pasos);
+}
+
+function updateCounter(count) {
+    const counter = document.getElementById('event-count');
+    if (counter) counter.textContent = count;
+}
+
+// ===== BANNER HOY =====
+function iniciarBannerHoy() {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const eventosHoy = allEvents.filter(e => {
+        const fechaInicio = new Date(e.fecha + 'T00:00:00');
+        const fechaFin = e.fecha_fin ? new Date(e.fecha_fin + 'T00:00:00') : fechaInicio;
+        return fechaInicio <= hoy && fechaFin >= hoy;
+    });
+    const badge = document.getElementById('hoy-badge');
+    const count = document.getElementById('hoy-badge-count');
+    if (eventosHoy.length === 0) {
+        if (badge) badge.style.display = 'none';
+        return;
+    }
+    if (count) count.textContent = eventosHoy.length;
+    if (badge) {
+        badge.style.display = 'flex';
+        badge.addEventListener('click', () => {
+            document.getElementById('filtro-fecha').value = 'hoy';
+            applyFilters();
+            const txt = `${eventosHoy.length} eventos hoy en Madrid`;
+            mostrarToast(txt);
+        });
+    }
+}
+
+// ===== CHARTS =====
+function initCharts() {
+    Object.values(charts).forEach(chart => chart?.destroy());
+    
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const textColor = isDark ? '#EBEBF5' : '#3A3A3C';
+    const gridColor = isDark ? '#2C2C2E' : '#E5E5EA';
+    
+    Chart.defaults.color = textColor;
+    Chart.defaults.borderColor = gridColor;
+    
+    const tiposData = {
+        labels: [
+            i18n.t('stats.concerts'), 
+            i18n.t('stats.parties'), 
+            i18n.t('stats.markets'), 
+            i18n.t('stats.cultural'), 
+            i18n.t('stats.gastro'), 
+            i18n.t('stats.sports'), 
+            i18n.t('stats.kids')
+        ],
+        datasets: [{
+            label: 'Eventos',
+            data: [
+                currentFilteredEvents.filter(e => e.tipo === 'concierto').length,
+                currentFilteredEvents.filter(e => e.tipo === 'fiesta').length,
+                currentFilteredEvents.filter(e => e.tipo === 'mercado').length,
+                currentFilteredEvents.filter(e => e.tipo === 'cultural').length,
+                currentFilteredEvents.filter(e => e.tipo === 'gastronomia').length,
+                currentFilteredEvents.filter(e => e.tipo === 'deporte').length,
+                currentFilteredEvents.filter(e => e.tipo === 'infantil').length,
+            ],
+            backgroundColor: [
+                colors.concierto,
+                colors.fiesta,
+                colors.mercado,
+                colors.cultural,
+                colors.gastronomia,
+                colors.deporte,
+                colors.infantil
+            ]
+        }]
+    };
+    
+    const ctxTipos = document.getElementById('chart-tipos');
+    if (ctxTipos) {
+        charts.tipos = new Chart(ctxTipos, {
+            type: 'doughnut',
+            data: tiposData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+    
+    const zonasCounts = {};
+    currentFilteredEvents.forEach(e => {
+        const zona = getZonaEvento(e);
+        zonasCounts[zona] = (zonasCounts[zona] || 0) + 1;
+    });
+    
+    const topZonas = Object.entries(zonasCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+    
+    const zonasData = {
+        labels: topZonas.map(z => i18n.t('zone.' + z[0], z[0])),
+        datasets: [{
+            label: 'Eventos',
+            data: topZonas.map(z => z[1]),
+            backgroundColor: '#0A84FF',
+            borderColor: '#0A84FF',
+            borderWidth: 1
+        }]
+    };
+    
+    const ctxZonas = document.getElementById('chart-zonas');
+    if (ctxZonas) {
+        charts.zonas = new Chart(ctxZonas, {
+            type: 'bar',
+            data: zonasData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const timelineData = [];
+    const timelineLabels = [];
+    
+    for (let i = 0; i < 30; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        
+        const count = currentFilteredEvents.filter(e => {
+            const eventStart = new Date(e.fecha);
+            const eventEnd = e.fecha_fin ? new Date(e.fecha_fin) : eventStart;
+            eventStart.setHours(0, 0, 0, 0);
+            eventEnd.setHours(0, 0, 0, 0);
+            return date >= eventStart && date <= eventEnd;
+        }).length;
+        
+        timelineLabels.push(date.getDate() + '/' + (date.getMonth() + 1));
+        timelineData.push(count);
+    }
+    
+    const ctxTimeline = document.getElementById('chart-timeline');
+    if (ctxTimeline) {
+        charts.timeline = new Chart(ctxTimeline, {
+            type: 'line',
+            data: {
+                labels: timelineLabels,
+                datasets: [{
+                    label: 'Eventos activos',
+                    data: timelineData,
+                    borderColor: '#0A84FF',
+                    backgroundColor: 'rgba(10, 132, 255, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// ===== CALENDARIO =====
+function renderCalendar() {
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    
+    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const monthYearEl = document.getElementById('calendar-month-year');
+    if (monthYearEl) {
+        monthYearEl.textContent = `${monthNames[month]} ${year}`;
+    }
+    
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    
+    let startDay = firstDay.getDay() - 1;
+    if (startDay === -1) startDay = 6;
+    
+    const daysInMonth = lastDay.getDate();
+    const prevMonthDays = new Date(year, month, 0).getDate();
+    
+    const grid = document.getElementById('calendar-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    for (let i = startDay - 1; i >= 0; i--) {
+        const day = prevMonthDays - i;
+        const cell = createCalendarDay(day, month - 1, year, true);
+        grid.appendChild(cell);
+    }
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+        const cell = createCalendarDay(day, month, year, false);
+        grid.appendChild(cell);
+    }
+    
+    const remainingCells = 42 - (startDay + daysInMonth);
+    for (let day = 1; day <= remainingCells; day++) {
+        const cell = createCalendarDay(day, month + 1, year, true);
+        grid.appendChild(cell);
+    }
+}
+
+function createCalendarDay(day, month, year, isOtherMonth) {
+    const cell = document.createElement('div');
+    cell.className = 'calendar-day';
+    cell.setAttribute('role', 'button');
+    cell.setAttribute('tabindex', '0');
+    
+    if (isOtherMonth) cell.classList.add('other-month');
+    
+    const date = new Date(year, month, day);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (date.toDateString() === today.toDateString()) {
+        cell.classList.add('today');
+    }
+    
+    const eventsOnDay = allEvents.filter(e => {
+        const eventStart = new Date(e.fecha);
+        const eventEnd = e.fecha_fin ? new Date(e.fecha_fin) : eventStart;
+        eventStart.setHours(0, 0, 0, 0);
+        eventEnd.setHours(0, 0, 0, 0);
+        return date >= eventStart && date <= eventEnd;
+    });
+    
+    cell.innerHTML = `
+        <div class="calendar-day-number">${day}</div>
+        ${eventsOnDay.length > 0 ? `
+            <div class="calendar-day-events-count">
+                <i class="fas fa-circle" style="font-size:4px;"></i>
+                ${eventsOnDay.length} ${eventsOnDay.length === 1 ? 'evento' : 'eventos'}
+            </div>
+            <div class="calendar-day-dots">
+                ${eventsOnDay.slice(0, 5).map(e => 
+                    `<div class="calendar-dot ${e.tipo}"></div>`
+                ).join('')}
+            </div>
+        ` : ''}
+    `;
+    
+    if (!isOtherMonth && eventsOnDay.length > 0) {
+        cell.addEventListener('click', () => showDayEvents(date, eventsOnDay));
+        cell.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') showDayEvents(date, eventsOnDay);
+        });
+    }
+    
+    return cell;
+}
+
+function showDayEvents(date, events) {
+    const container = document.getElementById('calendar-day-events');
+    const title = document.getElementById('calendar-day-title');
+    const list = document.getElementById('calendar-day-list');
+    
+    if (!container || !title || !list) return;
+    
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    title.textContent = date.toLocaleDateString('es-ES', options);
+    
+    list.innerHTML = events.map(evento => {
+        const emoji = icons[evento.tipo] || '📍';
+        const precioBadge = evento.precio === 'gratis'
+            ? `<span class="event-badge gratis">💚 ${i18n.t('badge.free')}</span>`
+            : `<span class="event-badge pago">💰 ${evento.precio_desde ? i18n.t('badge.from') + ' ' + evento.precio_desde : i18n.t('badge.paid')}</span>`;
+        
+        return renderEventCard(evento);
+    }).join('');
+    
+    container.style.display = 'block';
+    container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    
+    document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+    event.currentTarget?.classList.add('selected');
+}
+
+// ===== HELPERS DE FORMATEO =====
 function formatDate(dateStr) {
     const date = new Date(dateStr + 'T00:00:00');
     return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
@@ -1578,312 +2221,6 @@ function limpiarDescripcion(descripcion, maxLength = 150) {
     return texto;
 }
 
-function calcularDistancia(lat1, lng1, lat2, lng2) {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLng = (lng2 - lng1) * Math.PI / 180;
-    const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLng / 2) * Math.sin(dLng / 2);
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function formatearDistancia(km) {
-    return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
-}
-
-function getDistanciaHTML(evento) {
-    return getDistanciaHTMLCoords(evento.lat, evento.lng);
-}
-
-function getDistanciaHTMLCoords(lat, lng) {
-    if (!userLocation) return '';
-    const distancia = calcularDistancia(userLocation.lat, userLocation.lng, lat, lng);
-    const texto = formatearDistancia(distancia);
-    const color = distancia < 1 ? '#059669' : distancia < 5 ? '#D97706' : '#DC2626';
-    return `<span class="distancia-badge" style="color:${color}">
-        <i class="fas fa-walking"></i> ${texto}
-    </span>`;
-}
-
-function initGeolocate() {
-    const btn = document.getElementById('btn-geolocate');
-    if (!btn) return;
-
-    btn.addEventListener('click', () => {
-        if (btn.classList.contains('active')) {
-            desactivarGeolocalizacion();
-            return;
-        }
-        if (!navigator.geolocation) {
-            mostrarToast('Tu navegador no soporta geolocalización', 'error');
-            return;
-        }
-        btn.classList.add('loading');
-        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
-        mostrarToast('📍 Buscando tu ubicación...');
-        navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError, {
-            enableHighAccuracy: true, timeout: 8000, maximumAge: 60000
-        });
-    });
-}
-
-function initDistanceFilter() {
-    const slider = document.getElementById('filtro-distancia');
-    const label = document.getElementById('distancia-valor-label');
-    const section = document.getElementById('distance-filter-section');
-    const info = document.getElementById('distancia-info');
-    
-    if (!slider || !label || !section) return;
-
-    function updateDistanceFilterVisibility() {
-        if (userLocation) {
-            section.style.display = 'block';
-            info.classList.add('success');
-            info.innerHTML = '<i class="fas fa-check-circle"></i> Filtrando eventos cercanos';
-        } else {
-            section.style.display = 'none';
-        }
-    }
-
-    function actualizarSlider() {
-        const val = parseInt(slider.value);
-        maxDistance = val;
-        slider.style.setProperty('--pct', ((val - 1) / 19 * 100) + '%');
-        label.textContent = `${val} km`;
-        
-        if (userLocation) {
-            updateDistanceCircle();
-            applyFilters();
-            
-            const count = currentFilteredEvents.length;
-            info.innerHTML = `<i class="fas fa-check-circle"></i> ${count} ${count === 1 ? 'evento' : 'eventos'} a menos de ${val} km`;
-        }
-    }
-
-    slider.addEventListener('input', actualizarSlider);
-    
-    updateDistanceFilterVisibility();
-    actualizarSlider();
-    
-    window.addEventListener('geolocationChanged', updateDistanceFilterVisibility);
-}
-
-function updateDistanceCircle() {
-    if (distanceCircle) {
-        map.removeLayer(distanceCircle);
-        distanceCircle = null;
-    }
-    
-    if (!userLocation) return;
-    
-    distanceCircle = L.circle([userLocation.lat, userLocation.lng], {
-        color: '#3b82f6',
-        fillColor: '#3b82f6',
-        fillOpacity: 0.1,
-        radius: maxDistance * 1000,
-        weight: 2,
-        dashArray: '5, 5',
-        className: 'distance-circle'
-    }).addTo(map);
-}
-
-function isEventInDistance(evento) {
-    if (!userLocation) return true;
-    
-    const distancia = calcularDistancia(
-        userLocation.lat, 
-        userLocation.lng, 
-        evento.lat, 
-        evento.lng
-    );
-    
-    return distancia <= maxDistance;
-}
-
-function onGeoSuccess(position) {
-    const { latitude, longitude } = position.coords;
-    const btn = document.getElementById('btn-geolocate');
-    
-    userLocation = { lat: latitude, lng: longitude };
-    
-    btn.classList.remove('loading');
-    btn.classList.add('active');
-    btn.innerHTML = '<i class="fas fa-location-arrow"></i>';
-    
-    map.setView([latitude, longitude], 14);
-    
-    colocarMarkerUsuario(latitude, longitude);
-    
-    updateDistanceCircle();
-    
-    window.dispatchEvent(new Event('geolocationChanged'));
-    
-    displayEvents(currentFilteredEvents.length ? currentFilteredEvents : allEvents);
-    displayLugares(currentFilteredLugares.length ? currentFilteredLugares : allLugares);
-    
-    applyFilters();
-    
-    mostrarToast('✅ Ubicación encontrada');
-}
-
-function onGeoError(error) {
-    const btn = document.getElementById('btn-geolocate');
-    btn.classList.remove('loading');
-    btn.innerHTML = '<i class="fas fa-location-arrow"></i>';
-    
-    const mensajes = {
-        1: '❌ Permiso denegado',
-        2: '❌ Posición no disponible',
-        3: '❌ Tiempo de espera agotado'
-    };
-    
-    mostrarToast(mensajes[error.code] || '❌ Error desconocido', 'error');
-}
-
-function colocarMarkerUsuario(lat, lng) {
-    if (userMarker) map.removeLayer(userMarker);
-    const icon = L.divIcon({
-        html: '<div class="user-marker"></div>',
-        className: '',
-        iconSize: [20, 20],
-        iconAnchor: [10, 10]
-    });
-    userMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 })
-        .bindPopup('<div class="popup-evento"><h3>📍 Tu ubicación</h3><p>Estás aquí</p></div>')
-        .addTo(map);
-}
-
-function desactivarGeolocalizacion() {
-    const btn = document.getElementById('btn-geolocate');
-    
-    btn.classList.remove('active');
-    btn.innerHTML = '<i class="fas fa-location-arrow"></i>';
-    
-    if (userMarker) {
-        map.removeLayer(userMarker);
-        userMarker = null;
-    }
-    
-    if (distanceCircle) {
-        map.removeLayer(distanceCircle);
-        distanceCircle = null;
-    }
-    
-    userLocation = null;
-    
-    window.dispatchEvent(new Event('geolocationChanged'));
-    
-    map.setView([40.4168, -3.7038], 12);
-    
-    displayEvents(allEvents);
-    displayLugares(allLugares);
-    
-    applyFilters();
-    
-    mostrarToast('📍 Geolocalización desactivada');
-}
-
-function mostrarToast(mensaje, tipo = 'normal') {
-    document.querySelector('.geo-toast')?.remove();
-    const toast = document.createElement('div');
-    toast.className = `geo-toast ${tipo === 'error' ? 'error' : ''}`;
-    toast.textContent = mensaje;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.classList.add('visible'), 10);
-    setTimeout(() => {
-        toast.classList.remove('visible');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-function actualizarEstadisticas(eventos) {
-    const stats = {
-        concierto: 0, fiesta: 0, mercado: 0,
-        cultural: 0, gastronomia: 0,
-        deporte: 0, infantil: 0, gratis: 0
-    };
-    eventos.forEach(evento => {
-        if (stats[evento.tipo] !== undefined) stats[evento.tipo]++;
-        if (evento.precio === 'gratis') stats.gratis++;
-    });
-    animarContador('stat-conciertos', stats.concierto);
-    animarContador('stat-fiestas', stats.fiesta);
-    animarContador('stat-mercados', stats.mercado);
-    animarContador('stat-cultural', stats.cultural);
-    animarContador('stat-gastronomia', stats.gastronomia);
-    animarContador('stat-deporte', stats.deporte);
-    animarContador('stat-infantil', stats.infantil);
-    animarContador('stat-gratis', stats.gratis);
-}
-
-function animarContador(elementId, valorFinal) {
-    const elemento = document.getElementById(elementId);
-    if (!elemento) return;
-    const duracion = 1000;
-    const pasos = 60;
-    const incremento = valorFinal / pasos;
-    let valorActual = 0;
-    const intervalo = setInterval(() => {
-        valorActual += incremento;
-        if (valorActual >= valorFinal) {
-            elemento.textContent = valorFinal;
-            clearInterval(intervalo);
-        } else {
-            elemento.textContent = Math.floor(valorActual);
-        }
-    }, duracion / pasos);
-}
-
-function updateCounter(count) {
-    document.getElementById('event-count').textContent = count;
-}
-
-function iniciarBannerHoy() {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-    const eventosHoy = allEvents.filter(e => {
-        const fechaInicio = new Date(e.fecha + 'T00:00:00');
-        const fechaFin = e.fecha_fin ? new Date(e.fecha_fin + 'T00:00:00') : fechaInicio;
-        return fechaInicio <= hoy && fechaFin >= hoy;
-    });
-    const badge = document.getElementById('hoy-badge');
-    const count = document.getElementById('hoy-badge-count');
-    if (eventosHoy.length === 0) {
-        badge.style.display = 'none';
-        return;
-    }
-    count.textContent = eventosHoy.length;
-    badge.style.display = 'flex';
-    badge.addEventListener('click', () => {
-        document.getElementById('filtro-fecha').value = 'hoy';
-        applyFilters();
-        const txt = `${eventosHoy.length} eventos hoy en Madrid`;
-        mostrarToast(txt);
-    });
-}
-
-function generarLinkCalendar(evento) {
-    const formatearFechaCalendar = (fechaStr) => {
-        if (!fechaStr) return null;
-        const fecha = new Date(fechaStr + 'T00:00:00');
-        if (isNaN(fecha.getTime())) return null;
-        return fecha.toISOString().replace(/-|:|\.d{3}/g, '').slice(0, 8);
-    };
-    const inicio = formatearFechaCalendar(evento.fecha);
-    if (!inicio) return null;
-    const fin = formatearFechaCalendar(evento.fecha_fin) || inicio;
-    const params = new URLSearchParams({
-        action: 'TEMPLATE',
-        text: evento.nombre,
-        dates: `${inicio}/${fin}`,
-        details: `${evento.descripcion || ''}\n\nMás info: ${evento.url || ''}`,
-        location: evento.lugar || 'Madrid'
-    });
-    return `https://calendar.google.com/calendar/render?${params.toString()}`;
-}
-
 function ocultarLoader(numEventos) {
     const loader = document.getElementById('loader');
     const count = document.getElementById('loader-count');
@@ -1893,6 +2230,7 @@ function ocultarLoader(numEventos) {
     }, 600);
 }
 
+// ===== COLLAPSIBLE GROUPS =====
 function initCollapseGroups() {
     const headers = document.querySelectorAll('.filter-group-header');
     
@@ -1903,13 +2241,17 @@ function initCollapseGroups() {
         if (!content) return;
         
         header.addEventListener('click', () => {
+            const isCollapsed = content.classList.contains('collapsed');
             content.classList.toggle('collapsed');
             const icon = header.querySelector('i');
             icon.classList.toggle('collapsed');
+            
+            header.setAttribute('aria-expanded', isCollapsed ? 'true' : 'false');
         });
     });
 }
 
+// ===== LUGARES SELECT ALL =====
 function initLugaresSelectAll() {
     const selectAllCb = document.getElementById('lugares-select-all');
     const categoriaCbs = document.querySelectorAll('.lugar-categoria-cb');
@@ -1943,6 +2285,7 @@ function initLugaresSelectAll() {
     });
 }
 
+// ===== LUGARES LIST TOGGLE =====
 function initLugaresListToggle() {
     const toggleBtn = document.getElementById('lugares-toggle-btn');
     const lugaresHeader = document.getElementById('lugares-header');
@@ -1954,14 +2297,17 @@ function initLugaresListToggle() {
         
         if (mostrarLugaresEnLista) {
             toggleBtn.querySelector('i').className = 'fas fa-chevron-up';
+            lugaresHeader.setAttribute('aria-expanded', 'true');
             renderLugaresList(currentFilteredLugares);
         } else {
             toggleBtn.querySelector('i').className = 'fas fa-chevron-down';
+            lugaresHeader.setAttribute('aria-expanded', 'false');
             document.getElementById('lugares-list').innerHTML = '';
         }
     });
 }
 
+// ===== SETTINGS PANEL =====
 function initSettingsPanel() {
     const settingsToggle = document.getElementById('settings-toggle');
     const settingsPanel = document.getElementById('settings-panel');
@@ -1971,10 +2317,12 @@ function initSettingsPanel() {
     
     settingsToggle.addEventListener('click', () => {
         settingsPanel.classList.add('active');
+        settingsPanel.setAttribute('aria-modal', 'true');
     });
     
     closeSettings.addEventListener('click', () => {
         settingsPanel.classList.remove('active');
+        settingsPanel.setAttribute('aria-modal', 'false');
     });
     
     const themeToggle = document.getElementById('theme-toggle');
@@ -2012,10 +2360,6 @@ function initSettingsPanel() {
                 ? '♿ Alto contraste activado' 
                 : '♿ Alto contraste desactivado';
             mostrarToast(mensaje);
-            
-            if (document.getElementById('stats-panel').classList.contains('active')) {
-                initCharts();
-            }
         });
     }
     
@@ -2072,10 +2416,14 @@ function initSettingsPanel() {
     if (translateToggle) {
         const saved = localStorage.getItem('translateEvents') === 'true';
         translateToggle.checked = saved;
-        i18n.translateEvents = saved;
+        if (typeof i18n !== 'undefined') {
+            i18n.translateEvents = saved;
+        }
         
         translateToggle.addEventListener('change', (e) => {
-            i18n.translateEvents = e.target.checked;
+            if (typeof i18n !== 'undefined') {
+                i18n.translateEvents = e.target.checked;
+            }
             localStorage.setItem('translateEvents', e.target.checked);
             
             const mensaje = i18n.t(e.target.checked ? 'toast.translate_on' : 'toast.translate_off');
@@ -2127,6 +2475,178 @@ function initSettingsPanel() {
     }
 }
 
+// NUEVO: View Density Toggle
+function initViewDensity() {
+    const comfortableBtn = document.getElementById('density-comfortable');
+    const compactBtn = document.getElementById('density-compact');
+    
+    if (!comfortableBtn || !compactBtn) return;
+    
+    comfortableBtn.addEventListener('click', () => {
+        currentDensity = 'comfortable';
+        comfortableBtn.classList.add('active');
+        compactBtn.classList.remove('active');
+        comfortableBtn.setAttribute('aria-pressed', 'true');
+        compactBtn.setAttribute('aria-pressed', 'false');
+        renderListView(currentFilteredEvents);
+    });
+    
+    compactBtn.addEventListener('click', () => {
+        currentDensity = 'compact';
+        compactBtn.classList.add('active');
+        comfortableBtn.classList.remove('active');
+        compactBtn.setAttribute('aria-pressed', 'true');
+        comfortableBtn.setAttribute('aria-pressed', 'false');
+        renderListView(currentFilteredEvents);
+    });
+}
+
+// NUEVO: Infinite Scroll con Intersection Observer
+function initInfiniteScroll() {
+    const sentinel = document.getElementById('scroll-sentinel');
+    if (!sentinel) return;
+    
+    scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !isLoadingMore) {
+                loadMoreEvents();
+            }
+        });
+    }, {
+        rootMargin: '100px'
+    });
+    
+    scrollObserver.observe(sentinel);
+}
+
+function loadMoreEvents() {
+    if (isLoadingMore) return;
+    
+    const totalEvents = currentFilteredEvents.length;
+    const currentlyShown = (currentPage + 1) * eventsPerPage;
+    
+    if (currentlyShown >= totalEvents) return;
+    
+    isLoadingMore = true;
+    currentPage++;
+    
+    // NUEVO: Mostrar skeleton mientras carga
+    const skeletonList = document.getElementById('skeleton-list');
+    if (skeletonList) skeletonList.style.display = 'flex';
+    
+    setTimeout(() => {
+        renderListView(currentFilteredEvents);
+        isLoadingMore = false;
+        if (skeletonList) skeletonList.style.display = 'none';
+    }, 300);
+}
+
+// NUEVO: Scroll to Top FAB
+function initScrollToTop() {
+    const fab = document.getElementById('fab-scroll-top');
+    if (!fab) return;
+    
+    const listView = document.getElementById('list-view');
+    if (!listView) return;
+    
+    listView.addEventListener('scroll', () => {
+        if (listView.scrollTop > 500) {
+            fab.classList.add('visible');
+        } else {
+            fab.classList.remove('visible');
+        }
+    });
+    
+    fab.addEventListener('click', () => {
+        listView.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
+
+// NUEVO: Swipe Gestures para cambiar vistas en móvil
+function initSwipeGestures() {
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    const views = ['map', 'list', 'calendar'];
+    let currentViewIndex = 0;
+    
+    document.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    
+    document.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, { passive: true });
+    
+    function handleSwipe() {
+        const swipeThreshold = 100;
+        const diff = touchStartX - touchEndX;
+        
+        if (Math.abs(diff) > swipeThreshold) {
+            currentViewIndex = views.indexOf(currentView);
+            
+            if (diff > 0 && currentViewIndex < views.length - 1) {
+                // Swipe izquierda → siguiente vista
+                switchView(views[currentViewIndex + 1]);
+            } else if (diff < 0 && currentViewIndex > 0) {
+                // Swipe derecha → vista anterior
+                switchView(views[currentViewIndex - 1]);
+            }
+        }
+    }
+}
+
+// NUEVO: Pull to Refresh (solo móvil)
+function initPullToRefresh() {
+    if (window.innerWidth > 640) return;
+    
+    let touchStartY = 0;
+    let touchEndY = 0;
+    let isPulling = false;
+    
+    const listView = document.getElementById('list-view');
+    if (!listView) return;
+    
+    listView.addEventListener('touchstart', e => {
+        if (listView.scrollTop === 0) {
+            touchStartY = e.touches[0].clientY;
+            isPulling = true;
+        }
+    }, { passive: true });
+    
+    listView.addEventListener('touchmove', e => {
+        if (!isPulling) return;
+        touchEndY = e.touches[0].clientY;
+    }, { passive: true });
+    
+    listView.addEventListener('touchend', () => {
+        if (!isPulling) return;
+        
+        const pullDistance = touchEndY - touchStartY;
+        
+        if (pullDistance > 100) {
+            mostrarToast('🔄 Actualizando eventos...');
+            
+            // Haptic feedback
+            if ('vibrate' in navigator) {
+                navigator.vibrate(50);
+            }
+            
+            setTimeout(() => {
+                loadEvents();
+                mostrarToast('✅ Eventos actualizados', 'success');
+            }, 1000);
+        }
+        
+        isPulling = false;
+    });
+}
+
+// ===== INICIALIZACIÓN PRINCIPAL =====
 document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
@@ -2149,67 +2669,143 @@ document.addEventListener('DOMContentLoaded', () => {
     initLugaresSelectAll();
     initLugaresListToggle();
     initSettingsPanel();
+    initQuickFilters(); // NUEVO
+    initViewDensity(); // NUEVO
+    initInfiniteScroll(); // NUEVO
+    initScrollToTop(); // NUEVO
+    initSwipeGestures(); // NUEVO
+    initPullToRefresh(); // NUEVO
 
+    // Paneles laterales
     document.getElementById('fab-filters').addEventListener('click', () => {
         document.getElementById('filters-panel').classList.add('active');
+        document.getElementById('filters-panel').setAttribute('aria-modal', 'true');
     });
+    
     document.getElementById('close-panel').addEventListener('click', () => {
         document.getElementById('filters-panel').classList.remove('active');
+        document.getElementById('filters-panel').setAttribute('aria-modal', 'false');
     });
+    
     document.getElementById('stats-toggle').addEventListener('click', () => {
         document.getElementById('stats-panel').classList.add('active');
+        document.getElementById('stats-panel').setAttribute('aria-modal', 'true');
         setTimeout(() => initCharts(), 100);
     });
+    
     document.getElementById('close-stats').addEventListener('click', () => {
         document.getElementById('stats-panel').classList.remove('active');
+        document.getElementById('stats-panel').setAttribute('aria-modal', 'false');
     });
     
     document.getElementById('favorites-toggle').addEventListener('click', () => {
         document.getElementById('favorites-panel').classList.add('active');
+        document.getElementById('favorites-panel').setAttribute('aria-modal', 'true');
     });
+    
     document.getElementById('close-favorites').addEventListener('click', () => {
         document.getElementById('favorites-panel').classList.remove('active');
+        document.getElementById('favorites-panel').setAttribute('aria-modal', 'false');
     });
 
-    document.getElementById('btn-clear').addEventListener('click', clearFilters);
-    document.getElementById('view-map-btn').addEventListener('click', () => switchView('map'));
-    document.getElementById('view-list-btn').addEventListener('click', () => switchView('list'));
-    document.getElementById('view-calendar-btn').addEventListener('click', () => switchView('calendar'));
-    document.getElementById('btn-toggle-lugares')?.addEventListener('click', toggleLugares);
+    // Botones de vista (desktop)
+    const viewMapBtn = document.getElementById('view-map-btn');
+    const viewListBtn = document.getElementById('view-list-btn');
+    const viewCalendarBtn = document.getElementById('view-calendar-btn');
     
-    document.getElementById('calendar-prev')?.addEventListener('click', () => {
-        currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
-        renderCalendar();
-    });
-    document.getElementById('calendar-next')?.addEventListener('click', () => {
-        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-        renderCalendar();
-    });
+    if (viewMapBtn) viewMapBtn.addEventListener('click', () => switchView('map'));
+    if (viewListBtn) viewListBtn.addEventListener('click', () => switchView('list'));
+    if (viewCalendarBtn) viewCalendarBtn.addEventListener('click', () => switchView('calendar'));
+    
+    // Bottom navigation (móvil)
+    const bottomNavMap = document.getElementById('bottom-nav-map');
+    const bottomNavList = document.getElementById('bottom-nav-list');
+    const bottomNavFavorites = document.getElementById('bottom-nav-favorites');
+    const bottomNavCalendar = document.getElementById('bottom-nav-calendar');
+    const bottomNavSettings = document.getElementById('bottom-nav-settings');
+    
+    if (bottomNavMap) bottomNavMap.addEventListener('click', () => switchView('map'));
+    if (bottomNavList) bottomNavList.addEventListener('click', () => switchView('list'));
+    if (bottomNavCalendar) bottomNavCalendar.addEventListener('click', () => switchView('calendar'));
+    
+    if (bottomNavFavorites) {
+        bottomNavFavorites.addEventListener('click', () => {
+            document.getElementById('favorites-panel').classList.add('active');
+            document.getElementById('favorites-panel').setAttribute('aria-modal', 'true');
+        });
+    }
+    
+    if (bottomNavSettings) {
+        bottomNavSettings.addEventListener('click', () => {
+            document.getElementById('settings-panel').classList.add('active');
+            document.getElementById('settings-panel').setAttribute('aria-modal', 'true');
+        });
+    }
+    
+    // Botón toggle lugares
+    const btnToggleLugares = document.getElementById('btn-toggle-lugares');
+    if (btnToggleLugares) {
+        btnToggleLugares.addEventListener('click', toggleLugares);
+    }
+    
+    // Limpiar filtros
+    document.getElementById('btn-clear').addEventListener('click', clearFilters);
+    
+    // Calendario
+    const calendarPrev = document.getElementById('calendar-prev');
+    const calendarNext = document.getElementById('calendar-next');
+    
+    if (calendarPrev) {
+        calendarPrev.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            renderCalendar();
+        });
+    }
+    
+    if (calendarNext) {
+        calendarNext.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            renderCalendar();
+        });
+    }
 
-    document.getElementById('sort-by').addEventListener('change', e => {
-        currentSort = e.target.value;
-        if (currentSort === 'distance' && !userLocation) {
-            mostrarToast('📍 Activa tu ubicación primero', 'error');
-            e.target.value = 'date';
-            currentSort = 'date';
-            return;
-        }
-        renderListView(currentFilteredEvents);
-        renderLugaresList(currentFilteredLugares);
-    });
+    // Ordenación
+    const sortBy = document.getElementById('sort-by');
+    if (sortBy) {
+        sortBy.addEventListener('change', e => {
+            currentSort = e.target.value;
+            if (currentSort === 'distance' && !userLocation) {
+                mostrarToast('📍 Activa tu ubicación primero', 'error');
+                e.target.value = 'date';
+                currentSort = 'date';
+                return;
+            }
+            currentPage = 0; // Reset infinite scroll
+            renderListView(currentFilteredEvents);
+            renderLugaresList(currentFilteredLugares);
+        });
+    }
 
+    // Búsqueda y filtros
     document.getElementById('search').addEventListener('input', applyFilters);
     document.getElementById('filtro-fecha').addEventListener('change', applyFilters);
-    document.getElementById('filtro-zona')?.addEventListener('change', applyFilters);
+    
+    const filtroZona = document.getElementById('filtro-zona');
+    if (filtroZona) {
+        filtroZona.addEventListener('change', applyFilters);
+    }
+    
     document.querySelectorAll('.chip input').forEach(cb => {
         cb.addEventListener('change', applyFilters);
     });
 
+    // Cerrar paneles con ESC
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
             cerrarModalCompartir();
             document.querySelectorAll('.panel-header .close-panel').forEach(btn => {
-                if (btn.closest('.filters-panel, .stats-panel, .favorites-panel, .settings-panel').classList.contains('active')) {
+                const panel = btn.closest('.filters-panel, .stats-panel, .favorites-panel, .settings-panel');
+                if (panel && panel.classList.contains('active')) {
                     btn.click();
                 }
             });
@@ -2217,6 +2813,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// ===== SERVICE WORKER =====
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/eventos-madrid/sw.js')
