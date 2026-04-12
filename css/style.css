@@ -1162,6 +1162,7 @@ body {
     width: 100%;
     max-width: 360px;
     height: 100vh;
+    height: 100dvh; /* dynamic viewport height en móvil */
     background: var(--bg);
     z-index: var(--z-modal);
     transform: translateX(-100%);
@@ -1169,6 +1170,7 @@ body {
     display: flex;
     flex-direction: column;
     box-shadow: var(--shadow-xl);
+    overflow: hidden; /* 🔧 FIX: evita scroll en el contenedor padre */
 }
 
 .filters-panel { left: 0; }
@@ -1227,6 +1229,10 @@ body {
     flex: 1;
     padding: var(--space-5);
     overflow-y: auto;
+    overflow-x: hidden;
+    /* 🔧 FIX: scroll suave estilo iOS */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
 }
 
 /* ===== FILTROS ===== */
@@ -2366,6 +2372,42 @@ body {
     justify-content: space-between;
     gap: var(--space-4);
     padding: var(--space-4) 0;
+}
+
+.setting-info {
+    flex: 1;
+    min-width: 0;
+    /* 🔧 FIX: garantiza que el texto no sea aplastado por el toggle */
+    padding-right: var(--space-2);
+}
+
+.setting-label {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
+    /* 🔧 FIX: evita que el texto largo rompa el layout */
+    word-break: break-word;
+}
+
+.setting-description {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin: 0;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+/* 🔧 FIX: el toggle nunca se encoge */
+.toggle-switch {
+    position: relative;
+    display: inline-flex;
+    width: 52px;
+    height: 32px;
+    cursor: pointer;
+    flex-shrink: 0; /* nunca se comprime */
 }
 
 .setting-item:not(:last-child) {
