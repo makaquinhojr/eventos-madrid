@@ -24,48 +24,48 @@ html {
     --bg-elevated: #1C1C1E;
     --bg-elevated-2: #2C2C2E;
     --bg-elevated-3: #3A3A3C;
-    
+
     --text: #FFFFFF;
     --text-secondary: #EBEBF5;
     --text-tertiary: #ABABAB;
     --text-quaternary: #6E6E73;
-    
+
     --separator: rgba(84, 84, 88, 0.6);
     --separator-opaque: #38383A;
-    
+
     --accent: #0A84FF;
     --accent-hover: #409CFF;
     --accent-subtle: rgba(10, 132, 255, 0.15);
-    
+
     --green: #30D158;
     --green-subtle: rgba(48, 209, 88, 0.15);
-    
+
     --orange: #FF9F0A;
     --orange-subtle: rgba(255, 159, 10, 0.15);
-    
+
     --red: #FF453A;
     --red-subtle: rgba(255, 69, 58, 0.15);
-    
+
     --purple: #BF5AF2;
     --purple-subtle: rgba(191, 90, 242, 0.15);
-    
+
     --pink: #FF375F;
     --pink-subtle: rgba(255, 55, 95, 0.15);
-    
+
     --yellow: #FFD60A;
     --yellow-subtle: rgba(255, 214, 10, 0.15);
-    
+
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
     --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
-    
+
     --radius-sm: 10px;
     --radius-md: 13px;
     --radius-lg: 20px;
     --radius-xl: 28px;
     --radius-full: 9999px;
-    
+
     --space-1: 4px;
     --space-2: 8px;
     --space-3: 12px;
@@ -75,14 +75,14 @@ html {
     --space-8: 32px;
     --space-10: 40px;
     --space-12: 48px;
-    
+
     --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
     --font-mono: "SF Mono", "Monaco", "Menlo", monospace;
-    
+
     --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
     --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
     --spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    
+
     --z-base: 1;
     --z-elevated: 10;
     --z-sticky: 100;
@@ -98,37 +98,37 @@ html {
     --bg-elevated: #F2F2F7;
     --bg-elevated-2: #E5E5EA;
     --bg-elevated-3: #D1D1D6;
-    
+
     --text: #000000;
     --text-secondary: #3A3A3C;
     --text-tertiary: #6E6E73;
     --text-quaternary: #ABABAB;
-    
+
     --separator: rgba(60, 60, 67, 0.29);
     --separator-opaque: #C6C6C8;
-    
+
     --accent: #007AFF;
     --accent-hover: #0051D5;
     --accent-subtle: rgba(0, 122, 255, 0.1);
-    
+
     --green: #34C759;
     --green-subtle: rgba(52, 199, 89, 0.1);
-    
+
     --orange: #FF9500;
     --orange-subtle: rgba(255, 149, 0, 0.1);
-    
+
     --red: #FF3B30;
     --red-subtle: rgba(255, 59, 48, 0.1);
-    
+
     --purple: #AF52DE;
     --purple-subtle: rgba(175, 82, 222, 0.1);
-    
+
     --pink: #FF2D55;
     --pink-subtle: rgba(255, 45, 85, 0.1);
-    
+
     --yellow: #FFCC00;
     --yellow-subtle: rgba(255, 204, 0, 0.1);
-    
+
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
     --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
     --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
@@ -147,18 +147,12 @@ body {
 }
 
 /* ===== HEADER ===== */
-/*
- * 🔧 FIX: El header necesita más espacio horizontal para alojar
- * el segmented control central. Usamos grid de 3 columnas para
- * alinear logo | nav-center | actions de forma balanceada,
- * igual que lo hace la barra de navegación de macOS.
- */
 .top-bar {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: 52px; /* +8px para acomodar el segmented control */
+    height: 52px;
     background: rgba(28, 28, 30, 0.82);
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
@@ -227,9 +221,7 @@ body {
     transform: scale(1.05);
 }
 
-.hoy-badge:active {
-    transform: scale(0.95);
-}
+.hoy-badge:active { transform: scale(0.95); }
 
 .hoy-badge-dot {
     width: 6px;
@@ -241,7 +233,7 @@ body {
 
 @keyframes pulse-dot {
     0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
+    50%       { opacity: 0.5; transform: scale(0.8); }
 }
 
 .event-counter {
@@ -313,10 +305,6 @@ body {
 }
 
 /* ===== QUICK FILTERS ===== */
-/*
- * 🔧 FIX: Ajustamos top a 60px (altura del nuevo header 52px + 8px gap)
- * para que no solape con el segmented control del header.
- */
 .quick-filters {
     position: fixed;
     top: 60px;
@@ -364,15 +352,9 @@ body {
     box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
 }
 
-.quick-filter:active {
-    transform: scale(0.95);
-}
+.quick-filter:active { transform: scale(0.95); }
 
 /* ===== ACTIVE FILTERS PILLS ===== */
-/*
- * 🔧 FIX: top actualizado para respetar la cadena de alturas:
- * header(52) + quick-filters(~40) + gap(8) = 108px
- */
 .active-filters {
     position: fixed;
     top: 108px;
@@ -387,9 +369,7 @@ body {
     scrollbar-width: none;
 }
 
-.active-filters::-webkit-scrollbar {
-    display: none;
-}
+.active-filters::-webkit-scrollbar { display: none; }
 
 .filter-pill {
     display: inline-flex;
@@ -427,27 +407,12 @@ body {
     transition: all 0.2s var(--ease-out);
 }
 
-.remove-filter:hover {
-    background: var(--red);
-    color: white;
-}
-
-.remove-filter:active {
-    transform: scale(0.9);
-}
+.remove-filter:hover { background: var(--red); color: white; }
+.remove-filter:active { transform: scale(0.9); }
 
 /* ===== VIEW TOGGLE — SEGMENTED CONTROL (DESKTOP) ===== */
-/*
- * 🔧 FIX PRINCIPAL:
- * Antes: display:none en TODAS las resoluciones → nunca visible.
- * Ahora: visible en desktop (≥ 641px), oculto en móvil donde
- *        la bottom-nav cumple la misma función.
- *
- * Posición: columna central del grid del header (justify-self:center)
- * Estilo:   Segmented Control nativo iOS — pill con fondo blur glass.
- */
 .view-toggle {
-    display: flex; /* VISIBLE EN DESKTOP por defecto */
+    display: flex;
     align-items: center;
     justify-content: center;
     justify-self: center;
@@ -456,7 +421,6 @@ body {
     border-radius: var(--radius-full);
     padding: 3px;
     gap: 2px;
-    /* Sin position:fixed — vive dentro del flujo del header grid */
 }
 
 [data-theme="light"] .view-toggle {
@@ -479,7 +443,6 @@ body {
     font-family: var(--font-system);
     white-space: nowrap;
     letter-spacing: -0.2px;
-    position: relative;
 }
 
 .view-btn i {
@@ -492,7 +455,6 @@ body {
     background: var(--bg-elevated-2);
 }
 
-/* Estado activo: pastilla blanca flotante (estilo iOS Segmented Control) */
 .view-btn.active {
     background: var(--bg-elevated-3);
     color: var(--text);
@@ -505,13 +467,8 @@ body {
     box-shadow: 0 1px 4px rgba(0,0,0,0.12);
 }
 
-.view-btn.active i {
-    transform: scale(1.1);
-}
-
-.view-btn:active {
-    transform: scale(0.95);
-}
+.view-btn.active i { transform: scale(1.1); }
+.view-btn:active { transform: scale(0.95); }
 
 /* ===== BOTTOM NAVIGATION (MÓVIL) ===== */
 .bottom-nav {
@@ -524,7 +481,7 @@ body {
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
     border-top: 0.5px solid var(--separator);
-    display: none; /* Activado en móvil via media query */
+    display: none;
     justify-content: space-around;
     align-items: center;
     padding: 0 var(--space-2);
@@ -562,17 +519,9 @@ body {
     font-family: var(--font-system);
 }
 
-.bottom-nav-item.active {
-    color: var(--accent);
-}
-
-.bottom-nav-item.active i {
-    transform: scale(1.1);
-}
-
-.bottom-nav-item:active {
-    transform: scale(0.9);
-}
+.bottom-nav-item.active { color: var(--accent); }
+.bottom-nav-item.active i { transform: scale(1.1); }
+.bottom-nav-item:active { transform: scale(0.9); }
 
 .bottom-nav-item .badge {
     position: absolute;
@@ -591,9 +540,6 @@ body {
 }
 
 /* ===== MAPA ===== */
-/*
- * 🔧 FIX: top actualizado a 52px (nuevo header height)
- */
 #map {
     position: fixed;
     top: 52px;
@@ -604,18 +550,10 @@ body {
 }
 
 /* ===== CONTENEDORES DE VISTAS ===== */
-.view-container {
-    display: none;
-}
-
-.view-container.active {
-    display: block;
-}
+.view-container { display: none; }
+.view-container.active { display: block; }
 
 /* ===== VISTA LISTA ===== */
-/*
- * 🔧 FIX: top actualizado a 52px
- */
 #list-view {
     position: fixed;
     top: 52px;
@@ -630,10 +568,6 @@ body {
 .list-container {
     max-width: 800px;
     margin: 0 auto;
-    /*
-     * 🔧 FIX: padding-top aumentado para respetar la cadena completa:
-     * header(52) + quick-filters(~44) + active-pills(~36) + gap(16) = 148px
-     */
     padding: 148px var(--space-4) 100px;
 }
 
@@ -717,10 +651,7 @@ body {
 }
 
 .density-btn:hover { color: var(--text-secondary); }
-.density-btn.active {
-    background: var(--bg-elevated-2);
-    color: var(--text);
-}
+.density-btn.active { background: var(--bg-elevated-2); color: var(--text); }
 .density-btn:active { transform: scale(0.9); }
 
 /* ===== EVENT GROUPS ===== */
@@ -735,7 +666,7 @@ body {
     background: var(--bg-elevated);
     border-radius: var(--radius-md);
     position: sticky;
-    top: 148px; /* Sincronizado con padding-top del list-container */
+    top: 148px;
     z-index: var(--z-sticky);
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
@@ -791,11 +722,7 @@ body {
     transition: opacity 0.3s var(--ease-out);
 }
 
-.event-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
+.event-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .event-card:hover::before { opacity: 1; }
 .event-card:active { transform: translateY(0); }
 
@@ -805,12 +732,7 @@ body {
     gap: var(--space-3);
 }
 
-.event-card.compact .event-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
-}
-
+.event-card.compact .event-icon { width: 40px; height: 40px; font-size: 20px; }
 .event-card.compact .event-description { display: none; }
 
 .event-icon {
@@ -825,13 +747,13 @@ body {
     box-shadow: var(--shadow-sm);
 }
 
-.event-icon.concierto  { background: linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%); }
-.event-icon.fiesta     { background: linear-gradient(135deg, #F87171 0%, #DC2626 100%); }
-.event-icon.mercado    { background: linear-gradient(135deg, #4ADE80 0%, #059669 100%); }
-.event-icon.cultural   { background: linear-gradient(135deg, #60A5FA 0%, #2563EB 100%); }
-.event-icon.gastronomia{ background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%); }
-.event-icon.deporte    { background: linear-gradient(135deg, #4ADE80 0%, #16A34A 100%); }
-.event-icon.infantil   { background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%); }
+.event-icon.concierto   { background: linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%); }
+.event-icon.fiesta      { background: linear-gradient(135deg, #F87171 0%, #DC2626 100%); }
+.event-icon.mercado     { background: linear-gradient(135deg, #4ADE80 0%, #059669 100%); }
+.event-icon.cultural    { background: linear-gradient(135deg, #60A5FA 0%, #2563EB 100%); }
+.event-icon.gastronomia { background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%); }
+.event-icon.deporte     { background: linear-gradient(135deg, #4ADE80 0%, #16A34A 100%); }
+.event-icon.infantil    { background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%); }
 
 .event-info { min-width: 0; }
 
@@ -890,10 +812,7 @@ body {
     gap: 4px;
 }
 
-.event-meta-item i {
-    font-size: 12px;
-    color: var(--text-quaternary);
-}
+.event-meta-item i { font-size: 12px; color: var(--text-quaternary); }
 
 .event-description {
     font-size: 13px;
@@ -919,10 +838,7 @@ body {
     flex-shrink: 0;
 }
 
-.event-actions-row {
-    display: flex;
-    gap: var(--space-2);
-}
+.event-actions-row { display: flex; gap: var(--space-2); }
 
 .event-btn {
     padding: 8px 14px;
@@ -971,16 +887,10 @@ body {
     flex-shrink: 0;
 }
 
-.event-btn-llegar {
-    color: var(--green);
-    background: var(--green-subtle);
-}
+.event-btn-llegar { color: var(--green); background: var(--green-subtle); }
 .event-btn-llegar:hover { background: var(--green); color: white; }
 
-.event-btn-compartir {
-    color: var(--accent);
-    background: var(--accent-subtle);
-}
+.event-btn-compartir { color: var(--accent); background: var(--accent-subtle); }
 .event-btn-compartir:hover { background: var(--accent); color: white; }
 
 .event-btn-google { color: var(--accent); background: var(--accent-subtle); }
@@ -1002,17 +912,8 @@ body {
     flex-shrink: 0;
 }
 
-.btn-favorite:hover {
-    transform: scale(1.1);
-    background: var(--red-subtle);
-    color: var(--red);
-}
-
-.btn-favorite.active {
-    background: var(--red-subtle);
-    color: var(--red);
-    animation: heartBeat 0.4s var(--spring);
-}
+.btn-favorite:hover { transform: scale(1.1); background: var(--red-subtle); color: var(--red); }
+.btn-favorite.active { background: var(--red-subtle); color: var(--red); animation: heartBeat 0.4s var(--spring); }
 
 @keyframes heartBeat {
     0%, 100% { transform: scale(1); }
@@ -1045,11 +946,7 @@ body {
 }
 
 .empty-state p { font-size: 15px; margin-bottom: var(--space-6); }
-
-.empty-state .event-btn {
-    margin: 0 auto;
-    max-width: 200px;
-}
+.empty-state .event-btn { margin: 0 auto; max-width: 200px; }
 
 /* ===== SKELETON LOADING ===== */
 .skeleton-list {
@@ -1077,12 +974,7 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.05),
-        transparent
-    );
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
     animation: shimmer 2s infinite;
 }
 
@@ -1162,7 +1054,7 @@ body {
     width: 100%;
     max-width: 360px;
     height: 100vh;
-    height: 100dvh; /* dynamic viewport height en móvil */
+    height: 100dvh;
     background: var(--bg);
     z-index: var(--z-modal);
     transform: translateX(-100%);
@@ -1170,7 +1062,7 @@ body {
     display: flex;
     flex-direction: column;
     box-shadow: var(--shadow-xl);
-    overflow: hidden; /* 🔧 FIX: evita scroll en el contenedor padre */
+    overflow: hidden;
 }
 
 .filters-panel { left: 0; }
@@ -1190,6 +1082,7 @@ body {
     transform: translateX(0);
 }
 
+/* ===== PANEL HEADER ===== */
 .panel-header {
     padding: var(--space-5);
     border-bottom: 0.5px solid var(--separator);
@@ -1198,6 +1091,7 @@ body {
     justify-content: space-between;
     min-height: 64px;
     flex-shrink: 0;
+    width: 100%;
 }
 
 .panel-header h2 {
@@ -1220,17 +1114,22 @@ body {
     justify-content: center;
     font-size: 14px;
     transition: all 0.2s var(--ease-out);
+    flex-shrink: 0;
 }
 
 .close-panel:hover { background: var(--bg-elevated-2); color: var(--text); }
 .close-panel:active { transform: scale(0.9); }
 
+/* ===== PANEL CONTENT — SCROLL ÚNICO ===== */
 .panel-content {
     flex: 1;
+    min-height: 0;
     padding: var(--space-5);
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+    padding-bottom: calc(var(--space-10) + env(safe-area-inset-bottom));
     overflow-y: auto;
     overflow-x: hidden;
-    /* 🔧 FIX: scroll suave estilo iOS */
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
 }
@@ -1292,12 +1191,7 @@ body {
 }
 
 /* ===== CHIPS ===== */
-.filter-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-}
-
+.filter-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .chip { cursor: pointer; }
 .chip input { display: none; }
 
@@ -1324,14 +1218,14 @@ body {
     box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
 }
 
-.chip input:checked + .chip-content.concierto  { background: linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%); border-color: transparent; }
-.chip input:checked + .chip-content.fiesta     { background: linear-gradient(135deg, #F87171 0%, #DC2626 100%); border-color: transparent; }
-.chip input:checked + .chip-content.mercado    { background: linear-gradient(135deg, #4ADE80 0%, #059669 100%); border-color: transparent; }
-.chip input:checked + .chip-content.cultural   { background: linear-gradient(135deg, #60A5FA 0%, #2563EB 100%); border-color: transparent; }
-.chip input:checked + .chip-content.gastronomia{ background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%); border-color: transparent; }
-.chip input:checked + .chip-content.deporte    { background: linear-gradient(135deg, #4ADE80 0%, #16A34A 100%); border-color: transparent; }
-.chip input:checked + .chip-content.infantil   { background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%); border-color: transparent; }
-.chip input:checked + .chip-content.gratis     { background: var(--green); border-color: transparent; }
+.chip input:checked + .chip-content.concierto   { background: linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%); border-color: transparent; }
+.chip input:checked + .chip-content.fiesta      { background: linear-gradient(135deg, #F87171 0%, #DC2626 100%); border-color: transparent; }
+.chip input:checked + .chip-content.mercado     { background: linear-gradient(135deg, #4ADE80 0%, #059669 100%); border-color: transparent; }
+.chip input:checked + .chip-content.cultural    { background: linear-gradient(135deg, #60A5FA 0%, #2563EB 100%); border-color: transparent; }
+.chip input:checked + .chip-content.gastronomia { background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%); border-color: transparent; }
+.chip input:checked + .chip-content.deporte     { background: linear-gradient(135deg, #4ADE80 0%, #16A34A 100%); border-color: transparent; }
+.chip input:checked + .chip-content.infantil    { background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%); border-color: transparent; }
+.chip input:checked + .chip-content.gratis      { background: var(--green); border-color: transparent; }
 .chip:active .chip-content { transform: scale(0.95); }
 
 /* ===== FILTER GROUPS ===== */
@@ -1494,12 +1388,7 @@ body {
     font-family: var(--font-system);
 }
 
-.btn-clear:hover {
-    background: var(--red-subtle);
-    border-color: var(--red);
-    color: var(--red);
-}
-
+.btn-clear:hover { background: var(--red-subtle); border-color: var(--red); color: var(--red); }
 .btn-clear:active { transform: scale(0.98); }
 
 /* ===== STATS ===== */
@@ -1845,12 +1734,12 @@ body {
 }
 
 /* ===== CLUSTERS ===== */
-.marker-cluster-small       { background-color: rgba(10, 132, 255, 0.2); }
-.marker-cluster-small div   { background-color: rgba(10, 132, 255, 0.6); }
-.marker-cluster-medium      { background-color: rgba(10, 132, 255, 0.3); }
-.marker-cluster-medium div  { background-color: rgba(10, 132, 255, 0.7); }
-.marker-cluster-large       { background-color: rgba(10, 132, 255, 0.4); }
-.marker-cluster-large div   { background-color: rgba(10, 132, 255, 0.8); }
+.marker-cluster-small      { background-color: rgba(10, 132, 255, 0.2); }
+.marker-cluster-small div  { background-color: rgba(10, 132, 255, 0.6); }
+.marker-cluster-medium     { background-color: rgba(10, 132, 255, 0.3); }
+.marker-cluster-medium div { background-color: rgba(10, 132, 255, 0.7); }
+.marker-cluster-large      { background-color: rgba(10, 132, 255, 0.4); }
+.marker-cluster-large div  { background-color: rgba(10, 132, 255, 0.8); }
 
 .marker-cluster div {
     width: 36px;
@@ -1869,9 +1758,7 @@ body {
 }
 
 /* ===== CUSTOM MARKERS ===== */
-.custom-marker {
-    animation: markerPop 0.4s var(--spring);
-}
+.custom-marker { animation: markerPop 0.4s var(--spring); }
 
 @keyframes markerPop {
     0%   { transform: translate(-50%, -50%) scale(0); opacity: 0; }
@@ -1983,9 +1870,6 @@ body {
 }
 
 /* ===== CALENDARIO ===== */
-/*
- * 🔧 FIX: top actualizado a 52px en todas las vistas fijas
- */
 #calendar-view {
     position: fixed;
     top: 52px;
@@ -1998,7 +1882,7 @@ body {
 
 .calendar-header-fixed {
     position: fixed;
-    top: 108px; /* header(52) + quick-filters(~44) + gap(12) */
+    top: 108px;
     left: 0;
     right: 0;
     z-index: var(--z-sticky);
@@ -2113,21 +1997,16 @@ body {
 
 .calendar-day.selected .calendar-day-events-count { color: white; }
 
-.calendar-day-dots {
-    display: flex;
-    gap: 2px;
-    flex-wrap: wrap;
-    margin-top: 4px;
-}
+.calendar-day-dots { display: flex; gap: 2px; flex-wrap: wrap; margin-top: 4px; }
 
 .calendar-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-tertiary); }
-.calendar-dot.concierto  { background: #7C3AED; }
-.calendar-dot.fiesta     { background: #DC2626; }
-.calendar-dot.mercado    { background: #059669; }
-.calendar-dot.cultural   { background: #2563EB; }
-.calendar-dot.gastronomia{ background: #D97706; }
-.calendar-dot.deporte    { background: #16A34A; }
-.calendar-dot.infantil   { background: #F59E0B; }
+.calendar-dot.concierto   { background: #7C3AED; }
+.calendar-dot.fiesta      { background: #DC2626; }
+.calendar-dot.mercado     { background: #059669; }
+.calendar-dot.cultural    { background: #2563EB; }
+.calendar-dot.gastronomia { background: #D97706; }
+.calendar-dot.deporte     { background: #16A34A; }
+.calendar-dot.infantil    { background: #F59E0B; }
 
 .calendar-day-events {
     background: var(--bg-elevated);
@@ -2241,10 +2120,7 @@ body {
     white-space: nowrap;
 }
 
-.modal-compartir-acciones {
-    display: flex;
-    gap: var(--space-3);
-}
+.modal-compartir-acciones { display: flex; gap: var(--space-3); }
 
 .modal-compartir-btn {
     flex: 1;
@@ -2269,20 +2145,14 @@ body {
 
 .modal-compartir-btn.whatsapp { background: rgba(37, 211, 102, 0.15); color: #25d366; }
 .modal-compartir-btn.whatsapp:hover { background: rgba(37, 211, 102, 0.25); }
-
 .modal-compartir-btn.twitter { background: var(--bg-elevated-2); color: var(--text); }
 .modal-compartir-btn.twitter:hover { background: var(--bg-elevated-3); }
-
 .modal-compartir-btn.copiar { background: var(--accent-subtle); color: var(--accent); }
 .modal-compartir-btn.copiar:hover { background: var(--accent); color: white; }
 .modal-compartir-btn.copiar.copiado { background: var(--green-subtle); color: var(--green); }
 
 /* ===== FAVORITOS ===== */
-.favorites-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-}
+.favorites-list { display: flex; flex-direction: column; gap: var(--space-3); }
 
 .favorite-item {
     background: var(--bg-elevated);
@@ -2365,20 +2235,25 @@ body {
     letter-spacing: 0.5px;
 }
 
+/* Item base — fila (label izquierda + toggle derecha) */
 .setting-item {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-4);
+    gap: var(--space-5);
     padding: var(--space-4) 0;
 }
 
+.setting-item:not(:last-child) {
+    border-bottom: 0.5px solid var(--separator);
+}
+
+/* Texto descriptivo — ocupa todo el espacio disponible */
 .setting-info {
     flex: 1;
     min-width: 0;
-    /* 🔧 FIX: garantiza que el texto no sea aplastado por el toggle */
-    padding-right: var(--space-2);
+    padding-right: var(--space-4);
 }
 
 .setting-label {
@@ -2388,7 +2263,6 @@ body {
     color: var(--text);
     margin-bottom: 4px;
     letter-spacing: -0.2px;
-    /* 🔧 FIX: evita que el texto largo rompa el layout */
     word-break: break-word;
 }
 
@@ -2400,45 +2274,7 @@ body {
     word-break: break-word;
 }
 
-/* 🔧 FIX: el toggle nunca se encoge */
-.toggle-switch {
-    position: relative;
-    display: inline-flex;
-    width: 52px;
-    height: 32px;
-    cursor: pointer;
-    flex-shrink: 0; /* nunca se comprime */
-}
-
-.setting-item:not(:last-child) {
-    border-bottom: 0.5px solid var(--separator);
-}
-
-/* Items con select — layout en columna */
-.setting-item--column {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-3);
-}
-
-.setting-item--column .setting-info {
-    flex: none;
-    width: 100%;
-}
-
-.setting-info { flex: 1; min-width: 0; }
-
-.setting-label {
-    display: block;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 4px;
-    letter-spacing: -0.2px;
-}
-
-.setting-description { font-size: 13px; color: var(--text-tertiary); margin: 0; }
-
+/* Toggle — nunca se encoge */
 .toggle-switch {
     position: relative;
     display: inline-flex;
@@ -2478,6 +2314,20 @@ body {
 .toggle-checkbox:checked + .toggle-slider::before { transform: translateX(20px); }
 .toggle-checkbox:focus + .toggle-slider { box-shadow: 0 0 0 4px var(--accent-subtle); }
 
+/* Items con select — columna (texto arriba, select abajo) */
+.setting-item--column {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+}
+
+.setting-item--column .setting-info {
+    flex: none;
+    width: 100%;
+    padding-right: 0;
+}
+
+/* Select de ajustes */
 .settings-select {
     width: 100%;
     padding: var(--space-3);
@@ -2521,10 +2371,7 @@ body {
 .skip-link:focus { top: var(--space-2); }
 
 /* ===== REDUCED MOTION ===== */
-
-/* 🔧 FIX: El toggle guarda data-reduce-motion="true" en <html>
-   pero el CSS solo escuchaba la preferencia del sistema operativo.
-   Añadimos el selector de atributo para conectar ambos. */
+/* Via toggle manual (data-reduce-motion en <html>) */
 [data-reduce-motion="true"] *,
 [data-reduce-motion="true"] *::before,
 [data-reduce-motion="true"] *::after {
@@ -2534,11 +2381,9 @@ body {
     scroll-behavior: auto !important;
 }
 
-/* Preferencia del sistema operativo — se mantiene */
+/* Via preferencia del sistema operativo */
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    *, *::before, *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
@@ -2603,15 +2448,10 @@ body {
 }
 
 .lugares-toggle-btn:hover { background: var(--bg-elevated-2); color: var(--text); }
-
 .lugares-toggle-btn i { transition: transform 0.3s var(--ease-out); }
 .lugares-toggle-btn.collapsed i { transform: rotate(180deg); }
 
-.lugares-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-}
+.lugares-list { display: flex; flex-direction: column; gap: var(--space-3); }
 
 .lugar-card {
     background: var(--bg-elevated);
@@ -2659,20 +2499,13 @@ body {
    ================================================================ */
 @media (max-width: 640px) {
 
-    /* Header vuelve a ser flexbox en móvil — sin columna central */
     .top-bar {
         height: 48px;
         grid-template-columns: 1fr auto;
         padding: 0 var(--space-3);
     }
 
-    /*
-     * 🔧 FIX MÓVIL: Ocultamos el segmented control del header
-     * porque en móvil la bottom-nav cumple la misma función.
-     */
-    .view-toggle {
-        display: none;
-    }
+    .view-toggle { display: none; }
 
     .quick-filters {
         top: 52px;
@@ -2685,25 +2518,15 @@ body {
 
     .active-filters { top: 100px; }
 
-    /* Bottom nav visible en móvil */
     .bottom-nav { display: flex; }
 
-    /* Vistas fijas: reservan espacio para la bottom-nav */
     #map            { top: 48px; bottom: 60px; }
     #list-view      { top: 48px; bottom: 60px; }
     #calendar-view  { top: 48px; bottom: 60px; }
 
-    .list-container {
-        padding: 136px var(--space-3) 80px;
-    }
-
-    .skeleton-list {
-        padding: 136px var(--space-3) 80px;
-    }
-
-    .event-group-header {
-        top: 136px;
-    }
+    .list-container         { padding: 136px var(--space-3) 80px; }
+    .skeleton-list          { padding: 136px var(--space-3) 80px; }
+    .event-group-header     { top: 136px; }
 
     .list-header {
         flex-direction: column;
@@ -2743,9 +2566,15 @@ body {
         max-width: 100%;
     }
 
-    .fab-filters      { bottom: 76px; left: var(--space-3); }
-    .btn-geolocate    { bottom: 76px; right: var(--space-3); width: 48px; height: 48px; }
-    .fab-scroll-top   { bottom: 76px; right: var(--space-3); width: 40px; height: 40px; }
+    /* Panel content en móvil — padding lateral reducido */
+    .panel-content {
+        padding-left: var(--space-4);
+        padding-right: var(--space-4);
+    }
+
+    .fab-filters    { bottom: 76px; left: var(--space-3); }
+    .btn-geolocate  { bottom: 76px; right: var(--space-3); width: 48px; height: 48px; }
+    .fab-scroll-top { bottom: 76px; right: var(--space-3); width: 40px; height: 40px; }
 
     .geo-toast {
         bottom: 140px;
@@ -2764,12 +2593,12 @@ body {
         padding: 0 var(--space-3);
     }
 
-    .calendar-day      { min-height: 70px; padding: var(--space-2); }
+    .calendar-day        { min-height: 70px; padding: var(--space-2); }
     .calendar-day-number { font-size: 12px; }
-    .weekday           { font-size: 10px; }
+    .weekday             { font-size: 10px; }
     .calendar-day-events { max-height: 400px; }
     .calendar-day-events h3 { font-size: 15px; padding: var(--space-4); }
-    #calendar-day-list { padding: var(--space-4); }
+    #calendar-day-list   { padding: var(--space-4); }
 
     .modal-compartir-overlay { padding: var(--space-3); }
     .modal-compartir         { padding: var(--space-5); }
