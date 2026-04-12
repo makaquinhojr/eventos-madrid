@@ -40,7 +40,14 @@
     <script src="js/i18n.js"></script>
 </head>
 <body>
-
+<!-- Planificador de Rutas -->
+<button class="route-planner-btn" id="route-planner-btn" 
+        aria-label="Planificador de rutas"
+        title="Planificador de rutas">
+    <i class="fas fa-route" aria-hidden="true"></i>
+    <span class="desktop-only">Rutas</span>
+    <span class="route-count" id="route-count" style="display:none;">0</span>
+</button>
 <!-- ===== SKIP LINK (ACCESIBILIDAD) ===== -->
 <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
 
@@ -918,25 +925,7 @@
         </div>
     </div>
 </div>
-
-<!-- Planificador de Rutas -->
-<div class="settings-section">
-    <h3 class="settings-section-title">
-        🗺️ Planificador de Rutas
-    </h3>
-
-    <div class="setting-item">
-        <div class="setting-info">
-            <label class="setting-label" for="route-mode-toggle">Modo planificador</label>
-            <p class="setting-description">Selecciona múltiples eventos y crea tu ruta</p>
-        </div>
-        <label class="toggle-switch">
-            <input type="checkbox" id="route-mode-toggle" class="toggle-checkbox">
-            <span class="toggle-slider"></span>
-        </label>
-    </div>
-</div>
-        <!-- Privacidad -->
+       <!-- Privacidad -->
         <div class="settings-section">
             <h3 class="settings-section-title" data-i18n="settings.privacy">
                 🔒 Privacidad

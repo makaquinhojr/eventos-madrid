@@ -1,6 +1,6 @@
 /* ========================================
    EVENTOSMADRID - APP.JS COMPLETO
-   Apple-style Redesign + New Features
+   Apple-style Redesign + Premium Features
    Performance-optimized Vanilla JS
    ======================================== */
 
@@ -37,6 +37,17 @@ let performanceMetrics = {
     eventsLoaded: 0,
     renderTime: 0
 };
+
+// Premium Features
+let currentThemePreset = 'default';
+let customAccentColor = null;
+let heatmapLayer = null;
+let heatmapData = [];
+let heatmapRadius = 25;
+let routePlannerMode = false;
+let selectedRouteEvents = [];
+let routePolyline = null;
+let routeMarkers = [];
 
 // ===== ICONOS Y COLORES =====
 const icons = {
@@ -831,16 +842,10 @@ function categoriaNombre(categoria) {
     return nombres[categoria] || 'Lugar de interés';
 }
 
-// ===== CAMBIO DE VISTA — REPARADO =====
-/*
- * 🔧 FIX: La función ahora es null-safe en todos los getElementById.
- *    Sincroniza el segmented control desktop (.view-btn) y la
- *    bottom-nav móvil (.bottom-nav-item) simultáneamente.
- */
+// ===== CAMBIO DE VISTA =====
 function switchView(view) {
     currentView = view;
 
-    // ── Segmented Control desktop ──────────────────────────────
     document.querySelectorAll('.view-btn').forEach(btn => {
         btn.classList.remove('active');
         btn.setAttribute('aria-selected', 'false');
@@ -854,7 +859,6 @@ function switchView(view) {
         desktopBtn.setAttribute('aria-current', 'page');
     }
 
-    // ── Bottom navigation móvil ────────────────────────────────
     document.querySelectorAll('.bottom-nav-item').forEach(btn => {
         btn.classList.remove('active');
         btn.removeAttribute('aria-current');
@@ -866,7 +870,6 @@ function switchView(view) {
         bottomBtn.setAttribute('aria-current', 'page');
     }
 
-    // ── Contenedores de vista ──────────────────────────────────
     document.querySelectorAll('.view-container').forEach(c => {
         c.classList.remove('active');
     });
@@ -937,7 +940,6 @@ function renderListView(events) {
         }
     });
 
-    // Agrupar eventos por fechas
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
     const manana = new Date(hoy);
@@ -967,7 +969,6 @@ function renderListView(events) {
         }
     });
 
-    // Infinite scroll — renderizar solo primeras páginas
     const eventsToShow = sortedEvents.slice(0, (currentPage + 1) * eventsPerPage);
 
     listContainer.innerHTML = Object.entries(grupos)
@@ -1469,7 +1470,7 @@ function renderActivePills() {
 }
 
 function mostrarZonaActiva(zona) {
-    // Mantenida por compatibilidad — la funcionalidad migró a renderActivePills
+    // Mantenida por compatibilidad
 }
 
 function actualizarContadorFiltros() {
@@ -2316,15 +2317,28 @@ function initLugaresListToggle() {
 // ===== SETTINGS PANEL =====
 function initSettingsPanel() {
     const settingsToggle = document.getElementById('settings-toggle');
+    const bottomNavSettings = document.getElementById('bottom-nav-settings');
     const settingsPanel = document.getElementById('settings-panel');
     const closeSettings = document.getElementById('close-settings');
 
-    if (!settingsToggle || !settingsPanel) return;
+    if (!settingsPanel) return;
 
-    settingsToggle.addEventListener('click', () => {
+    // Event listeners para abrir settings
+    const openSettings = () => {
         settingsPanel.classList.add('active');
         settingsPanel.setAttribute('aria-modal', 'true');
-    });
+        
+        // Inicializar features premium al abrir settings
+        initPremiumFeatures();
+    };
+
+    if (settingsToggle) {
+        settingsToggle.addEventListener('click', openSettings);
+    }
+
+    if (bottomNavSettings) {
+        bottomNavSettings.addEventListener('click', openSettings);
+    }
 
     if (closeSettings) {
         closeSettings.addEventListener('click', () => {
@@ -2622,278 +2636,46 @@ function initPullToRefresh() {
     });
 }
 
-// ===== INICIALIZACIÓN PRINCIPAL — REPARADA =====
-document.addEventListener('DOMContentLoaded', () => {
-    // Restaurar preferencias
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-
-    const savedContrast = localStorage.getItem('contrast') || 'normal';
-    document.documentElement.setAttribute('data-contrast', savedContrast);
-
-    const savedLargeText = localStorage.getItem('largeText') === 'true';
-    document.documentElement.setAttribute('data-large-text', savedLargeText);
-
-    const savedReduceMotion = localStorage.getItem('reduceMotion') === 'true';
-    document.documentElement.setAttribute('data-reduce-motion', savedReduceMotion);
-
-    // Core
-    initMap();
-    loadEvents();
-    initGeolocate();
-    initSliderPrecio();
-    initDistanceFilter();
-    initCollapseGroups();
-    initLugaresSelectAll();
-    initLugaresListToggle();
-    initSettingsPanel();
-    initQuickFilters();
-    initViewDensity();
-    initInfiniteScroll();
-    initScrollToTop();
-    initSwipeGestures();
-    initPullToRefresh();
-
-    // ── FAB Filtros ────────────────────────────────────────────
-    const fabFilters = document.getElementById('fab-filters');
-    if (fabFilters) {
-        fabFilters.addEventListener('click', () => {
-            const panel = document.getElementById('filters-panel');
-            if (panel) {
-                panel.classList.add('active');
-                panel.setAttribute('aria-modal', 'true');
-            }
-        });
-    }
-
-    const closePanel = document.getElementById('close-panel');
-    if (closePanel) {
-        closePanel.addEventListener('click', () => {
-            const panel = document.getElementById('filters-panel');
-            if (panel) {
-                panel.classList.remove('active');
-                panel.setAttribute('aria-modal', 'false');
-            }
-        });
-    }
-
-    // ── Stats ──────────────────────────────────────────────────
-    const statsToggle = document.getElementById('stats-toggle');
-    if (statsToggle) {
-        statsToggle.addEventListener('click', () => {
-            const panel = document.getElementById('stats-panel');
-            if (panel) {
-                panel.classList.add('active');
-                panel.setAttribute('aria-modal', 'true');
-                setTimeout(() => initCharts(), 100);
-            }
-        });
-    }
-
-    const closeStats = document.getElementById('close-stats');
-    if (closeStats) {
-        closeStats.addEventListener('click', () => {
-            const panel = document.getElementById('stats-panel');
-            if (panel) {
-                panel.classList.remove('active');
-                panel.setAttribute('aria-modal', 'false');
-            }
-        });
-    }
-
-    // ── Favoritos ──────────────────────────────────────────────
-    const favToggle = document.getElementById('favorites-toggle');
-    if (favToggle) {
-        favToggle.addEventListener('click', () => {
-            const panel = document.getElementById('favorites-panel');
-            if (panel) {
-                panel.classList.add('active');
-                panel.setAttribute('aria-modal', 'true');
-            }
-        });
-    }
-
-    const closeFav = document.getElementById('close-favorites');
-    if (closeFav) {
-        closeFav.addEventListener('click', () => {
-            const panel = document.getElementById('favorites-panel');
-            if (panel) {
-                panel.classList.remove('active');
-                panel.setAttribute('aria-modal', 'false');
-            }
-        });
-    }
-
-    // ── Navegación: Segmented Control desktop + Bottom nav móvil
-    /*
-     * 🔧 FIX CLAVE: Un único querySelectorAll('[data-view]') maneja
-     *    TODOS los botones de navegación (desktop Y móvil) de forma
-     *    DRY y null-safe. Elimina los 3 getElementById('view-*-btn')
-     *    que devolvían null y bloqueaban la navegación.
-     */
-    document.querySelectorAll('[data-view]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const view = btn.dataset.view;
-            if (view) switchView(view);
-        });
-    });
-
-    // ── Bottom nav — botones sin data-view ────────────────────
-    const bottomNavFavorites = document.getElementById('bottom-nav-favorites');
-    if (bottomNavFavorites) {
-        bottomNavFavorites.addEventListener('click', () => {
-            const panel = document.getElementById('favorites-panel');
-            if (panel) {
-                panel.classList.add('active');
-                panel.setAttribute('aria-modal', 'true');
-            }
-        });
-    }
-
-    const bottomNavSettings = document.getElementById('bottom-nav-settings');
-    if (bottomNavSettings) {
-        bottomNavSettings.addEventListener('click', () => {
-            const panel = document.getElementById('settings-panel');
-            if (panel) {
-                panel.classList.add('active');
-                panel.setAttribute('aria-modal', 'true');
-            }
-        });
-    }
-
-    // ── Toggle lugares ─────────────────────────────────────────
-    const btnToggleLugares = document.getElementById('btn-toggle-lugares');
-    if (btnToggleLugares) {
-        btnToggleLugares.addEventListener('click', toggleLugares);
-    }
-
-    // ── Limpiar filtros ────────────────────────────────────────
-    const btnClear = document.getElementById('btn-clear');
-    if (btnClear) {
-        btnClear.addEventListener('click', clearFilters);
-    }
-
-    // ── Calendario ─────────────────────────────────────────────
-    const calPrev = document.getElementById('calendar-prev');
-    if (calPrev) {
-        calPrev.addEventListener('click', () => {
-            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
-            renderCalendar();
-        });
-    }
-
-    const calNext = document.getElementById('calendar-next');
-    if (calNext) {
-        calNext.addEventListener('click', () => {
-            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-            renderCalendar();
-        });
-    }
-
-    // ── Ordenación ─────────────────────────────────────────────
-    const sortBy = document.getElementById('sort-by');
-    if (sortBy) {
-        sortBy.addEventListener('change', e => {
-            currentSort = e.target.value;
-            if (currentSort === 'distance' && !userLocation) {
-                mostrarToast('📍 Activa tu ubicación primero', 'error');
-                e.target.value = 'date';
-                currentSort = 'date';
-                return;
-            }
-            currentPage = 0;
-            renderListView(currentFilteredEvents);
-            renderLugaresList(currentFilteredLugares);
-        });
-    }
-
-    // ── Búsqueda y filtros ─────────────────────────────────────
-    const searchInput = document.getElementById('search');
-    if (searchInput) searchInput.addEventListener('input', applyFilters);
-
-    const filtroFecha = document.getElementById('filtro-fecha');
-    if (filtroFecha) filtroFecha.addEventListener('change', applyFilters);
-
-    const filtroZona = document.getElementById('filtro-zona');
-    if (filtroZona) filtroZona.addEventListener('change', applyFilters);
-
-    document.querySelectorAll('.chip input').forEach(cb => {
-        cb.addEventListener('change', applyFilters);
-    });
-
-    // ── Cerrar con ESC ─────────────────────────────────────────
-    document.addEventListener('keydown', e => {
-        if (e.key !== 'Escape') return;
-        cerrarModalCompartir();
-        document.querySelectorAll(
-            '.filters-panel.active, .stats-panel.active, ' +
-            '.favorites-panel.active, .settings-panel.active'
-        ).forEach(panel => {
-            const closeBtn = panel.querySelector('.close-panel');
-            if (closeBtn) closeBtn.click();
-        });
-    });
-});
-    // ── NUEVAS FEATURES PREMIUM ────────────────────────────
-    initPremiumFeatures();
-
-// ===== SERVICE WORKER =====
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/eventos-madrid/sw.js')
-            .then(reg => console.log('✅ SW registrado:', reg.scope))
-            .catch(err => console.log('❌ SW error:', err));
-    });
-}
 /* ================================================================
-   EVENTOSMADRID - FEATURES PREMIUM LOGIC
-   Temas + Heatmap + Route Planner
+   PREMIUM FEATURES - TEMAS + HEATMAP + RUTAS
    ================================================================ */
-
-// ===== VARIABLES GLOBALES PARA NUEVAS FEATURES =====
-let currentThemePreset = 'default';
-let customAccentColor = null;
-let heatmapLayer = null;
-let heatmapData = [];
-let heatmapRadius = 25;
-let routePlannerMode = false;
-let selectedRouteEvents = [];
-let routePolyline = null;
-let routeMarkers = [];
 
 // ===== SISTEMA DE TEMAS PERSONALIZADOS =====
 function initThemeSystem() {
+    console.log('🎨 Inicializando sistema de temas...');
+    
     const themeCards = document.querySelectorAll('.theme-card');
     const customColorToggle = document.getElementById('custom-color-toggle');
     const customColorSection = document.getElementById('custom-color-picker-section');
     const accentColorPicker = document.getElementById('accent-color-picker');
 
-    // Cargar tema guardado
+    if (!themeCards.length) {
+        console.warn('⚠️ No se encontraron theme cards');
+        return;
+    }
+
     const savedTheme = localStorage.getItem('themePreset') || 'default';
     const savedCustomColor = localStorage.getItem('customAccentColor');
 
     if (savedCustomColor) {
-        customColorToggle.checked = true;
-        customColorSection.style.display = 'block';
-        accentColorPicker.value = savedCustomColor;
+        if (customColorToggle) customColorToggle.checked = true;
+        if (customColorSection) customColorSection.style.display = 'block';
+        if (accentColorPicker) accentColorPicker.value = savedCustomColor;
         applyCustomColor(savedCustomColor);
     } else {
         applyThemePreset(savedTheme);
     }
 
-    // Event listeners para theme cards
     themeCards.forEach(card => {
         card.addEventListener('click', () => {
             const preset = card.dataset.themePreset;
             
-            // Desactivar custom color si está activo
-            if (customColorToggle.checked) {
+            if (customColorToggle && customColorToggle.checked) {
                 customColorToggle.checked = false;
-                customColorSection.style.display = 'none';
+                if (customColorSection) customColorSection.style.display = 'none';
                 localStorage.removeItem('customAccentColor');
             }
 
-            // Activar tema
             themeCards.forEach(c => c.classList.remove('active'));
             card.classList.add('active');
             applyThemePreset(preset);
@@ -2901,7 +2683,6 @@ function initThemeSystem() {
             localStorage.setItem('themePreset', preset);
             mostrarToast(`✨ Tema "${card.querySelector('.theme-name').textContent}" activado`);
             
-            // Refresh charts si están visibles
             const statsPanel = document.getElementById('stats-panel');
             if (statsPanel && statsPanel.classList.contains('active')) {
                 setTimeout(() => initCharts(), 100);
@@ -2909,25 +2690,24 @@ function initThemeSystem() {
         });
     });
 
-    // Toggle custom color
     if (customColorToggle) {
         customColorToggle.addEventListener('change', (e) => {
             if (e.target.checked) {
-                customColorSection.style.display = 'block';
+                if (customColorSection) customColorSection.style.display = 'block';
                 themeCards.forEach(c => c.classList.remove('active'));
-                applyCustomColor(accentColorPicker.value);
+                if (accentColorPicker) applyCustomColor(accentColorPicker.value);
                 mostrarToast('🎨 Color personalizado activado');
             } else {
-                customColorSection.style.display = 'none';
+                if (customColorSection) customColorSection.style.display = 'none';
                 localStorage.removeItem('customAccentColor');
                 applyThemePreset('default');
-                document.querySelector('[data-theme-preset="default"]').classList.add('active');
+                const defaultCard = document.querySelector('[data-theme-preset="default"]');
+                if (defaultCard) defaultCard.classList.add('active');
                 mostrarToast('🎨 Tema por defecto restaurado');
             }
         });
     }
 
-    // Color picker
     if (accentColorPicker) {
         accentColorPicker.addEventListener('input', (e) => {
             applyCustomColor(e.target.value);
@@ -2938,22 +2718,30 @@ function initThemeSystem() {
             mostrarToast('🎨 Color guardado');
         });
     }
+
+    console.log('✅ Sistema de temas inicializado');
 }
 
 function applyThemePreset(preset) {
+    console.log('🎨 Aplicando tema:', preset);
     currentThemePreset = preset;
     document.documentElement.setAttribute('data-theme-preset', preset);
     customAccentColor = null;
+    
+    setTimeout(() => {
+        const accentColor = getComputedStyle(document.documentElement)
+            .getPropertyValue('--accent').trim();
+        console.log('✅ Color de acento:', accentColor);
+    }, 100);
 }
 
 function applyCustomColor(color) {
+    console.log('🎨 Aplicando color custom:', color);
     customAccentColor = color;
     const root = document.documentElement;
     
-    // Remover preset
     root.removeAttribute('data-theme-preset');
     
-    // Calcular colores derivados
     const rgb = hexToRgb(color);
     const hoverColor = lightenColor(color, 20);
     
@@ -2987,19 +2775,24 @@ function lightenColor(hex, percent) {
 
 // ===== MODO EXPLORACIÓN INTERACTIVA (HEATMAP) =====
 function initHeatmapMode() {
+    console.log('🌈 Inicializando heatmap...');
+    
     const heatmapToggle = document.getElementById('heatmap-toggle');
     const heatmapControls = document.getElementById('heatmap-controls');
     const heatmapRadiusSlider = document.getElementById('heatmap-radius');
 
-    if (!heatmapToggle) return;
+    if (!heatmapToggle) {
+        console.warn('⚠️ Toggle de heatmap no encontrado');
+        return;
+    }
 
     heatmapToggle.addEventListener('change', (e) => {
         if (e.target.checked) {
-            heatmapControls.style.display = 'block';
+            if (heatmapControls) heatmapControls.style.display = 'block';
             activateHeatmap();
             mostrarToast('🌈 Mapa de calor activado');
         } else {
-            heatmapControls.style.display = 'none';
+            if (heatmapControls) heatmapControls.style.display = 'none';
             deactivateHeatmap();
             mostrarToast('🌈 Mapa de calor desactivado');
         }
@@ -3013,51 +2806,63 @@ function initHeatmapMode() {
             }
         });
     }
+
+    console.log('✅ Heatmap inicializado');
 }
 
 function activateHeatmap() {
-    // Preparar datos para el heatmap
-    heatmapData = currentFilteredEvents.map(evento => ({
-        lat: evento.lat,
-        lng: evento.lng,
-        intensity: 1
-    }));
+    if (!map) return;
 
-    // Crear capa de heatmap usando canvas
+    const eventos = currentFilteredEvents.length > 0 ? currentFilteredEvents : allEvents;
+    
+    if (eventos.length === 0) {
+        mostrarToast('⚠️ No hay eventos para mostrar', 'error');
+        const toggle = document.getElementById('heatmap-toggle');
+        if (toggle) toggle.checked = false;
+        return;
+    }
+
     if (!heatmapLayer) {
         heatmapLayer = L.layerGroup().addTo(map);
     }
 
-    updateHeatmap();
-    showHeatmapLegend();
-}
+    const coordMap = {};
+    eventos.forEach(evento => {
+        const key = `${evento.lat.toFixed(3)},${evento.lng.toFixed(3)}`;
+        coordMap[key] = coordMap[key] || { lat: evento.lat, lng: evento.lng, count: 0 };
+        coordMap[key].count++;
+    });
 
-function updateHeatmap() {
-    if (!heatmapLayer) return;
-
-    heatmapLayer.clearLayers();
-
-    // Crear círculos con gradiente para simular heatmap
-    heatmapData.forEach(point => {
+    const maxCount = Math.max(...Object.values(coordMap).map(p => p.count));
+    
+    Object.values(coordMap).forEach(point => {
+        const intensity = point.count / maxCount;
+        const radius = heatmapRadius * 30 * (0.5 + intensity);
+        
         L.circle([point.lat, point.lng], {
-            radius: heatmapRadius * 50,
-            fillColor: getHeatColor(point.intensity),
-            fillOpacity: 0.4,
+            radius: radius,
+            fillColor: getHeatColor(intensity),
+            fillOpacity: 0.3 + (intensity * 0.3),
             stroke: false,
+            interactive: false,
             className: 'heatmap-circle'
         }).addTo(heatmapLayer);
     });
+
+    showHeatmapLegend();
+    console.log(`✅ Heatmap creado con ${Object.keys(coordMap).length} puntos`);
+}
+
+function updateHeatmap() {
+    deactivateHeatmap();
+    activateHeatmap();
 }
 
 function getHeatColor(intensity) {
-    const colors = [
-        '#0000FF', // Azul (baja densidad)
-        '#00FF00', // Verde
-        '#FFFF00', // Amarillo
-        '#FF0000'  // Rojo (alta densidad)
-    ];
-    const index = Math.min(Math.floor(intensity * colors.length), colors.length - 1);
-    return colors[index];
+    if (intensity < 0.25) return '#3498DB';
+    if (intensity < 0.5) return '#2ECC71';
+    if (intensity < 0.75) return '#F39C12';
+    return '#E74C3C';
 }
 
 function deactivateHeatmap() {
@@ -3095,52 +2900,49 @@ function hideHeatmapLegend() {
 
 // ===== PLANIFICADOR DE RUTAS =====
 function initRoutePlanner() {
-    const routeModeToggle = document.getElementById('route-mode-toggle');
-    const routePlannerToggle = document.getElementById('route-planner-toggle');
+    console.log('🗺️ Inicializando planificador de rutas...');
+    
+    const routePlannerBtn = document.getElementById('route-planner-btn');
     const routePanel = document.getElementById('route-panel');
     const closeRoute = document.getElementById('close-route');
     const optimizeRouteBtn = document.getElementById('optimize-route');
     const exportRouteBtn = document.getElementById('export-route');
     const clearRouteBtn = document.getElementById('clear-route');
 
-    if (!routeModeToggle) return;
+    if (!routePlannerBtn) {
+        console.warn('❌ Botón de planificador no encontrado');
+        return;
+    }
 
-    // Activar/desactivar modo planificador
-    routeModeToggle.addEventListener('change', (e) => {
-        routePlannerMode = e.target.checked;
+    routePlannerBtn.addEventListener('click', () => {
+        routePlannerMode = !routePlannerMode;
         
         if (routePlannerMode) {
+            routePlannerBtn.classList.add('active');
             document.body.classList.add('route-mode');
-            if (routePlannerToggle) {
-                routePlannerToggle.style.display = 'flex';
-            }
-            mostrarToast('🗺️ Modo planificador activado - Click en eventos para añadir', 'success');
             
-            // Hacer marcadores clickeables para añadir a ruta
-            enableRouteSelection();
-        } else {
-            document.body.classList.remove('route-mode');
-            if (routePlannerToggle) {
-                routePlannerToggle.style.display = 'none';
+            if (routePanel) {
+                routePanel.classList.add('active');
+                routePanel.setAttribute('aria-modal', 'true');
             }
+            
+            enableRouteSelection();
+            mostrarToast('🗺️ Click en eventos para añadir a tu ruta', 'success');
+        } else {
+            routePlannerBtn.classList.remove('active');
+            document.body.classList.remove('route-mode');
             disableRouteSelection();
             mostrarToast('🗺️ Modo planificador desactivado');
         }
     });
 
-    // Abrir panel de ruta
-    if (routePlannerToggle) {
-        routePlannerToggle.addEventListener('click', () => {
-            if (routePanel) {
-                routePanel.classList.add('active');
-                routePanel.setAttribute('aria-modal', 'true');
-            }
-        });
-    }
-
-    // Cerrar panel
     if (closeRoute) {
         closeRoute.addEventListener('click', () => {
+            routePlannerMode = false;
+            routePlannerBtn.classList.remove('active');
+            document.body.classList.remove('route-mode');
+            disableRouteSelection();
+            
             if (routePanel) {
                 routePanel.classList.remove('active');
                 routePanel.setAttribute('aria-modal', 'false');
@@ -3148,25 +2950,24 @@ function initRoutePlanner() {
         });
     }
 
-    // Optimizar ruta
     if (optimizeRouteBtn) {
         optimizeRouteBtn.addEventListener('click', optimizeRoute);
     }
 
-    // Exportar ruta
     if (exportRouteBtn) {
         exportRouteBtn.addEventListener('click', exportRoute);
     }
 
-    // Limpiar ruta
     if (clearRouteBtn) {
         clearRouteBtn.addEventListener('click', clearRoute);
     }
+
+    console.log('✅ Planificador de rutas inicializado');
 }
 
 function enableRouteSelection() {
     markersLayer.eachLayer(marker => {
-        marker.off('click'); // Remover handler anterior
+        marker.off('click');
         marker.on('click', (e) => {
             L.DomEvent.stopPropagation(e);
             const eventoId = marker.eventoId;
@@ -3176,10 +2977,8 @@ function enableRouteSelection() {
 }
 
 function disableRouteSelection() {
-    // Restaurar comportamiento original de markers
     markersLayer.eachLayer(marker => {
         marker.off('click');
-        // El popup se abrirá automáticamente por defecto de Leaflet
     });
 }
 
@@ -3187,7 +2986,6 @@ function addEventToRoute(eventoId) {
     const evento = allEvents.find(e => e.id === eventoId);
     if (!evento) return;
 
-    // Verificar si ya está en la ruta
     if (selectedRouteEvents.find(e => e.id === eventoId)) {
         mostrarToast('⚠️ Este evento ya está en tu ruta', 'error');
         return;
@@ -3246,7 +3044,6 @@ function updateRoutePanel() {
     if (optimizeBtn) optimizeBtn.disabled = count < 2;
     if (exportBtn) exportBtn.disabled = false;
 
-    // Calcular distancias
     let totalDistance = 0;
     let totalTime = 0;
 
@@ -3260,7 +3057,6 @@ function updateRoutePanel() {
                 evento.lat, evento.lng
             );
             totalDistance += distance;
-            // Estimar 30 min por km caminando + 15 min de buffer
             const timeMinutes = Math.round((distance * 30) + 15);
             totalTime += timeMinutes;
             distanceText = formatearDistancia(distance);
@@ -3286,7 +3082,6 @@ function updateRoutePanel() {
         `;
     }).join('');
 
-    // Actualizar stats
     const totalDistanceEl = document.getElementById('route-total-distance');
     const totalTimeEl = document.getElementById('route-total-time');
     
@@ -3304,7 +3099,6 @@ function updateRoutePanel() {
 }
 
 function updateRouteOnMap() {
-    // Limpiar marcadores y líneas anteriores
     routeMarkers.forEach(marker => map.removeLayer(marker));
     routeMarkers = [];
     
@@ -3315,7 +3109,6 @@ function updateRouteOnMap() {
 
     if (selectedRouteEvents.length === 0) return;
 
-    // Crear marcadores numerados
     selectedRouteEvents.forEach((evento, index) => {
         const icon = L.divIcon({
             html: `<div class="route-marker">${index + 1}</div>`,
@@ -3337,7 +3130,6 @@ function updateRouteOnMap() {
         routeMarkers.push(marker);
     });
 
-    // Dibujar línea conectando eventos
     if (selectedRouteEvents.length >= 2) {
         const latlngs = selectedRouteEvents.map(e => [e.lat, e.lng]);
         routePolyline = L.polyline(latlngs, {
@@ -3349,7 +3141,6 @@ function updateRouteOnMap() {
             className: 'route-line'
         }).addTo(map);
 
-        // Ajustar vista para mostrar toda la ruta
         map.fitBounds(routePolyline.getBounds(), { padding: [50, 50] });
     }
 }
@@ -3357,7 +3148,6 @@ function updateRouteOnMap() {
 function optimizeRoute() {
     if (selectedRouteEvents.length < 2) return;
 
-    // Algoritmo simple: Nearest Neighbor (greedy)
     const optimized = [selectedRouteEvents[0]];
     const remaining = selectedRouteEvents.slice(1);
 
@@ -3397,7 +3187,6 @@ function exportRoute() {
 
     const fullText = `🗺️ MI RUTA EN EVENTOSMADRID\n\n${routeText}\n🌐 Creada en: ${window.location.href}`;
 
-    // Mostrar modal de exportación
     showExportModal(fullText);
 }
 
@@ -3417,7 +3206,7 @@ function showExportModal(text) {
                     <i class="fab fa-whatsapp"></i>
                     <span>WhatsApp</span>
                 </button>
-                <button class="route-export-btn" onclick="copyRouteText('${text.replace(/'/g, "\\'")}')">
+                <button class="route-export-btn" onclick="copyRouteText(\`${text.replace(/`/g, '\\`')}\`)">
                     <i class="fas fa-copy"></i>
                     <span>Copiar texto</span>
                 </button>
@@ -3486,11 +3275,202 @@ function clearRoute() {
 
 // ===== INICIALIZACIÓN DE FEATURES PREMIUM =====
 function initPremiumFeatures() {
+    console.log('🚀 Inicializando features premium...');
+    
     initThemeSystem();
     initHeatmapMode();
     initRoutePlanner();
+    
+    console.log('✅ Todas las features premium inicializadas');
 }
 
-// ===== MODIFICAR DOMContentLoaded EXISTENTE =====
-// Añade esta línea al final de tu DOMContentLoaded actual:
-// initPremiumFeatures();
+// ===== INICIALIZACIÓN PRINCIPAL =====
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    const savedContrast = localStorage.getItem('contrast') || 'normal';
+    document.documentElement.setAttribute('data-contrast', savedContrast);
+
+    const savedLargeText = localStorage.getItem('largeText') === 'true';
+    document.documentElement.setAttribute('data-large-text', savedLargeText);
+
+    const savedReduceMotion = localStorage.getItem('reduceMotion') === 'true';
+    document.documentElement.setAttribute('data-reduce-motion', savedReduceMotion);
+
+    initMap();
+    loadEvents();
+    initGeolocate();
+    initSliderPrecio();
+    initDistanceFilter();
+    initCollapseGroups();
+    initLugaresSelectAll();
+    initLugaresListToggle();
+    initSettingsPanel();
+    initQuickFilters();
+    initViewDensity();
+    initInfiniteScroll();
+    initScrollToTop();
+    initSwipeGestures();
+    initPullToRefresh();
+
+    const fabFilters = document.getElementById('fab-filters');
+    if (fabFilters) {
+        fabFilters.addEventListener('click', () => {
+            const panel = document.getElementById('filters-panel');
+            if (panel) {
+                panel.classList.add('active');
+                panel.setAttribute('aria-modal', 'true');
+            }
+        });
+    }
+
+    const closePanel = document.getElementById('close-panel');
+    if (closePanel) {
+        closePanel.addEventListener('click', () => {
+            const panel = document.getElementById('filters-panel');
+            if (panel) {
+                panel.classList.remove('active');
+                panel.setAttribute('aria-modal', 'false');
+            }
+        });
+    }
+
+    const statsToggle = document.getElementById('stats-toggle');
+    if (statsToggle) {
+        statsToggle.addEventListener('click', () => {
+            const panel = document.getElementById('stats-panel');
+            if (panel) {
+                panel.classList.add('active');
+                panel.setAttribute('aria-modal', 'true');
+                setTimeout(() => initCharts(), 100);
+            }
+        });
+    }
+
+    const closeStats = document.getElementById('close-stats');
+    if (closeStats) {
+        closeStats.addEventListener('click', () => {
+            const panel = document.getElementById('stats-panel');
+            if (panel) {
+                panel.classList.remove('active');
+                panel.setAttribute('aria-modal', 'false');
+            }
+        });
+    }
+
+    const favToggle = document.getElementById('favorites-toggle');
+    if (favToggle) {
+        favToggle.addEventListener('click', () => {
+            const panel = document.getElementById('favorites-panel');
+            if (panel) {
+                panel.classList.add('active');
+                panel.setAttribute('aria-modal', 'true');
+            }
+        });
+    }
+
+    const closeFav = document.getElementById('close-favorites');
+    if (closeFav) {
+        closeFav.addEventListener('click', () => {
+            const panel = document.getElementById('favorites-panel');
+            if (panel) {
+                panel.classList.remove('active');
+                panel.setAttribute('aria-modal', 'false');
+            }
+        });
+    }
+
+    document.querySelectorAll('[data-view]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const view = btn.dataset.view;
+            if (view) switchView(view);
+        });
+    });
+
+    const bottomNavFavorites = document.getElementById('bottom-nav-favorites');
+    if (bottomNavFavorites) {
+        bottomNavFavorites.addEventListener('click', () => {
+            const panel = document.getElementById('favorites-panel');
+            if (panel) {
+                panel.classList.add('active');
+                panel.setAttribute('aria-modal', 'true');
+            }
+        });
+    }
+
+    const btnToggleLugares = document.getElementById('btn-toggle-lugares');
+    if (btnToggleLugares) {
+        btnToggleLugares.addEventListener('click', toggleLugares);
+    }
+
+    const btnClear = document.getElementById('btn-clear');
+    if (btnClear) {
+        btnClear.addEventListener('click', clearFilters);
+    }
+
+    const calPrev = document.getElementById('calendar-prev');
+    if (calPrev) {
+        calPrev.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            renderCalendar();
+        });
+    }
+
+    const calNext = document.getElementById('calendar-next');
+    if (calNext) {
+        calNext.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            renderCalendar();
+        });
+    }
+
+    const sortBy = document.getElementById('sort-by');
+    if (sortBy) {
+        sortBy.addEventListener('change', e => {
+            currentSort = e.target.value;
+            if (currentSort === 'distance' && !userLocation) {
+                mostrarToast('📍 Activa tu ubicación primero', 'error');
+                e.target.value = 'date';
+                currentSort = 'date';
+                return;
+            }
+            currentPage = 0;
+            renderListView(currentFilteredEvents);
+            renderLugaresList(currentFilteredLugares);
+        });
+    }
+
+    const searchInput = document.getElementById('search');
+    if (searchInput) searchInput.addEventListener('input', applyFilters);
+
+    const filtroFecha = document.getElementById('filtro-fecha');
+    if (filtroFecha) filtroFecha.addEventListener('change', applyFilters);
+
+    const filtroZona = document.getElementById('filtro-zona');
+    if (filtroZona) filtroZona.addEventListener('change', applyFilters);
+
+    document.querySelectorAll('.chip input').forEach(cb => {
+        cb.addEventListener('change', applyFilters);
+    });
+
+    document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape') return;
+        cerrarModalCompartir();
+        document.querySelectorAll(
+            '.filters-panel.active, .stats-panel.active, ' +
+            '.favorites-panel.active, .settings-panel.active'
+        ).forEach(panel => {
+            const closeBtn = panel.querySelector('.close-panel');
+            if (closeBtn) closeBtn.click();
+        });
+    });
+});
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/eventos-madrid/sw.js')
+            .then(reg => console.log('✅ SW registrado:', reg.scope))
+            .catch(err => console.log('❌ SW error:', err));
+    });
+}

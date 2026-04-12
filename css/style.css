@@ -287,7 +287,53 @@ body {
     background: var(--accent-subtle);
     color: var(--accent);
 }
+/* ===== BOTÓN PLANIFICADOR DE RUTAS (HEADER) ===== */
+.route-planner-btn {
+    background: transparent;
+    border: none;
+    color: var(--purple);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s var(--ease-out);
+    font-family: var(--font-system);
+    position: relative;
+}
 
+.route-planner-btn:hover {
+    background: var(--purple-subtle);
+}
+
+.route-planner-btn:active {
+    transform: scale(0.95);
+}
+
+.route-planner-btn.active {
+    background: var(--purple-subtle);
+    color: var(--purple);
+    box-shadow: 0 2px 8px rgba(191, 90, 242, 0.3);
+}
+
+.route-planner-btn .route-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--purple);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .favorites-count {
     position: absolute;
     top: -4px;
