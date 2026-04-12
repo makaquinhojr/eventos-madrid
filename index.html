@@ -64,15 +64,6 @@
         <span class="logo-text" data-i18n="logo.text">EventosMadrid</span>
     </div>
 
-    <!-- =====================================================
-         🔧 FIX #1: SEGMENTED CONTROL DE NAVEGACIÓN (DESKTOP)
-         Antes: NO EXISTÍA en el HTML → todos los getElementById
-                de app.js devolvían null silenciosamente.
-         Ahora: Segmented control Apple-style con los IDs exactos
-                que app.js busca: view-map-btn, view-list-btn,
-                view-calendar-btn.
-         Visible solo en desktop (≥ 641px) via CSS.
-         ===================================================== -->
     <nav class="view-toggle" 
          role="tablist" 
          aria-label="Cambiar vista">
@@ -331,12 +322,6 @@
 </main>
 
 <!-- ===== BOTTOM NAVIGATION (MÓVIL) ===== -->
-<!--
-     🔧 FIX #2: La bottom-nav YA TENÍA los IDs correctos.
-     El problema era que en desktop (> 640px) display:none la ocultaba
-     y NO HABÍA alternativa desktop. Ahora coexiste con el
-     segmented control del header para desktop.
--->
 <nav class="bottom-nav" role="navigation" aria-label="Navegación principal">
     <button class="bottom-nav-item active" 
             id="bottom-nav-map" 
@@ -764,7 +749,7 @@
                 🌐 Idioma
             </h3>
 
-            <div class="setting-item setting-item--column"></div>
+            <div class="setting-item setting-item--column">
                 <div class="setting-info">
                     <label class="setting-label" 
                            for="lang-select"
@@ -871,14 +856,13 @@
             <h3 class="settings-section-title" data-i18n="settings.about">
                 ℹ️ Sobre
             </h3>
-               <div class="setting-item" style="flex-direction: column; align-items: center; gap: 8px;"></div>
-                    <p class="setting-label" data-i18n="settings.about.app">EventosMadrid</p>
-                    <p class="setting-description" data-i18n="settings.about.version">v1.0.0</p>
-                    <p class="setting-description" style="font-size: 12px; margin-top: 8px;" 
-                       data-i18n="settings.about.desc">
-                        Mapa de eventos culturales y de ocio en Madrid
-                    </p>
-                </div>
+            <div class="setting-item" style="flex-direction: column; align-items: center; gap: 8px;">
+                <p class="setting-label" data-i18n="settings.about.app">EventosMadrid</p>
+                <p class="setting-description" data-i18n="settings.about.version">v1.0.0</p>
+                <p class="setting-description" style="font-size: 12px; margin-top: 8px;" 
+                   data-i18n="settings.about.desc">
+                    Mapa de eventos culturales y de ocio en Madrid
+                </p>
             </div>
         </div>
     </div>

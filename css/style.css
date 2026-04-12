@@ -1091,7 +1091,6 @@ body {
     justify-content: space-between;
     min-height: 64px;
     flex-shrink: 0;
-    width: 100%;
 }
 
 .panel-header h2 {
@@ -1120,13 +1119,11 @@ body {
 .close-panel:hover { background: var(--bg-elevated-2); color: var(--text); }
 .close-panel:active { transform: scale(0.9); }
 
-/* ===== PANEL CONTENT — SCROLL ÚNICO ===== */
+/* ===== PANEL CONTENT ===== */
 .panel-content {
     flex: 1;
     min-height: 0;
-    padding: var(--space-5);
-    padding-left: var(--space-6);
-    padding-right: var(--space-6);
+    padding: var(--space-5) var(--space-6);
     padding-bottom: calc(var(--space-10) + env(safe-area-inset-bottom));
     overflow-y: auto;
     overflow-x: hidden;
@@ -2235,7 +2232,6 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Item base — fila (label izquierda + toggle derecha) */
 .setting-item {
     display: flex;
     flex-direction: row;
@@ -2249,11 +2245,9 @@ body {
     border-bottom: 0.5px solid var(--separator);
 }
 
-/* Texto descriptivo — ocupa todo el espacio disponible */
 .setting-info {
     flex: 1;
     min-width: 0;
-    padding-right: var(--space-4);
 }
 
 .setting-label {
@@ -2263,7 +2257,6 @@ body {
     color: var(--text);
     margin-bottom: 4px;
     letter-spacing: -0.2px;
-    word-break: break-word;
 }
 
 .setting-description {
@@ -2271,10 +2264,8 @@ body {
     color: var(--text-tertiary);
     margin: 0;
     line-height: 1.4;
-    word-break: break-word;
 }
 
-/* Toggle — nunca se encoge */
 .toggle-switch {
     position: relative;
     display: inline-flex;
@@ -2314,7 +2305,6 @@ body {
 .toggle-checkbox:checked + .toggle-slider::before { transform: translateX(20px); }
 .toggle-checkbox:focus + .toggle-slider { box-shadow: 0 0 0 4px var(--accent-subtle); }
 
-/* Items con select — columna (texto arriba, select abajo) */
 .setting-item--column {
     flex-direction: column;
     align-items: stretch;
@@ -2324,10 +2314,8 @@ body {
 .setting-item--column .setting-info {
     flex: none;
     width: 100%;
-    padding-right: 0;
 }
 
-/* Select de ajustes */
 .settings-select {
     width: 100%;
     padding: var(--space-3);
@@ -2340,8 +2328,6 @@ body {
     cursor: pointer;
     transition: all 0.2s var(--ease-out);
     outline: none;
-    min-width: 0;
-    max-width: 100%;
 }
 
 .settings-select:hover { background: var(--bg-elevated-2); }
@@ -2371,7 +2357,6 @@ body {
 .skip-link:focus { top: var(--space-2); }
 
 /* ===== REDUCED MOTION ===== */
-/* Via toggle manual (data-reduce-motion en <html>) */
 [data-reduce-motion="true"] *,
 [data-reduce-motion="true"] *::before,
 [data-reduce-motion="true"] *::after {
@@ -2381,7 +2366,6 @@ body {
     scroll-behavior: auto !important;
 }
 
-/* Via preferencia del sistema operativo */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -2494,9 +2478,7 @@ body {
 @keyframes fadeUp  { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
-/* ================================================================
-   RESPONSIVE — MOBILE (≤ 640px)
-   ================================================================ */
+/* ===== RESPONSIVE — MOBILE (≤ 640px) ===== */
 @media (max-width: 640px) {
 
     .top-bar {
@@ -2566,7 +2548,6 @@ body {
         max-width: 100%;
     }
 
-    /* Panel content en móvil — padding lateral reducido */
     .panel-content {
         padding-left: var(--space-4);
         padding-right: var(--space-4);
@@ -2605,5 +2586,3 @@ body {
 
     .desktop-only { display: none; }
 }
-
-/* ===== FIN DEL REDISEÑO APPLE-STYLE ===== */
