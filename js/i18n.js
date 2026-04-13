@@ -1,6 +1,12 @@
-// ===== SISTEMA DE TRADUCCIONES I18N COMPLETO =====
+/* ========================================
+   EVENTOSMADRID - i18n.js COMPLETO
+   VERSIÓN: 2.0 - MOBILE FIRST + PREMIUM
+   9 IDIOMAS: ES, EN, FR, PT, DE, IT, ZH, JA, KO
+   COBERTURA: 100% UI + Features Premium
+   ======================================== */
 
 const translations = {
+    // ===== ESPAÑOL =====
     es: {
         // ===== HEADER =====
         'logo.text': 'EventosMadrid',
@@ -62,6 +68,8 @@ const translations = {
         'list.sort.type': '🎭 Tipo',
         'list.sort.distance': '📍 Distancia',
         'list.places': '🏛️ Lugares de Interés',
+        'list.empty.title': 'No se encontraron eventos',
+        'list.empty.description': 'Prueba a cambiar los filtros',
         
         // ===== FAVORITOS =====
         'favorites.title': '❤️ Mis Favoritos',
@@ -116,6 +124,55 @@ const translations = {
         'settings.about.version': 'v1.0.0',
         'settings.about.desc': 'Mapa de eventos culturales y de ocio en Madrid',
         
+        // ===== TEMAS PERSONALIZADOS =====
+        'themes.title': '🎨 Temas Personalizados',
+        'themes.select': 'Seleccionar tema',
+        'themes.select.desc': 'Elige un tema prediseñado o crea el tuyo',
+        'themes.default': 'Default',
+        'themes.sunset': 'Sunset',
+        'themes.forest': 'Forest',
+        'themes.ocean': 'Ocean',
+        'themes.berry': 'Berry',
+        'themes.custom': 'Personalizar color',
+        'themes.custom.desc': 'Usa tu propio color de acento',
+        'themes.accent': 'Color de acento',
+        
+        // ===== MODO EXPLORACIÓN =====
+        'explore.title': '🌈 Modo Exploración',
+        'explore.heatmap': 'Mapa de calor',
+        'explore.heatmap.desc': 'Visualiza densidad de eventos por zona',
+        'explore.intensity': 'Intensidad del heatmap',
+        'explore.intensity.low': 'Sutil',
+        'explore.intensity.medium': 'Normal',
+        'explore.intensity.high': 'Intenso',
+        'explore.legend.title': 'Densidad de eventos',
+        'explore.legend.low': 'Baja',
+        'explore.legend.high': 'Alta',
+        
+        // ===== PLANIFICADOR DE RUTAS =====
+        'route.title': '🗺️ Mi Ruta',
+        'route.events_selected': 'Eventos seleccionados',
+        'route.total_distance': 'Distancia total',
+        'route.estimated_time': 'Tiempo estimado',
+        'route.optimize': 'Optimizar ruta',
+        'route.export': 'Compartir ruta',
+        'route.clear': 'Limpiar ruta',
+        'route.empty.title': 'Selecciona eventos en el mapa',
+        'route.empty.desc': 'Haz click en los marcadores para añadirlos a tu ruta',
+        'route.added': '✅ Añadido a la ruta',
+        'route.removed': '🗑️ Eliminado de la ruta',
+        'route.already_added': '⚠️ Este evento ya está en tu ruta',
+        'route.optimized': '✨ Ruta optimizada - Distancia mínima calculada',
+        'route.export_title': '📤 Compartir ruta',
+        'route.export.whatsapp': 'WhatsApp',
+        'route.export.copy': 'Copiar texto',
+        'route.export.download': 'Descargar JSON',
+        'route.export.copied': '✅ Ruta copiada al portapapeles',
+        'route.export.downloaded': '💾 Ruta descargada',
+        'route.clear.confirm': '¿Seguro que quieres limpiar la ruta?',
+        'route.mode.enabled': '🗺️ Click en eventos para añadir a tu ruta',
+        'route.mode.disabled': '🗺️ Modo planificador desactivado',
+        
         // ===== TOAST =====
         'toast.theme_dark': '🌙 Modo oscuro activado',
         'toast.theme_light': '☀️ Modo claro activado',
@@ -127,10 +184,18 @@ const translations = {
         'toast.searches_on': '💾 Se guardarán tus búsquedas',
         'toast.searches_off': '🗑️ Las búsquedas no se guardarán',
         'toast.data_cleared': '🗑️ Datos limpiados',
+        'toast.theme_activated': '✨ Tema "{theme}" activado',
+        'toast.custom_color_on': '🎨 Color personalizado activado',
+        'toast.custom_color_off': '🎨 Tema por defecto restaurado',
+        'toast.custom_color_saved': '🎨 Color guardado',
+        'toast.heatmap_on': '🌈 Mapa de calor activado',
+        'toast.heatmap_off': '🌈 Mapa de calor desactivado',
+        'toast.heatmap_no_events': '⚠️ No hay eventos para mostrar',
         
         // ===== LOADER =====
         'loader.title': 'EventosMadrid',
         'loader.subtitle': 'Cargando eventos...',
+        'loader.events_loaded': '✅ {count} eventos cargados',
         
         // ===== IDIOMAS =====
         'lang.es': '🇪🇸 Español',
@@ -217,6 +282,7 @@ const translations = {
         'common.loading': 'Cargando...',
         'common.error': 'Error',
         'common.no_description': 'Sin descripción',
+        'common.showing': 'Mostrando {shown} de {total}',
     },
     
     // ===== INGLÉS =====
@@ -278,6 +344,8 @@ const translations = {
         'list.sort.type': '🎭 Type',
         'list.sort.distance': '📍 Distance',
         'list.places': '🏛️ Points of Interest',
+        'list.empty.title': 'No events found',
+        'list.empty.description': 'Try changing the filters',
         
         'favorites.title': '❤️ My Favorites',
         'favorites.empty': 'No favorites yet',
@@ -329,6 +397,52 @@ const translations = {
         'settings.about.version': 'v1.0.0',
         'settings.about.desc': 'Cultural and leisure events map in Madrid',
         
+        'themes.title': '🎨 Custom Themes',
+        'themes.select': 'Select theme',
+        'themes.select.desc': 'Choose a preset theme or create your own',
+        'themes.default': 'Default',
+        'themes.sunset': 'Sunset',
+        'themes.forest': 'Forest',
+        'themes.ocean': 'Ocean',
+        'themes.berry': 'Berry',
+        'themes.custom': 'Custom color',
+        'themes.custom.desc': 'Use your own accent color',
+        'themes.accent': 'Accent color',
+        
+        'explore.title': '🌈 Exploration Mode',
+        'explore.heatmap': 'Heatmap',
+        'explore.heatmap.desc': 'Visualize event density by zone',
+        'explore.intensity': 'Heatmap intensity',
+        'explore.intensity.low': 'Subtle',
+        'explore.intensity.medium': 'Normal',
+        'explore.intensity.high': 'Intense',
+        'explore.legend.title': 'Event density',
+        'explore.legend.low': 'Low',
+        'explore.legend.high': 'High',
+        
+        'route.title': '🗺️ My Route',
+        'route.events_selected': 'Selected events',
+        'route.total_distance': 'Total distance',
+        'route.estimated_time': 'Estimated time',
+        'route.optimize': 'Optimize route',
+        'route.export': 'Share route',
+        'route.clear': 'Clear route',
+        'route.empty.title': 'Select events on the map',
+        'route.empty.desc': 'Click on markers to add them to your route',
+        'route.added': '✅ Added to route',
+        'route.removed': '🗑️ Removed from route',
+        'route.already_added': '⚠️ This event is already in your route',
+        'route.optimized': '✨ Route optimized - Minimum distance calculated',
+        'route.export_title': '📤 Share route',
+        'route.export.whatsapp': 'WhatsApp',
+        'route.export.copy': 'Copy text',
+        'route.export.download': 'Download JSON',
+        'route.export.copied': '✅ Route copied to clipboard',
+        'route.export.downloaded': '💾 Route downloaded',
+        'route.clear.confirm': 'Are you sure you want to clear the route?',
+        'route.mode.enabled': '🗺️ Click on events to add to your route',
+        'route.mode.disabled': '🗺️ Route planner disabled',
+        
         'toast.theme_dark': '🌙 Dark mode enabled',
         'toast.theme_light': '☀️ Light mode enabled',
         'toast.lang_changed': '🌐 Language changed',
@@ -339,9 +453,17 @@ const translations = {
         'toast.searches_on': '💾 Searches will be saved',
         'toast.searches_off': '🗑️ Searches won\'t be saved',
         'toast.data_cleared': '🗑️ Data cleared',
+        'toast.theme_activated': '✨ Theme "{theme}" activated',
+        'toast.custom_color_on': '🎨 Custom color activated',
+        'toast.custom_color_off': '🎨 Default theme restored',
+        'toast.custom_color_saved': '🎨 Color saved',
+        'toast.heatmap_on': '🌈 Heatmap activated',
+        'toast.heatmap_off': '🌈 Heatmap deactivated',
+        'toast.heatmap_no_events': '⚠️ No events to display',
         
         'loader.title': 'EventosMadrid',
         'loader.subtitle': 'Loading events...',
+        'loader.events_loaded': '✅ {count} events loaded',
         
         'lang.es': '🇪🇸 Español',
         'lang.en': '🇬🇧 English',
@@ -422,8 +544,9 @@ const translations = {
         'common.loading': 'Loading...',
         'common.error': 'Error',
         'common.no_description': 'No description',
+        'common.showing': 'Showing {shown} of {total}',
     },
-    
+
     // ===== FRANCÉS =====
     fr: {
         'logo.text': 'EventosMadrid',
@@ -483,6 +606,8 @@ const translations = {
         'list.sort.type': '🎭 Type',
         'list.sort.distance': '📍 Distance',
         'list.places': '🏛️ Points d\'intérêt',
+        'list.empty.title': 'Aucun événement trouvé',
+        'list.empty.description': 'Essayez de changer les filtres',
         
         'favorites.title': '❤️ Mes Favoris',
         'favorites.empty': 'Aucun favori',
@@ -534,6 +659,52 @@ const translations = {
         'settings.about.version': 'v1.0.0',
         'settings.about.desc': 'Carte des événements culturels et de loisirs à Madrid',
         
+        'themes.title': '🎨 Thèmes Personnalisés',
+        'themes.select': 'Sélectionner un thème',
+        'themes.select.desc': 'Choisir un thème prédéfini ou créer le vôtre',
+        'themes.default': 'Par défaut',
+        'themes.sunset': 'Coucher de soleil',
+        'themes.forest': 'Forêt',
+        'themes.ocean': 'Océan',
+        'themes.berry': 'Baie',
+        'themes.custom': 'Couleur personnalisée',
+        'themes.custom.desc': 'Utilisez votre propre couleur d\'accent',
+        'themes.accent': 'Couleur d\'accent',
+        
+        'explore.title': '🌈 Mode Exploration',
+        'explore.heatmap': 'Carte thermique',
+        'explore.heatmap.desc': 'Visualiser la densité d\'événements par zone',
+        'explore.intensity': 'Intensité de la carte',
+        'explore.intensity.low': 'Subtile',
+        'explore.intensity.medium': 'Normale',
+        'explore.intensity.high': 'Intense',
+        'explore.legend.title': 'Densité d\'événements',
+        'explore.legend.low': 'Faible',
+        'explore.legend.high': 'Élevée',
+        
+        'route.title': '🗺️ Mon Itinéraire',
+        'route.events_selected': 'Événements sélectionnés',
+        'route.total_distance': 'Distance totale',
+        'route.estimated_time': 'Temps estimé',
+        'route.optimize': 'Optimiser l\'itinéraire',
+        'route.export': 'Partager l\'itinéraire',
+        'route.clear': 'Effacer l\'itinéraire',
+        'route.empty.title': 'Sélectionnez des événements sur la carte',
+        'route.empty.desc': 'Cliquez sur les marqueurs pour les ajouter à votre itinéraire',
+        'route.added': '✅ Ajouté à l\'itinéraire',
+        'route.removed': '🗑️ Retiré de l\'itinéraire',
+        'route.already_added': '⚠️ Cet événement est déjà dans votre itinéraire',
+        'route.optimized': '✨ Itinéraire optimisé - Distance minimale calculée',
+        'route.export_title': '📤 Partager l\'itinéraire',
+        'route.export.whatsapp': 'WhatsApp',
+        'route.export.copy': 'Copier le texte',
+        'route.export.download': 'Télécharger JSON',
+        'route.export.copied': '✅ Itinéraire copié dans le presse-papiers',
+        'route.export.downloaded': '💾 Itinéraire téléchargé',
+        'route.clear.confirm': 'Êtes-vous sûr de vouloir effacer l\'itinéraire?',
+        'route.mode.enabled': '🗺️ Cliquez sur les événements pour les ajouter',
+        'route.mode.disabled': '🗺️ Planificateur d\'itinéraire désactivé',
+        
         'toast.theme_dark': '🌙 Mode sombre activé',
         'toast.theme_light': '☀️ Mode clair activé',
         'toast.lang_changed': '🌐 Langue modifiée',
@@ -544,9 +715,17 @@ const translations = {
         'toast.searches_on': '💾 Les recherches seront enregistrées',
         'toast.searches_off': '🗑️ Les recherches ne seront pas enregistrées',
         'toast.data_cleared': '🗑️ Données effacées',
+        'toast.theme_activated': '✨ Thème "{theme}" activé',
+        'toast.custom_color_on': '🎨 Couleur personnalisée activée',
+        'toast.custom_color_off': '🎨 Thème par défaut restauré',
+        'toast.custom_color_saved': '🎨 Couleur enregistrée',
+        'toast.heatmap_on': '🌈 Carte thermique activée',
+        'toast.heatmap_off': '🌈 Carte thermique désactivée',
+        'toast.heatmap_no_events': '⚠️ Aucun événement à afficher',
         
         'loader.title': 'EventosMadrid',
         'loader.subtitle': 'Chargement des événements...',
+        'loader.events_loaded': '✅ {count} événements chargés',
         
         'lang.es': '🇪🇸 Español',
         'lang.en': '🇬🇧 English',
@@ -627,8 +806,8 @@ const translations = {
         'common.loading': 'Chargement...',
         'common.error': 'Erreur',
         'common.no_description': 'Sans description',
+        'common.showing': 'Affichage de {shown} sur {total}',
     },
-
     // ===== PORTUGUÉS =====
     pt: {
         'logo.text': 'EventosMadrid',
@@ -688,6 +867,8 @@ const translations = {
         'list.sort.type': '🎭 Tipo',
         'list.sort.distance': '📍 Distância',
         'list.places': '🏛️ Pontos de Interesse',
+        'list.empty.title': 'Nenhum evento encontrado',
+        'list.empty.description': 'Tente mudar os filtros',
         
         'favorites.title': '❤️ Meus Favoritos',
         'favorites.empty': 'Sem favoritos',
@@ -739,6 +920,52 @@ const translations = {
         'settings.about.version': 'v1.0.0',
         'settings.about.desc': 'Mapa de eventos culturais e de lazer em Madrid',
         
+        'themes.title': '🎨 Temas Personalizados',
+        'themes.select': 'Selecionar tema',
+        'themes.select.desc': 'Escolha um tema predefinido ou crie o seu',
+        'themes.default': 'Padrão',
+        'themes.sunset': 'Pôr do sol',
+        'themes.forest': 'Floresta',
+        'themes.ocean': 'Oceano',
+        'themes.berry': 'Berry',
+        'themes.custom': 'Cor personalizada',
+        'themes.custom.desc': 'Use sua própria cor de destaque',
+        'themes.accent': 'Cor de destaque',
+        
+        'explore.title': '🌈 Modo Exploração',
+        'explore.heatmap': 'Mapa de calor',
+        'explore.heatmap.desc': 'Visualizar densidade de eventos por zona',
+        'explore.intensity': 'Intensidade do mapa',
+        'explore.intensity.low': 'Sutil',
+        'explore.intensity.medium': 'Normal',
+        'explore.intensity.high': 'Intenso',
+        'explore.legend.title': 'Densidade de eventos',
+        'explore.legend.low': 'Baixa',
+        'explore.legend.high': 'Alta',
+        
+        'route.title': '🗺️ Minha Rota',
+        'route.events_selected': 'Eventos selecionados',
+        'route.total_distance': 'Distância total',
+        'route.estimated_time': 'Tempo estimado',
+        'route.optimize': 'Otimizar rota',
+        'route.export': 'Compartilhar rota',
+        'route.clear': 'Limpar rota',
+        'route.empty.title': 'Selecione eventos no mapa',
+        'route.empty.desc': 'Clique nos marcadores para adicioná-los à sua rota',
+        'route.added': '✅ Adicionado à rota',
+        'route.removed': '🗑️ Removido da rota',
+        'route.already_added': '⚠️ Este evento já está na sua rota',
+        'route.optimized': '✨ Rota otimizada - Distância mínima calculada',
+        'route.export_title': '📤 Compartilhar rota',
+        'route.export.whatsapp': 'WhatsApp',
+        'route.export.copy': 'Copiar texto',
+        'route.export.download': 'Baixar JSON',
+        'route.export.copied': '✅ Rota copiada para a área de transferência',
+        'route.export.downloaded': '💾 Rota baixada',
+        'route.clear.confirm': 'Tem certeza de que deseja limpar a rota?',
+        'route.mode.enabled': '🗺️ Clique nos eventos para adicionar',
+        'route.mode.disabled': '🗺️ Planejador de rotas desativado',
+        
         'toast.theme_dark': '🌙 Modo escuro ativado',
         'toast.theme_light': '☀️ Modo claro ativado',
         'toast.lang_changed': '🌐 Idioma alterado',
@@ -749,9 +976,17 @@ const translations = {
         'toast.searches_on': '💾 Pesquisas serão salvas',
         'toast.searches_off': '🗑️ Pesquisas não serão salvas',
         'toast.data_cleared': '🗑️ Dados limpos',
+        'toast.theme_activated': '✨ Tema "{theme}" ativado',
+        'toast.custom_color_on': '🎨 Cor personalizada ativada',
+        'toast.custom_color_off': '🎨 Tema padrão restaurado',
+        'toast.custom_color_saved': '🎨 Cor salva',
+        'toast.heatmap_on': '🌈 Mapa de calor ativado',
+        'toast.heatmap_off': '🌈 Mapa de calor desativado',
+        'toast.heatmap_no_events': '⚠️ Nenhum evento para exibir',
         
         'loader.title': 'EventosMadrid',
         'loader.subtitle': 'Carregando eventos...',
+        'loader.events_loaded': '✅ {count} eventos carregados',
         
         'lang.es': '🇪🇸 Español',
         'lang.en': '🇬🇧 English',
@@ -832,6 +1067,7 @@ const translations = {
         'common.loading': 'Carregando...',
         'common.error': 'Erro',
         'common.no_description': 'Sem descrição',
+        'common.showing': 'Mostrando {shown} de {total}',
     },
 
     // ===== ALEMÁN =====
@@ -893,6 +1129,8 @@ const translations = {
         'list.sort.type': '🎭 Typ',
         'list.sort.distance': '📍 Entfernung',
         'list.places': '🏛️ Sehenswürdigkeiten',
+        'list.empty.title': 'Keine Veranstaltungen gefunden',
+        'list.empty.description': 'Versuchen Sie, die Filter zu ändern',
         
         'favorites.title': '❤️ Meine Favoriten',
         'favorites.empty': 'Keine Favoriten',
@@ -944,6 +1182,52 @@ const translations = {
         'settings.about.version': 'v1.0.0',
         'settings.about.desc': 'Karte für Kultur- und Freizeitveranstaltungen in Madrid',
         
+        'themes.title': '🎨 Benutzerdefinierte Themen',
+        'themes.select': 'Thema auswählen',
+        'themes.select.desc': 'Wählen Sie ein vordefiniertes Thema oder erstellen Sie Ihr eigenes',
+        'themes.default': 'Standard',
+        'themes.sunset': 'Sonnenuntergang',
+        'themes.forest': 'Wald',
+        'themes.ocean': 'Ozean',
+        'themes.berry': 'Beere',
+        'themes.custom': 'Benutzerdefinierte Farbe',
+        'themes.custom.desc': 'Verwenden Sie Ihre eigene Akzentfarbe',
+        'themes.accent': 'Akzentfarbe',
+        
+        'explore.title': '🌈 Erkundungsmodus',
+        'explore.heatmap': 'Heatmap',
+        'explore.heatmap.desc': 'Veranstaltungsdichte nach Zone visualisieren',
+        'explore.intensity': 'Heatmap-Intensität',
+        'explore.intensity.low': 'Subtil',
+        'explore.intensity.medium': 'Normal',
+        'explore.intensity.high': 'Intensiv',
+        'explore.legend.title': 'Veranstaltungsdichte',
+        'explore.legend.low': 'Niedrig',
+        'explore.legend.high': 'Hoch',
+        
+        'route.title': '🗺️ Meine Route',
+        'route.events_selected': 'Ausgewählte Veranstaltungen',
+        'route.total_distance': 'Gesamtentfernung',
+        'route.estimated_time': 'Geschätzte Zeit',
+        'route.optimize': 'Route optimieren',
+        'route.export': 'Route teilen',
+        'route.clear': 'Route löschen',
+        'route.empty.title': 'Wählen Sie Veranstaltungen auf der Karte aus',
+        'route.empty.desc': 'Klicken Sie auf die Marker, um sie zu Ihrer Route hinzuzufügen',
+        'route.added': '✅ Zur Route hinzugefügt',
+        'route.removed': '🗑️ Von Route entfernt',
+        'route.already_added': '⚠️ Diese Veranstaltung ist bereits in Ihrer Route',
+        'route.optimized': '✨ Route optimiert - Minimale Entfernung berechnet',
+        'route.export_title': '📤 Route teilen',
+        'route.export.whatsapp': 'WhatsApp',
+        'route.export.copy': 'Text kopieren',
+        'route.export.download': 'JSON herunterladen',
+        'route.export.copied': '✅ Route in Zwischenablage kopiert',
+        'route.export.downloaded': '💾 Route heruntergeladen',
+        'route.clear.confirm': 'Sind Sie sicher, dass Sie die Route löschen möchten?',
+        'route.mode.enabled': '🗺️ Klicken Sie auf Veranstaltungen, um sie hinzuzufügen',
+        'route.mode.disabled': '🗺️ Routenplaner deaktiviert',
+        
         'toast.theme_dark': '🌙 Dunkler Modus aktiviert',
         'toast.theme_light': '☀️ Heller Modus aktiviert',
         'toast.lang_changed': '🌐 Sprache geändert',
@@ -954,9 +1238,17 @@ const translations = {
         'toast.searches_on': '💾 Suchen werden gespeichert',
         'toast.searches_off': '🗑️ Suchen werden nicht gespeichert',
         'toast.data_cleared': '🗑️ Daten gelöscht',
+        'toast.theme_activated': '✨ Thema "{theme}" aktiviert',
+        'toast.custom_color_on': '🎨 Benutzerdefinierte Farbe aktiviert',
+        'toast.custom_color_off': '🎨 Standardthema wiederhergestellt',
+        'toast.custom_color_saved': '🎨 Farbe gespeichert',
+        'toast.heatmap_on': '🌈 Heatmap aktiviert',
+        'toast.heatmap_off': '🌈 Heatmap deaktiviert',
+        'toast.heatmap_no_events': '⚠️ Keine Veranstaltungen zum Anzeigen',
         
         'loader.title': 'EventosMadrid',
         'loader.subtitle': 'Veranstaltungen werden geladen...',
+        'loader.events_loaded': '✅ {count} Veranstaltungen geladen',
         
         'lang.es': '🇪🇸 Español',
         'lang.en': '🇬🇧 English',
@@ -1037,8 +1329,8 @@ const translations = {
         'common.loading': 'Laden...',
         'common.error': 'Fehler',
         'common.no_description': 'Keine Beschreibung',
+        'common.showing': '{shown} von {total} anzeigen',
     },
-
     // ===== ITALIANO =====
     it: {
         'logo.text': 'EventosMadrid',
@@ -1098,6 +1390,8 @@ const translations = {
         'list.sort.type': '🎭 Tipo',
         'list.sort.distance': '📍 Distanza',
         'list.places': '🏛️ Punti di Interesse',
+        'list.empty.title': 'Nessun evento trovato',
+        'list.empty.description': 'Prova a cambiare i filtri',
         
         'favorites.title': '❤️ I Miei Preferiti',
         'favorites.empty': 'Nessun preferito',
@@ -1149,6 +1443,52 @@ const translations = {
         'settings.about.version': 'v1.0.0',
         'settings.about.desc': 'Mappa di eventi culturali e di svago a Madrid',
         
+        'themes.title': '🎨 Temi Personalizzati',
+        'themes.select': 'Seleziona tema',
+        'themes.select.desc': 'Scegli un tema predefinito o crea il tuo',
+        'themes.default': 'Predefinito',
+        'themes.sunset': 'Tramonto',
+        'themes.forest': 'Foresta',
+        'themes.ocean': 'Oceano',
+        'themes.berry': 'Bacca',
+        'themes.custom': 'Colore personalizzato',
+        'themes.custom.desc': 'Usa il tuo colore principale',
+        'themes.accent': 'Colore principale',
+        
+        'explore.title': '🌈 Modalità Esplorazione',
+        'explore.heatmap': 'Mappa termica',
+        'explore.heatmap.desc': 'Visualizza densità eventi per zona',
+        'explore.intensity': 'Intensità mappa',
+        'explore.intensity.low': 'Sottile',
+        'explore.intensity.medium': 'Normale',
+        'explore.intensity.high': 'Intenso',
+        'explore.legend.title': 'Densità eventi',
+        'explore.legend.low': 'Bassa',
+        'explore.legend.high': 'Alta',
+        
+        'route.title': '🗺️ Il Mio Percorso',
+        'route.events_selected': 'Eventi selezionati',
+        'route.total_distance': 'Distanza totale',
+        'route.estimated_time': 'Tempo stimato',
+        'route.optimize': 'Ottimizza percorso',
+        'route.export': 'Condividi percorso',
+        'route.clear': 'Cancella percorso',
+        'route.empty.title': 'Seleziona eventi sulla mappa',
+        'route.empty.desc': 'Fai clic sui marcatori per aggiungerli al tuo percorso',
+        'route.added': '✅ Aggiunto al percorso',
+        'route.removed': '🗑️ Rimosso dal percorso',
+        'route.already_added': '⚠️ Questo evento è già nel tuo percorso',
+        'route.optimized': '✨ Percorso ottimizzato - Distanza minima calcolata',
+        'route.export_title': '📤 Condividi percorso',
+        'route.export.whatsapp': 'WhatsApp',
+        'route.export.copy': 'Copia testo',
+        'route.export.download': 'Scarica JSON',
+        'route.export.copied': '✅ Percorso copiato negli appunti',
+        'route.export.downloaded': '💾 Percorso scaricato',
+        'route.clear.confirm': 'Sei sicuro di voler cancellare il percorso?',
+        'route.mode.enabled': '🗺️ Fai clic sugli eventi per aggiungerli',
+        'route.mode.disabled': '🗺️ Pianificatore percorso disattivato',
+        
         'toast.theme_dark': '🌙 Modalità scura attivata',
         'toast.theme_light': '☀️ Modalità chiara attivata',
         'toast.lang_changed': '🌐 Lingua cambiata',
@@ -1159,9 +1499,17 @@ const translations = {
         'toast.searches_on': '💾 Le ricerche saranno salvate',
         'toast.searches_off': '🗑️ Le ricerche non saranno salvate',
         'toast.data_cleared': '🗑️ Dati cancellati',
+        'toast.theme_activated': '✨ Tema "{theme}" attivato',
+        'toast.custom_color_on': '🎨 Colore personalizzato attivato',
+        'toast.custom_color_off': '🎨 Tema predefinito ripristinato',
+        'toast.custom_color_saved': '🎨 Colore salvato',
+        'toast.heatmap_on': '🌈 Mappa termica attivata',
+        'toast.heatmap_off': '🌈 Mappa termica disattivata',
+        'toast.heatmap_no_events': '⚠️ Nessun evento da visualizzare',
         
         'loader.title': 'EventosMadrid',
         'loader.subtitle': 'Caricamento eventi...',
+        'loader.events_loaded': '✅ {count} eventi caricati',
         
         'lang.es': '🇪🇸 Español',
         'lang.en': '🇬🇧 English',
@@ -1242,9 +1590,10 @@ const translations = {
         'common.loading': 'Caricamento...',
         'common.error': 'Errore',
         'common.no_description': 'Nessuna descrizione',
+        'common.showing': 'Mostrando {shown} di {total}',
     },
 
-    // ===== CHINO (Simplificado) =====
+    // ===== CHINO (简体中文) =====
     zh: {
         'logo.text': 'EventosMadrid',
         'btn.map': '地图',
@@ -1303,6 +1652,8 @@ const translations = {
         'list.sort.type': '🎭 类型',
         'list.sort.distance': '📍 距离',
         'list.places': '🏛️ 景点',
+        'list.empty.title': '未找到活动',
+        'list.empty.description': '尝试更改筛选条件',
         
         'favorites.title': '❤️ 我的收藏',
         'favorites.empty': '暂无收藏',
@@ -1354,6 +1705,52 @@ const translations = {
         'settings.about.version': 'v1.0.0',
         'settings.about.desc': '马德里文化和休闲活动地图',
         
+        'themes.title': '🎨 自定义主题',
+        'themes.select': '选择主题',
+        'themes.select.desc': '选择预设主题或创建您自己的主题',
+        'themes.default': '默认',
+        'themes.sunset': '日落',
+        'themes.forest': '森林',
+        'themes.ocean': '海洋',
+        'themes.berry': '浆果',
+        'themes.custom': '自定义颜色',
+        'themes.custom.desc': '使用您自己的强调色',
+        'themes.accent': '强调色',
+        
+        'explore.title': '🌈 探索模式',
+        'explore.heatmap': '热图',
+        'explore.heatmap.desc': '按区域可视化活动密度',
+        'explore.intensity': '热图强度',
+        'explore.intensity.low': '微妙',
+        'explore.intensity.medium': '正常',
+        'explore.intensity.high': '强烈',
+        'explore.legend.title': '活动密度',
+        'explore.legend.low': '低',
+        'explore.legend.high': '高',
+        
+        'route.title': '🗺️ 我的路线',
+        'route.events_selected': '已选活动',
+        'route.total_distance': '总距离',
+        'route.estimated_time': '预计时间',
+        'route.optimize': '优化路线',
+        'route.export': '分享路线',
+        'route.clear': '清除路线',
+        'route.empty.title': '在地图上选择活动',
+        'route.empty.desc': '点击标记将其添加到您的路线',
+        'route.added': '✅ 已添加到路线',
+        'route.removed': '🗑️ 已从路线移除',
+        'route.already_added': '⚠️ 此活动已在您的路线中',
+        'route.optimized': '✨ 路线已优化 - 已计算最短距离',
+        'route.export_title': '📤 分享路线',
+        'route.export.whatsapp': 'WhatsApp',
+        'route.export.copy': '复制文本',
+        'route.export.download': '下载 JSON',
+        'route.export.copied': '✅ 路线已复制到剪贴板',
+        'route.export.downloaded': '💾 路线已下载',
+        'route.clear.confirm': '确定要清除路线吗？',
+        'route.mode.enabled': '🗺️ 点击活动以添加到路线',
+        'route.mode.disabled': '🗺️ 路线规划器已禁用',
+        
         'toast.theme_dark': '🌙 已启用深色模式',
         'toast.theme_light': '☀️ 已启用浅色模式',
         'toast.lang_changed': '🌐 语言已更改',
@@ -1364,9 +1761,17 @@ const translations = {
         'toast.searches_on': '💾 搜索将被保存',
         'toast.searches_off': '🗑️ 搜索不会被保存',
         'toast.data_cleared': '🗑️ 数据已清除',
+        'toast.theme_activated': '✨ 主题 "{theme}" 已激活',
+        'toast.custom_color_on': '🎨 自定义颜色已激活',
+        'toast.custom_color_off': '🎨 默认主题已恢复',
+        'toast.custom_color_saved': '🎨 颜色已保存',
+        'toast.heatmap_on': '🌈 热图已激活',
+        'toast.heatmap_off': '🌈 热图已禁用',
+        'toast.heatmap_no_events': '⚠️ 没有可显示的活动',
         
         'loader.title': 'EventosMadrid',
         'loader.subtitle': '加载活动中...',
+        'loader.events_loaded': '✅ 已加载 {count} 个活动',
         
         'lang.es': '🇪🇸 Español',
         'lang.en': '🇬🇧 English',
@@ -1447,9 +1852,10 @@ const translations = {
         'common.loading': '加载中...',
         'common.error': '错误',
         'common.no_description': '无描述',
+        'common.showing': '显示 {shown} / {total}',
     },
 
-    // ===== JAPONÉS =====
+    // ===== JAPONÉS (日本語) =====
     ja: {
         'logo.text': 'EventosMadrid',
         'btn.map': '地図',
@@ -1508,6 +1914,8 @@ const translations = {
         'list.sort.type': '🎭 タイプ',
         'list.sort.distance': '📍 距離',
         'list.places': '🏛️ 観光スポット',
+        'list.empty.title': 'イベントが見つかりません',
+        'list.empty.description': 'フィルターを変更してみてください',
         
         'favorites.title': '❤️ お気に入り',
         'favorites.empty': 'お気に入りなし',
@@ -1559,6 +1967,52 @@ const translations = {
         'settings.about.version': 'v1.0.0',
         'settings.about.desc': 'マドリードの文化・レジャーイベント地図',
         
+        'themes.title': '🎨 カスタムテーマ',
+        'themes.select': 'テーマを選択',
+        'themes.select.desc': 'プリセットテーマを選択するか、独自に作成',
+        'themes.default': 'デフォルト',
+        'themes.sunset': '夕焼け',
+        'themes.forest': '森',
+        'themes.ocean': '海',
+        'themes.berry': 'ベリー',
+        'themes.custom': 'カスタムカラー',
+        'themes.custom.desc': '独自のアクセントカラーを使用',
+        'themes.accent': 'アクセントカラー',
+        
+        'explore.title': '🌈 探索モード',
+        'explore.heatmap': 'ヒートマップ',
+        'explore.heatmap.desc': 'ゾーン別のイベント密度を可視化',
+        'explore.intensity': 'ヒートマップの強度',
+        'explore.intensity.low': '控えめ',
+        'explore.intensity.medium': '通常',
+        'explore.intensity.high': '強い',
+        'explore.legend.title': 'イベント密度',
+        'explore.legend.low': '低',
+        'explore.legend.high': '高',
+        
+        'route.title': '🗺️ マイルート',
+        'route.events_selected': '選択されたイベント',
+        'route.total_distance': '総距離',
+        'route.estimated_time': '予想時間',
+        'route.optimize': 'ルートを最適化',
+        'route.export': 'ルートを共有',
+        'route.clear': 'ルートをクリア',
+        'route.empty.title': 'マップ上でイベントを選択',
+        'route.empty.desc': 'マーカーをクリックしてルートに追加',
+        'route.added': '✅ ルートに追加されました',
+        'route.removed': '🗑️ ルートから削除されました',
+        'route.already_added': '⚠️ このイベントはすでにルートに含まれています',
+        'route.optimized': '✨ ルートが最適化されました - 最短距離を計算',
+        'route.export_title': '📤 ルートを共有',
+        'route.export.whatsapp': 'WhatsApp',
+        'route.export.copy': 'テキストをコピー',
+        'route.export.download': 'JSONをダウンロード',
+        'route.export.copied': '✅ ルートがクリップボードにコピーされました',
+        'route.export.downloaded': '💾 ルートがダウンロードされました',
+        'route.clear.confirm': 'ルートをクリアしてもよろしいですか？',
+        'route.mode.enabled': '🗺️ イベントをクリックして追加',
+        'route.mode.disabled': '🗺️ ルートプランナーが無効',
+        
         'toast.theme_dark': '🌙 ダークモードが有効になりました',
         'toast.theme_light': '☀️ ライトモードが有効になりました',
         'toast.lang_changed': '🌐 言語が変更されました',
@@ -1569,9 +2023,17 @@ const translations = {
         'toast.searches_on': '💾 検索が保存されます',
         'toast.searches_off': '🗑️ 検索は保存されません',
         'toast.data_cleared': '🗑️ データを消去しました',
+        'toast.theme_activated': '✨ テーマ "{theme}" が有効になりました',
+        'toast.custom_color_on': '🎨 カスタムカラーが有効になりました',
+        'toast.custom_color_off': '🎨 デフォルトテーマが復元されました',
+        'toast.custom_color_saved': '🎨 カラーが保存されました',
+        'toast.heatmap_on': '🌈 ヒートマップが有効になりました',
+        'toast.heatmap_off': '🌈 ヒートマップが無効になりました',
+        'toast.heatmap_no_events': '⚠️ 表示するイベントがありません',
         
         'loader.title': 'EventosMadrid',
         'loader.subtitle': 'イベントを読み込み中...',
+        'loader.events_loaded': '✅ {count} 件のイベントを読み込みました',
         
         'lang.es': '🇪🇸 Español',
         'lang.en': '🇬🇧 English',
@@ -1652,9 +2114,10 @@ const translations = {
         'common.loading': '読み込み中...',
         'common.error': 'エラー',
         'common.no_description': '説明なし',
+        'common.showing': '{total} 件中 {shown} 件を表示',
     },
 
-    // ===== COREANO =====
+    // ===== COREANO (한국어) =====
     ko: {
         'logo.text': 'EventosMadrid',
         'btn.map': '지도',
@@ -1713,6 +2176,8 @@ const translations = {
         'list.sort.type': '🎭 유형',
         'list.sort.distance': '📍 거리',
         'list.places': '🏛️ 명소',
+        'list.empty.title': '이벤트를 찾을 수 없습니다',
+        'list.empty.description': '필터를 변경해 보세요',
         
         'favorites.title': '❤️ 즐겨찾기',
         'favorites.empty': '즐겨찾기 없음',
@@ -1764,6 +2229,52 @@ const translations = {
         'settings.about.version': 'v1.0.0',
         'settings.about.desc': '마드리드 문화 및 레저 이벤트 지도',
         
+        'themes.title': '🎨 커스텀 테마',
+        'themes.select': '테마 선택',
+        'themes.select.desc': '프리셋 테마를 선택하거나 직접 만들기',
+        'themes.default': '기본',
+        'themes.sunset': '일몰',
+        'themes.forest': '숲',
+        'themes.ocean': '바다',
+        'themes.berry': '베리',
+        'themes.custom': '커스텀 색상',
+        'themes.custom.desc': '나만의 강조 색상 사용',
+        'themes.accent': '강조 색상',
+        
+        'explore.title': '🌈 탐색 모드',
+        'explore.heatmap': '히트맵',
+        'explore.heatmap.desc': '지역별 이벤트 밀도 시각화',
+        'explore.intensity': '히트맵 강도',
+        'explore.intensity.low': '약함',
+        'explore.intensity.medium': '보통',
+        'explore.intensity.high': '강함',
+        'explore.legend.title': '이벤트 밀도',
+        'explore.legend.low': '낮음',
+        'explore.legend.high': '높음',
+        
+        'route.title': '🗺️ 내 경로',
+        'route.events_selected': '선택된 이벤트',
+        'route.total_distance': '총 거리',
+        'route.estimated_time': '예상 시간',
+        'route.optimize': '경로 최적화',
+        'route.export': '경로 공유',
+        'route.clear': '경로 지우기',
+        'route.empty.title': '지도에서 이벤트 선택',
+        'route.empty.desc': '마커를 클릭하여 경로에 추가',
+        'route.added': '✅ 경로에 추가됨',
+        'route.removed': '🗑️ 경로에서 제거됨',
+        'route.already_added': '⚠️ 이 이벤트는 이미 경로에 있습니다',
+        'route.optimized': '✨ 경로 최적화됨 - 최단 거리 계산',
+        'route.export_title': '📤 경로 공유',
+        'route.export.whatsapp': 'WhatsApp',
+        'route.export.copy': '텍스트 복사',
+        'route.export.download': 'JSON 다운로드',
+        'route.export.copied': '✅ 경로가 클립보드에 복사됨',
+        'route.export.downloaded': '💾 경로가 다운로드됨',
+        'route.clear.confirm': '경로를 지우시겠습니까?',
+        'route.mode.enabled': '🗺️ 이벤트를 클릭하여 추가',
+        'route.mode.disabled': '🗺️ 경로 플래너 비활성화됨',
+        
         'toast.theme_dark': '🌙 다크 모드 활성화',
         'toast.theme_light': '☀️ 라이트 모드 활성화',
         'toast.lang_changed': '🌐 언어 변경됨',
@@ -1774,9 +2285,17 @@ const translations = {
         'toast.searches_on': '💾 검색이 저장됩니다',
         'toast.searches_off': '🗑️ 검색이 저장되지 않습니다',
         'toast.data_cleared': '🗑️ 데이터 삭제됨',
+        'toast.theme_activated': '✨ "{theme}" 테마 활성화됨',
+        'toast.custom_color_on': '🎨 커스텀 색상 활성화',
+        'toast.custom_color_off': '🎨 기본 테마 복원됨',
+        'toast.custom_color_saved': '🎨 색상 저장됨',
+        'toast.heatmap_on': '🌈 히트맵 활성화',
+        'toast.heatmap_off': '🌈 히트맵 비활성화',
+        'toast.heatmap_no_events': '⚠️ 표시할 이벤트 없음',
         
         'loader.title': 'EventosMadrid',
         'loader.subtitle': '이벤트 로딩 중...',
+        'loader.events_loaded': '✅ {count}개 이벤트 로드됨',
         
         'lang.es': '🇪🇸 Español',
         'lang.en': '🇬🇧 English',
@@ -1857,7 +2376,8 @@ const translations = {
         'common.loading': '로딩 중...',
         'common.error': '오류',
         'common.no_description': '설명 없음',
-    },
+        'common.showing': '{total}개 중 {shown}개 표시',
+    }
 };
 
 // ===== GESTOR DE IDIOMAS MEJORADO =====
@@ -1889,8 +2409,17 @@ class I18n {
         localStorage.setItem('language', this.currentLang);
     }
 
-    t(key, defaultValue = key) {
-        return translations[this.currentLang]?.[key] || translations['es'][key] || defaultValue;
+    t(key, vars = {}) {
+        let text = translations[this.currentLang]?.[key] || 
+                   translations['es'][key] || 
+                   key;
+        
+        // Reemplazar {variable} con valores
+        Object.keys(vars).forEach(varKey => {
+            text = text.replace(`{${varKey}}`, vars[varKey]);
+        });
+        
+        return text;
     }
 
     setLanguage(lang) {
@@ -1921,12 +2450,30 @@ class I18n {
         });
 
         this.updateSelectOptions();
+        this.updateDynamicContent();
     }
 
     updateSelectOptions() {
         const selects = [
-            { id: 'filtro-fecha', options: ['filters.when.all', 'filters.when.today', 'filters.when.weekend', 'filters.when.week', 'filters.when.month'] },
-            { id: 'sort-by', options: ['list.sort.date', 'list.sort.name', 'list.sort.type', 'list.sort.distance'] },
+            { 
+                id: 'filtro-fecha', 
+                options: [
+                    'filters.when.all', 
+                    'filters.when.today', 
+                    'filters.when.weekend', 
+                    'filters.when.week', 
+                    'filters.when.month'
+                ] 
+            },
+            { 
+                id: 'sort-by', 
+                options: [
+                    'list.sort.date', 
+                    'list.sort.name', 
+                    'list.sort.type', 
+                    'list.sort.distance'
+                ] 
+            },
         ];
 
         selects.forEach(({ id, options }) => {
@@ -1960,6 +2507,55 @@ class I18n {
             filtroZona.options[0].textContent = this.t('filters.zone.all');
             filtroZona.value = currentValue;
         }
+    }
+
+    updateDynamicContent() {
+        const routeTitle = document.getElementById('route-title');
+        if (routeTitle) {
+            routeTitle.textContent = this.t('route.title');
+        }
+
+        const routeLabels = document.querySelectorAll('.route-stat-label');
+        if (routeLabels.length >= 3) {
+            routeLabels[0].textContent = this.t('route.events_selected');
+            routeLabels[1].textContent = this.t('route.total_distance');
+            routeLabels[2].textContent = this.t('route.estimated_time');
+        }
+
+        const optimizeBtn = document.getElementById('optimize-route');
+        if (optimizeBtn) {
+            const icon = optimizeBtn.querySelector('i');
+            optimizeBtn.innerHTML = icon ? icon.outerHTML + ' ' + this.t('route.optimize') : this.t('route.optimize');
+        }
+
+        const exportBtn = document.getElementById('export-route');
+        if (exportBtn) {
+            const icon = exportBtn.querySelector('i');
+            exportBtn.innerHTML = icon ? icon.outerHTML + ' ' + this.t('route.export') : this.t('route.export');
+        }
+
+        const clearRouteBtn = document.getElementById('clear-route');
+        if (clearRouteBtn) {
+            const icon = clearRouteBtn.querySelector('i');
+            clearRouteBtn.innerHTML = icon ? icon.outerHTML + ' ' + this.t('route.clear') : this.t('route.clear');
+        }
+
+        const routeEmpty = document.getElementById('route-empty');
+        if (routeEmpty) {
+            routeEmpty.innerHTML = `
+                <i class="fas fa-route"></i>
+                <h3>${this.t('route.empty.title')}</h3>
+                <p>${this.t('route.empty.desc')}</p>
+            `;
+        }
+
+        const themeNames = document.querySelectorAll('.theme-name');
+        const themeKeys = ['default', 'sunset', 'forest', 'ocean', 'berry'];
+        themeNames.forEach((name, index) => {
+            if (themeKeys[index]) {
+                name.textContent = this.t(`themes.${themeKeys[index]}`);
+            }
+        });
     }
 
     async translateEventName(nombre) {
@@ -1999,10 +2595,14 @@ class I18n {
 
 const i18n = new I18n();
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => i18n.updateUI(), 100);
-    });
-} else {
-    setTimeout(() => i18n.updateUI(), 100);
-}
+const initI18n = () => {
+    if (document.readyState === 'complete') {
+        i18n.updateUI();
+    } else {
+        window.addEventListener('load', () => {
+            setTimeout(() => i18n.updateUI(), 100);
+        });
+    }
+};
+
+initI18n();
