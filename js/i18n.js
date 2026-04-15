@@ -70,6 +70,10 @@ const translations = {
         'list.places': '🏛️ Lugares de Interés',
         'list.empty.title': 'No se encontraron eventos',
         'list.empty.description': 'Prueba a cambiar los filtros',
+        'list.group.today': 'Hoy',
+        'list.group.tomorrow': 'Mañana',
+        'list.group.this_week': 'Esta semana',
+        'list.group.later': 'Más adelante',
         
         // ===== FAVORITOS =====
         'favorites.title': '❤️ Mis Favoritos',

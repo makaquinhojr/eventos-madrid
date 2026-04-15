@@ -948,10 +948,10 @@ function renderListView(events) {
     finSemana.setDate(hoy.getDate() + 7);
 
     const grupos = {
-        'Hoy': [],
-        'Mañana': [],
-        'Esta semana': [],
-        'Más adelante': []
+        [t('list.group.today')]: [],
+        [t('list.group.tomorrow')]: [],
+        [t('list.group.this_week')]: [],
+        [t('list.group.later')]: []
     };
 
     sortedEvents.forEach(evento => {
@@ -959,13 +959,13 @@ function renderListView(events) {
         fechaEvento.setHours(0, 0, 0, 0);
 
         if (fechaEvento.getTime() === hoy.getTime()) {
-            grupos['Hoy'].push(evento);
+            grupos[t('list.group.today')].push(evento);
         } else if (fechaEvento.getTime() === manana.getTime()) {
-            grupos['Mañana'].push(evento);
+            grupos[t('list.group.tomorrow')].push(evento);
         } else if (fechaEvento <= finSemana) {
-            grupos['Esta semana'].push(evento);
+            grupos[t('list.group.this_week')].push(evento);
         } else {
-            grupos['Más adelante'].push(evento);
+            grupos[t('list.group.later')].push(evento);
         }
     });
 

@@ -1926,7 +1926,7 @@ body {
 
 .calendar-header-fixed {
     position: sticky;
-    top: 0;
+    top: 52px;
     left: 0;
     right: 0;
     z-index: var(--z-sticky);
@@ -2619,7 +2619,7 @@ body {
     }
 
     .calendar-header-fixed {
-        top: 0;
+        top: 52px;
         padding: var(--space-3) var(--space-3);
         background: var(--bg);
         border-bottom: 0.5px solid var(--separator);
