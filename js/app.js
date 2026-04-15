@@ -997,7 +997,7 @@ function renderListView(events) {
     if (subtitle) {
         const totalShown = eventsToShow.length;
         const totalEvents = sortedEvents.length;
-        subtitle.textContent = `Mostrando ${totalShown} de ${totalEvents} eventos`;
+        subtitle.textContent = t('common.showing').replace('{shown}', totalShown).replace('{total}', totalEvents);
     }
 }
 

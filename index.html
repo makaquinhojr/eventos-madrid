@@ -111,7 +111,7 @@
         <button class="hoy-badge" id="hoy-badge" style="display:none" aria-label="Eventos hoy">
             <span class="hoy-badge-dot" aria-hidden="true"></span>
             <span id="hoy-badge-count">0</span>
-            <span class="desktop-only">hoy</span>
+            <span class="desktop-only" data-i18n="badge.today">hoy</span>
         </button>
 
         <!-- Toggle Lugares -->
@@ -370,7 +370,7 @@
             id="bottom-nav-settings" 
             aria-label="Ajustes">
         <i class="fas fa-cog" aria-hidden="true"></i>
-        <span>Ajustes</span>
+        <span data-i18n="settings.title">Ajustes</span>
     </button>
 </nav>
 
@@ -405,7 +405,8 @@
             <input type="text" 
                    id="search" 
                    class="search-box" 
-                   placeholder="🔍 Buscar eventos, lugares..."
+                   placeholder="Buscar eventos, lugares..."
+                   data-i18n-placeholder="filters.search.placeholder"
                    aria-label="Buscar eventos"
                    autocomplete="off"
                    spellcheck="false">
@@ -429,11 +430,11 @@
                         Cuándo
                     </label>
                     <select id="filtro-fecha" class="filter-select" aria-label="Filtrar por fecha">
-                        <option value="todos">Todos</option>
-                        <option value="hoy">Hoy</option>
+                        <option value="todos" data-i18n="filters.when.all">Todos</option>
+                        <option value="hoy" data-i18n="filters.when.today">Hoy</option>
                         <option value="finde" data-i18n="filters.when.weekend">Este fin de semana</option>
-                        <option value="semana">Próximos 7 días</option>
-                        <option value="mes">Este mes</option>
+                        <option value="semana" data-i18n="filters.when.week">Próximos 7 días</option>
+                        <option value="mes" data-i18n="filters.when.month">Este mes</option>
                     </select>
                 </div>
 
