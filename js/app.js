@@ -2070,8 +2070,9 @@ function renderCalendar() {
     const month = currentCalendarDate.getMonth();
 
     const monthNames = [
-        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        t('months.january'), t('months.february'), t('months.march'), t('months.april'), 
+        t('months.may'), t('months.june'), t('months.july'), t('months.august'),
+        t('months.september'), t('months.october'), t('months.november'), t('months.december')
     ];
 
     const monthYearEl = document.getElementById('calendar-month-year');
@@ -2140,7 +2141,7 @@ function createCalendarDay(day, month, year, isOtherMonth) {
         ${eventsOnDay.length > 0 ? `
             <div class="calendar-day-events-count">
                 <i class="fas fa-circle" style="font-size:4px;"></i>
-                ${eventsOnDay.length} ${eventsOnDay.length === 1 ? 'evento' : 'eventos'}
+                ${eventsOnDay.length} ${eventsOnDay.length === 1 ? t('calendar.event') : t('calendar.events')}
             </div>
             <div class="calendar-day-dots">
                 ${eventsOnDay.slice(0, 5).map(e =>
