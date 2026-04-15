@@ -2306,22 +2306,34 @@ function initLugaresSelectAll() {
 // ===== LUGARES LIST TOGGLE =====
 function initLugaresListToggle() {
     const toggleBtn = document.getElementById('lugares-toggle-btn');
-    const lugaresHeader = document.getElementById('lugares-header');
+    const lugaresHeader = document.getElementById('lugares-header-filter');
 
     if (!toggleBtn || !lugaresHeader) return;
 
-    lugaresHeader.addEventListener('click', () => {
-        mostrarLugaresEnLista = !mostrarLugaresEnLista;
+    // Cargar categorías guardadas al iniciar
+    const savedCategorias = localStorage.getItem('lugares_categorias');
+    if (savedCategorias) {
+        const categorias = JSON.parse(savedCategorias);
+        const checkboxes = document.querySelectorAll('.lugar-categoria-cb');
+        checkboxes.forEach(cb => {
+            cb.checked = categorias[cb.value] !== false;
+        });
+    }
 
-        const icon = toggleBtn.querySelector('i');
-        if (mostrarLugaresEnLista) {
-            if (icon) icon.className = 'fas fa-chevron-up';
-            lugaresHeader.setAttribute('aria-expanded', 'true');
-            renderLugaresList(currentFilteredLugares);
-        } else {
-            if (icon) icon.className = 'fas fa-chevron-down';
-            lugaresHeader.setAttribute('aria-expanded', 'false');
-            const lugaresList = document.getElementById('lugares-list');
+    toggleBtn.addEventListener('click', () => {
+        const content = document.getElementById('lugares-content');
+        if (content) {
+            content.classList.toggle('collapsed');
+            toggleBtn.classList.toggle('active');
+            toggleBtn.setAttribute('aria-expanded', content.classList.contains('collapsed') ? 'false' : 'true');
+            
+            // Guardar estado de categorías en localStorage
+            const checkboxes = content.querySelectorAll('.lugar-categoria-cb');
+            const categorias = {};
+            checkboxes.forEach(cb => {
+                categorias[cb.value] = cb.checked;
+            });
+            localStorage.setItem('lugares_categorias', JSON.stringify(categorias));
             if (lugaresList) lugaresList.innerHTML = '';
         }
     });
