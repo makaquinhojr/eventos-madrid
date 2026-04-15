@@ -2064,16 +2064,20 @@ function initCharts() {
     }
 }
 
-// ===== CALENDARIO =====
 function renderCalendar() {
     const year = currentCalendarDate.getFullYear();
     const month = currentCalendarDate.getMonth();
 
+    console.log('renderCalendar - i18n.currentLang:', i18n?.currentLang, 'mes index:', month);
+    console.log('i18n.getLanguage():', i18n?.getLanguage());
+    console.log('Traduciendo months.april:', i18n?.t('months.april'));
+
     const monthNames = [
-        t('months.january'), t('months.february'), t('months.march'), t('months.april'), 
-        t('months.may'), t('months.june'), t('months.july'), t('months.august'),
-        t('months.september'), t('months.october'), t('months.november'), t('months.december')
+        i18n.t('months.january'), i18n.t('months.february'), i18n.t('months.march'), i18n.t('months.april'),
+        i18n.t('months.may'), i18n.t('months.june'), i18n.t('months.july'), i18n.t('months.august'),
+        i18n.t('months.september'), i18n.t('months.october'), i18n.t('months.november'), i18n.t('months.december')
     ];
+    console.log('monthNames array:', monthNames);
 
     const monthYearEl = document.getElementById('calendar-month-year');
     if (monthYearEl) {
@@ -2141,7 +2145,7 @@ function createCalendarDay(day, month, year, isOtherMonth) {
         ${eventsOnDay.length > 0 ? `
             <div class="calendar-day-events-count">
                 <i class="fas fa-circle" style="font-size:4px;"></i>
-                ${eventsOnDay.length} ${eventsOnDay.length === 1 ? t('calendar.event') : t('calendar.events')}
+                ${eventsOnDay.length} ${eventsOnDay.length === 1 ? i18n.t('calendar.event') : i18n.t('calendar.events')}
             </div>
             <div class="calendar-day-dots">
                 ${eventsOnDay.slice(0, 5).map(e =>
@@ -2254,7 +2258,10 @@ function initCollapseGroups() {
     const headers = document.querySelectorAll('.filter-group-header');
 
     headers.forEach(header => {
-        const groupId = header.id.replace('-header', '-content');
+        // Manejar caso especial: lugares-header-filter -> lugares-content
+        let groupId = header.id.replace('-header-filter', '-content');
+        // Caso normal: eventos-header -> eventos-content
+        groupId = groupId.replace('-header', '-content');
         const content = document.getElementById(groupId);
 
         if (!content) return;

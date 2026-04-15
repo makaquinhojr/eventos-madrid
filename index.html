@@ -784,7 +784,8 @@
                     <option value="it">🇮🇹 Italiano</option>
                     <option value="zh">🇨🇳 中文</option>
                     <option value="ja">🇯🇵 日本語</option>
-                                    </select>
+                    <option value="ko">🇰🇷 한국어</option>
+                </select>
             </div>
 
             <div class="setting-item">
@@ -833,14 +834,14 @@
         </div>
 <!-- Temas Personalizados -->
 <div class="settings-section">
-    <h3 class="settings-section-title">
+    <h3 class="settings-section-title" data-i18n="themes.title">
         🎨 Temas Personalizados
     </h3>
 
     <div class="setting-item setting-item--column">
         <div class="setting-info">
-            <label class="setting-label">Seleccionar tema</label>
-            <p class="setting-description">Elige un tema prediseñado o crea el tuyo</p>
+            <label class="setting-label" data-i18n="themes.select">Seleccionar tema</label>
+            <p class="setting-description" data-i18n="themes.select.desc">Elige un tema prediseñado o crea el tuyo</p>
         </div>
         <div class="theme-selector">
             <button class="theme-card active" data-theme-preset="default">
@@ -878,8 +879,8 @@
 
     <div class="setting-item">
         <div class="setting-info">
-            <label class="setting-label" for="custom-color-toggle">🎨 Personalizar color</label>
-            <p class="setting-description">Usa tu propio color de acento</p>
+            <label class="setting-label" for="custom-color-toggle" data-i18n="themes.custom">🎨 Personalizar color</label>
+            <p class="setting-description" data-i18n="themes.custom.desc">Usa tu propio color de acento</p>
         </div>
         <label class="toggle-switch">
             <input type="checkbox" id="custom-color-toggle" class="toggle-checkbox">
@@ -889,7 +890,7 @@
 
     <div class="setting-item setting-item--column" id="custom-color-picker-section" style="display: none;">
         <div class="setting-info">
-            <label class="setting-label" for="accent-color-picker">Color de acento</label>
+            <label class="setting-label" for="accent-color-picker" data-i18n="themes.accent">Color de acento</label>
         </div>
         <input type="color" id="accent-color-picker" class="color-picker" value="#0A84FF">
     </div>
@@ -897,14 +898,14 @@
 
 <!-- Modo Exploración -->
 <div class="settings-section">
-    <h3 class="settings-section-title">
+    <h3 class="settings-section-title" data-i18n="explore.title">
         🌈 Modo Exploración
     </h3>
 
     <div class="setting-item">
         <div class="setting-info">
-            <label class="setting-label" for="heatmap-toggle">Mapa de calor</label>
-            <p class="setting-description">Visualiza densidad de eventos por zona</p>
+            <label class="setting-label" for="heatmap-toggle" data-i18n="explore.heatmap">Mapa de calor</label>
+            <p class="setting-description" data-i18n="explore.heatmap.desc">Visualiza densidad de eventos por zona</p>
         </div>
         <label class="toggle-switch">
             <input type="checkbox" id="heatmap-toggle" class="toggle-checkbox">
@@ -914,14 +915,14 @@
 
     <div class="setting-item setting-item--column" id="heatmap-controls" style="display: none;">
         <div class="setting-info">
-            <label class="setting-label" for="heatmap-radius">Intensidad del heatmap</label>
+            <label class="setting-label" for="heatmap-radius" data-i18n="explore.intensity">Intensidad del heatmap</label>
         </div>
         <input type="range" id="heatmap-radius" class="precio-slider" 
                min="10" max="50" value="25" step="5">
         <div class="precio-marks">
-            <span>Sutil</span>
-            <span>Normal</span>
-            <span>Intenso</span>
+            <span data-i18n="explore.intensity.low">Sutil</span>
+            <span data-i18n="explore.intensity.medium">Normal</span>
+            <span data-i18n="explore.intensity.high">Intenso</span>
         </div>
     </div>
 </div>

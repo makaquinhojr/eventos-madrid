@@ -2566,20 +2566,24 @@ class I18n {
     }
 
     t(key, vars = {}) {
-        let text = translations[this.currentLang]?.[key] || 
+        const translation = translations[this.currentLang]?.[key];
+        if (key === 'months.april' || key === 'months.may') {
+            console.log(`i18n.t DEBUG: key=${key}, currentLang=${this.currentLang}, translation=${translation}, fallback=${translations['es'][key]}`);
+        }
+        let text = translation || 
                    translations['es'][key] || 
                    key;
-        
+
         // Reemplazar {variable} con valores
         Object.keys(vars).forEach(varKey => {
             text = text.replace(`{${varKey}}`, vars[varKey]);
         });
-        
+
         return text;
     }
 
     setLanguage(lang) {
-        const availableLanguages = ['es', 'en', 'fr', 'pt', 'de', 'it', 'zh', 'ja'];
+        const availableLanguages = ['es', 'en', 'fr', 'pt', 'de', 'it', 'zh', 'ja', 'ko'];
         if (availableLanguages.includes(lang)) {
             this.currentLang = lang;
             localStorage.setItem('language', lang);
