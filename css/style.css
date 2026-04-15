@@ -2763,6 +2763,29 @@ body {
     transition: opacity 0.3s var(--ease-out);
 }
 
+.heatmap.quick-filters {
+    position: sticky;
+    top: 52px;
+    left: 0;
+    right: 0;
+    background: var(--bg-elevated);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 0.5px solid var(--separator);
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    gap: var(--space-2);
+    overflow-x: auto;
+    z-index: var(--z-sticky);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+/* Ocultar filtros rápidos en vistas que no sean mapa */
+body:not(.view-map) .quick-filters {
+    display: none;
+}
+
 .heatmap-legend {
     position: fixed;
     bottom: 100px;

@@ -846,6 +846,10 @@ function categoriaNombre(categoria) {
 function switchView(view) {
     currentView = view;
 
+    // Actualizar clase en body para CSS
+    document.body.classList.remove('view-map', 'view-list', 'view-calendar');
+    document.body.classList.add(`view-${view}`);
+
     document.querySelectorAll('.view-btn').forEach(btn => {
         btn.classList.remove('active');
         btn.setAttribute('aria-selected', 'false');
@@ -948,10 +952,10 @@ function renderListView(events) {
     finSemana.setDate(hoy.getDate() + 7);
 
     const grupos = {
-        [t('list.group.today')]: [],
-        [t('list.group.tomorrow')]: [],
-        [t('list.group.this_week')]: [],
-        [t('list.group.later')]: []
+        'Hoy': [],
+        'Mañana': [],
+        'Esta semana': [],
+        'Más adelante': []
     };
 
     sortedEvents.forEach(evento => {
@@ -959,13 +963,13 @@ function renderListView(events) {
         fechaEvento.setHours(0, 0, 0, 0);
 
         if (fechaEvento.getTime() === hoy.getTime()) {
-            grupos[t('list.group.today')].push(evento);
+            grupos['Hoy'].push(evento);
         } else if (fechaEvento.getTime() === manana.getTime()) {
-            grupos[t('list.group.tomorrow')].push(evento);
+            grupos['Mañana'].push(evento);
         } else if (fechaEvento <= finSemana) {
-            grupos[t('list.group.this_week')].push(evento);
+            grupos['Esta semana'].push(evento);
         } else {
-            grupos[t('list.group.later')].push(evento);
+            grupos['Más adelante'].push(evento);
         }
     });
 
@@ -977,10 +981,18 @@ function renderListView(events) {
             const eventosGrupo = eventos.filter(e => eventsToShow.includes(e));
             if (eventosGrupo.length === 0) return '';
 
+            // Traducir nombres de grupos
+            const grupoTraducido = {
+                'Hoy': t('list.group.today'),
+                'Mañana': t('list.group.tomorrow'),
+                'Esta semana': t('list.group.this_week'),
+                'Más adelante': t('list.group.later')
+            }[grupo] || grupo;
+
             return `
                 <div class="event-group">
                     <div class="event-group-header">
-                        <h3>${grupo}</h3>
+                        <h3>${grupoTraducido}</h3>
                         <span class="event-group-count">${eventosGrupo.length}</span>
                     </div>
                     <div class="events-list">
