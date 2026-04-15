@@ -2310,16 +2310,6 @@ function initLugaresListToggle() {
 
     if (!toggleBtn || !lugaresHeader) return;
 
-    // Cargar categorías guardadas al iniciar
-    const savedCategorias = localStorage.getItem('lugares_categorias');
-    if (savedCategorias) {
-        const categorias = JSON.parse(savedCategorias);
-        const checkboxes = document.querySelectorAll('.lugar-categoria-cb');
-        checkboxes.forEach(cb => {
-            cb.checked = categorias[cb.value] !== false;
-        });
-    }
-
     toggleBtn.addEventListener('click', () => {
         const content = document.getElementById('lugares-content');
         if (content) {
@@ -2334,7 +2324,9 @@ function initLugaresListToggle() {
                 categorias[cb.value] = cb.checked;
             });
             localStorage.setItem('lugares_categorias', JSON.stringify(categorias));
-            if (lugaresList) lugaresList.innerHTML = '';
+            
+            // Aplicar filtros inmediatamente
+            applyFilters();
         }
     });
 }

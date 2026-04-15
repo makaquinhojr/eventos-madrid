@@ -2579,12 +2579,17 @@ class I18n {
     }
 
     setLanguage(lang) {
-        const availableLanguages = ['es', 'en', 'fr', 'pt', 'de', 'it', 'zh', 'ja', 'ko'];
+        const availableLanguages = ['es', 'en', 'fr', 'pt', 'de', 'it', 'zh', 'ja'];
         if (availableLanguages.includes(lang)) {
             this.currentLang = lang;
             localStorage.setItem('language', lang);
             document.documentElement.lang = lang;
             this.updateUI();
+            
+            // Forzar recarga del calendario para actualizar traducciones
+            if (typeof renderCalendar === 'function') {
+                renderCalendar();
+            }
         }
     }
 
