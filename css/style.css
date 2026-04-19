@@ -4994,63 +4994,107 @@ font-size: 13px;
 @media (max-width: 640px) {
 
     .top-bar {
-        height: 48px;
+        height: 44px; /* Reduced from 48px */
         grid-template-columns: 1fr auto;
-        padding: 0 var(--space-3);
+        padding: 0 var(--space-2); /* Tighter padding */
     }
 
     .view-toggle { display: none; }
 
     .quick-filters {
-        top: 52px;
+        top: 44px; /* Matches new header height */
         max-width: calc(100% - 32px);
         overflow-x: auto;
         scrollbar-width: none;
+        padding-top: var(--space-2);
+        padding-bottom: var(--space-2);
     }
 
     .quick-filters::-webkit-scrollbar { display: none; }
 
-    .active-filters { top: 100px; }
+    .active-filters { top: 90px; } /* Adjusted after quick filters adjustment */
 
-    .bottom-nav { display: flex; }
+    .bottom-nav { 
+        display: flex; 
+        height: 52px; /* Reduced from 60px */
+        padding: 0; /* Removing side padding to fit 5 items better */
+    }
+    
+    .bottom-nav-item {
+        padding: var(--space-1); /* Reduced padding */
+        min-width: 50px; /* Reduced to fit 5 items */
+        gap: 0px;
+    }
+    
+    .bottom-nav-item i {
+        font-size: 18px; /* Slightly smaller icon */
+    }
+    
+    .bottom-nav-item span {
+        font-size: 10px; /* Smaller text */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        display: inline-block;
+    }
 
-    #map            { top: 48px; bottom: 60px; }
-    #list-view      { top: 48px; bottom: 60px; }
-    #calendar-view  { top: 48px; bottom: 60px; }
+    #map            { top: 44px; bottom: 52px; }
+    #list-view      { top: 44px; bottom: 52px; }
+    #calendar-view  { top: 44px; bottom: 52px; }
 
-    .list-container         { padding: 136px var(--space-3) 80px; }
-    .skeleton-list          { padding: 136px var(--space-3) 80px; }
-    .event-group-header     { top: 136px; }
+    .list-container         { padding: 100px var(--space-3) 80px; } /* Reduced top padding */
+    .skeleton-list          { padding: 100px var(--space-3) 80px; }
+    .event-group-header     { top: 100px; }
 
     .list-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: var(--space-3);
+        gap: var(--space-2); /* Tighter gap */
+        margin-bottom: var(--space-3);
     }
+    
+    .list-header-right {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .sort-label { display: none; } /* Hide "Ordenar:" text on mobile to save space */
 
     .event-card {
-        grid-template-columns: 44px 1fr;
+        grid-template-columns: 40px 1fr; /* Slightly smaller icon column */
         gap: var(--space-3);
-        padding: var(--space-4);
+        padding: var(--space-3); /* Tighter padding inside card */
+    }
+    
+    .event-card-desc {
+        display: none; /* Hide description on mobile to make cards shorter */
     }
 
     .event-actions {
         grid-column: 1 / -1;
         flex-direction: row;
         flex-wrap: wrap;
+        gap: var(--space-2);
+        margin-top: var(--space-2);
     }
 
     .event-btn {
         flex: 1;
-        min-width: calc(50% - 6px);
+        min-width: calc(50% - 4px);
+        padding: var(--space-2);
+        font-size: 12px;
     }
 
     .event-btn-calendar,
     .event-btn-llegar,
     .event-btn-compartir {
         flex: 0;
-        width: 36px;
-        height: 36px;
+        width: 32px;
+        height: 32px;
     }
 
     .filters-panel,
@@ -5065,31 +5109,31 @@ font-size: 13px;
         padding-right: var(--space-4);
     }
 
-    .fab-filters    { bottom: 76px; left: var(--space-3); }
-    .btn-geolocate  { bottom: 76px; right: var(--space-3); width: 48px; height: 48px; }
-    .fab-scroll-top { bottom: 76px; right: var(--space-3); width: 40px; height: 40px; }
+    .fab-filters    { bottom: 68px; left: var(--space-3); } /* Adjusted for new bottom nav height */
+    .btn-geolocate  { bottom: 68px; right: var(--space-3); width: 44px; height: 44px; }
+    .fab-scroll-top { bottom: 68px; right: var(--space-3); width: 40px; height: 40px; }
 
     .geo-toast {
-        bottom: 140px;
+        bottom: 120px;
         right: var(--space-3);
         left: var(--space-3);
         max-width: none;
     }
 
     .calendar-container {
-        padding: 120px var(--space-3) var(--space-8);
-        height: calc(100vh - 48px);
+        padding: 100px var(--space-2) var(--space-8);
+        height: calc(100vh - 44px);
     }
 
     .calendar-header-fixed {
-        top: 52px;
-        padding: var(--space-3) var(--space-3);
+        top: 44px;
+        padding: var(--space-2) var(--space-2);
         background: var(--bg);
         border-bottom: 0.5px solid var(--separator);
     }
 
     .calendar-header {
-        padding: var(--space-2) 0;
+        padding: var(--space-1) 0;
     }
 
     .calendar-header h2 {
@@ -5356,6 +5400,12 @@ font-size: 13px;
     z-index: var(--z-sticky);
     scrollbar-width: none;
     -ms-overflow-style: none;
+}
+
+@media (max-width: 640px) {
+    .heatmap.quick-filters {
+        top: 44px;
+    }
 }
 
 /* Ocultar filtros rápidos en vistas que no sean mapa */
