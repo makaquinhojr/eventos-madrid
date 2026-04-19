@@ -2068,21 +2068,25 @@ function renderCalendar() {
     const year = currentCalendarDate.getFullYear();
     const month = currentCalendarDate.getMonth();
 
-    console.log('renderCalendar - i18n.currentLang:', i18n?.currentLang, 'mes index:', month);
-    console.log('i18n.getLanguage():', i18n?.getLanguage());
-    console.log('Traduciendo months.april:', i18n?.t('months.april'));
-
     const monthNames = [
         i18n.t('months.january'), i18n.t('months.february'), i18n.t('months.march'), i18n.t('months.april'),
         i18n.t('months.may'), i18n.t('months.june'), i18n.t('months.july'), i18n.t('months.august'),
         i18n.t('months.september'), i18n.t('months.october'), i18n.t('months.november'), i18n.t('months.december')
     ];
-    console.log('monthNames array:', monthNames);
 
     const monthYearEl = document.getElementById('calendar-month-year');
     if (monthYearEl) {
         monthYearEl.textContent = `${monthNames[month]} ${year}`;
     }
+
+    // Update weekday headers dynamically
+    const weekdayKeys = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    const weekdayEls = document.querySelectorAll('.calendar-weekdays .weekday');
+    weekdayEls.forEach((el, index) => {
+        if (weekdayKeys[index]) {
+            el.textContent = i18n.t('calendar.weekdays.' + weekdayKeys[index]);
+        }
+    });
 
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
@@ -2173,7 +2177,16 @@ function showDayEvents(date, events, e) {
     if (!container || !title || !list) return;
 
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    title.textContent = date.toLocaleDateString('es-ES', options);
+    const langLocale = i18n.getLanguage() === 'es' ? 'es-ES' : 
+                      i18n.getLanguage() === 'en' ? 'en-US' :
+                      i18n.getLanguage() === 'fr' ? 'fr-FR' :
+                      i18n.getLanguage() === 'pt' ? 'pt-PT' :
+                      i18n.getLanguage() === 'de' ? 'de-DE' :
+                      i18n.getLanguage() === 'it' ? 'it-IT' :
+                      i18n.getLanguage() === 'zh' ? 'zh-CN' :
+                      i18n.getLanguage() === 'ja' ? 'ja-JP' :
+                      i18n.getLanguage() === 'ko' ? 'ko-KR' : 'es-ES';
+    title.textContent = date.toLocaleDateString(langLocale, options);
 
     list.innerHTML = events.map(evento => renderEventCard(evento)).join('');
 
@@ -2186,27 +2199,36 @@ function showDayEvents(date, events, e) {
     }
 }
 
-// ===== HELPERS DE FORMATEO =====
+function getCurrentLocale() {
+    const lang = i18n?.getLanguage() || 'es';
+    const locales = {
+        'es': 'es-ES', 'en': 'en-US', 'fr': 'fr-FR', 'pt': 'pt-PT',
+        'de': 'de-DE', 'it': 'it-IT', 'zh': 'zh-CN', 'ja': 'ja-JP', 'ko': 'ko-KR'
+    };
+    return locales[lang] || 'es-ES';
+}
+
 function formatDate(dateStr) {
     const date = new Date(dateStr + 'T00:00:00');
-    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+    return date.toLocaleDateString(getCurrentLocale(), { day: 'numeric', month: 'short' });
 }
 
 function formatearFechaSafe(fechaInicio, fechaFin) {
     const fecha1 = parsearFecha(fechaInicio);
-    if (!fecha1) return 'Fecha a confirmar';
+    if (!fecha1) return i18n?.t('common.date_tbd') || 'Fecha a confirmar';
 
+    const locale = getCurrentLocale();
     const opciones = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
-    const textoFecha1 = fecha1.toLocaleDateString('es-ES', opciones);
+    const textoFecha1 = fecha1.toLocaleDateString(locale, opciones);
 
     if (fechaFin) {
         const fecha2 = parsearFecha(fechaFin);
         if (fecha2) {
             if (fecha1.getMonth() === fecha2.getMonth() &&
                 fecha1.getFullYear() === fecha2.getFullYear()) {
-                return `${fecha1.getDate()}-${fecha2.getDate()} ${fecha2.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })}`;
+                return `${fecha1.getDate()}-${fecha2.getDate()} ${fecha2.toLocaleDateString(locale, { month: 'short', year: 'numeric' })}`;
             }
-            return `${textoFecha1} - ${fecha2.toLocaleDateString('es-ES', opciones)}`;
+            return `${textoFecha1} - ${fecha2.toLocaleDateString(locale, opciones)}`;
         }
     }
     return textoFecha1;
@@ -2442,9 +2464,9 @@ function initSettingsPanel() {
         langSelect.addEventListener('change', (e) => {
             i18n.setLanguage(e.target.value);
             mostrarToast(i18n.t('toast.lang_changed'));
-            if (i18n.translateEvents) {
-                displayEvents(currentFilteredEvents);
-            }
+            // Recargar eventos y lugares para actualizar popups con nuevo idioma
+            displayEvents(currentFilteredEvents);
+            displayLugares(currentFilteredLugares.length ? currentFilteredLugares : allLugares);
         });
     }
 
