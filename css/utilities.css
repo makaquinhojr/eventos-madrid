@@ -1,0 +1,445 @@
+/* ===== SCROLL TO TOP FAB ===== */
+
+.fab-scroll-top {
+
+    position: fixed;
+
+    bottom: 80px;
+
+    right: var(--space-5);
+
+    background: var(--bg-elevated-2);
+
+    color: var(--text-secondary);
+
+    border: none;
+
+    width: 44px;
+
+    height: 44px;
+
+    border-radius: var(--radius-full);
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    box-shadow: var(--shadow-lg);
+
+    z-index: calc(var(--z-fixed) - 1);
+
+    transition: all 0.3s var(--spring);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+}
+
+
+
+.fab-scroll-top.visible { opacity: 1; pointer-events: all; }
+
+.fab-scroll-top:hover { transform: scale(1.1); background: var(--accent); color: white; }
+
+.fab-scroll-top:active { transform: scale(0.9); }
+
+
+
+/* ===== GEOLOCALIZACIÓN ===== */
+
+.btn-geolocate {
+
+    position: fixed;
+
+    bottom: 80px;
+
+    right: var(--space-5);
+
+    width: 52px;
+
+    height: 52px;
+
+    background: var(--bg-elevated-2);
+
+    border: none;
+
+    border-radius: var(--radius-full);
+
+    font-size: 18px;
+
+    color: var(--accent);
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    box-shadow: var(--shadow-lg);
+
+    z-index: calc(var(--z-fixed) - 1);
+
+    transition: all 0.3s var(--spring);
+
+    backdrop-filter: saturate(180%) blur(20px);
+
+}
+
+
+
+.btn-geolocate:hover { transform: scale(1.1); background: var(--accent); color: white; box-shadow: var(--shadow-xl); }
+
+.btn-geolocate:active { transform: scale(0.95); }
+
+
+
+.btn-geolocate.loading {
+
+    color: var(--accent);
+
+    pointer-events: none;
+
+    animation: rotate 1s linear infinite;
+
+}
+
+
+
+@keyframes rotate { to { transform: rotate(360deg); } }
+
+
+
+.btn-geolocate.active {
+
+    background: var(--accent);
+
+    color: white;
+
+    box-shadow: 0 4px 16px rgba(10, 132, 255, 0.4);
+
+}
+
+
+
+/* ===== TOAST ===== */
+
+.geo-toast {
+
+    position: fixed;
+
+    bottom: 150px;
+
+    right: var(--space-5);
+
+    background: var(--bg-elevated-2);
+
+    border: 0.5px solid var(--separator);
+
+    color: var(--text);
+
+    padding: var(--space-3) var(--space-4);
+
+    border-radius: var(--radius-md);
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    z-index: var(--z-toast);
+
+    box-shadow: var(--shadow-lg);
+
+    opacity: 0;
+
+    transform: translateY(20px);
+
+    transition: all 0.3s var(--spring);
+
+    pointer-events: none;
+
+    max-width: 280px;
+
+    text-align: center;
+
+    backdrop-filter: saturate(180%) blur(20px);
+
+}
+
+
+
+.geo-toast.visible { opacity: 1; transform: translateY(0); }
+
+.geo-toast.error { background: var(--red-subtle); border-color: var(--red); color: var(--red); }
+
+.geo-toast.success { background: var(--green-subtle); border-color: var(--green); color: var(--green); }
+
+
+
+/* ===== LOADER ===== */
+
+.loader-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: var(--bg);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 9999;
+
+    transition: opacity 0.4s var(--ease-out), visibility 0.4s var(--ease-out);
+
+}
+
+
+
+.loader-overlay.oculto { opacity: 0; visibility: hidden; }
+
+
+
+.loader-contenido { text-align: center; padding: var(--space-10); }
+
+
+
+.loader-emoji {
+
+    font-size: 64px;
+
+    margin-bottom: var(--space-5);
+
+    animation: bounce 1s var(--ease-in-out) infinite;
+
+}
+
+
+
+@keyframes bounce {
+
+    0%, 100% { transform: translateY(0); }
+
+    50% { transform: translateY(-20px); }
+
+}
+
+
+
+.loader-titulo {
+
+    font-size: 28px;
+
+    font-weight: 700;
+
+    color: var(--text);
+
+    margin-bottom: var(--space-2);
+
+    letter-spacing: -0.6px;
+
+}
+
+
+
+.loader-subtitulo {
+
+    font-size: 15px;
+
+    color: var(--text-tertiary);
+
+    margin-bottom: var(--space-6);
+
+}
+
+
+
+.loader-barra {
+
+    width: 200px;
+
+    height: 4px;
+
+    background: var(--bg-elevated-2);
+
+    border-radius: var(--radius-full);
+
+    margin: 0 auto var(--space-3);
+
+    overflow: hidden;
+
+}
+
+
+
+.loader-progreso {
+
+    height: 100%;
+
+    background: linear-gradient(90deg, var(--accent), var(--purple));
+
+    border-radius: var(--radius-full);
+
+    animation: progreso 2s var(--ease-out) forwards;
+
+}
+
+
+
+@keyframes progreso {
+
+    0% { width: 0%; }
+
+    30% { width: 40%; }
+
+    60% { width: 70%; }
+
+    90% { width: 90%; }
+
+    100% { width: 100%; }
+
+}
+
+
+
+.loader-count {
+
+font-size: 13px;
+
+}
+
+
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--separator); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-quaternary); }
+
+/* ===== TOAST DE RUTA ===== */
+.route-toast {
+
+    position: fixed;
+
+    bottom: 150px;
+
+    right: var(--space-5);
+
+    background: var(--accent);
+
+    color: white;
+
+    padding: var(--space-3) var(--space-4);
+
+    border-radius: var(--radius-md);
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    z-index: var(--z-toast);
+
+    box-shadow: var(--shadow-lg);
+
+    opacity: 0;
+
+    transform: translateY(20px);
+
+    transition: all 0.3s var(--spring);
+
+    pointer-events: none;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: var(--space-2);
+
+}
+
+
+
+.route-toast.visible {
+
+    opacity: 1;
+
+    transform: translateY(0);
+
+}
+
+
+
+/* ===== CUSTOM SCROLLBAR PARA PANEL DE RUTA ===== */
+.route-panel .panel-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.route-panel .panel-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.route-panel .panel-content::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: var(--radius-full);
+}
+
+.route-panel .panel-content::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-hover);
+}
+
+/* ===== SCROLLBAR ===== */
+
+::-webkit-scrollbar { width: 8px; }
+
+::-webkit-scrollbar-track { background: transparent; }
+
+::-webkit-scrollbar-thumb { background: var(--separator); border-radius: var(--radius-full); }
+
+::-webkit-scrollbar-thumb:hover { background: var(--text-quaternary); }
+
+
+
+.route-panel .panel-content::-webkit-scrollbar {
+
+    width: 6px;
+
+}
+
+
+
+.route-panel .panel-content::-webkit-scrollbar-track {
+
+    background: transparent;
+
+}
+
+
+
+.route-panel .panel-content::-webkit-scrollbar-thumb {
+
+    background: var(--accent);
+
+    border-radius: var(--radius-full);
+
+}
+
+
+
+.route-panel .panel-content::-webkit-scrollbar-thumb:hover {
+
+    background: var(--accent-hover);
+
+}
+
+
+

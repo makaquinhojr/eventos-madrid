@@ -2834,3 +2834,4 @@ const initI18n = () => {
 };
 
 initI18n();
+window.i18n = i18n;

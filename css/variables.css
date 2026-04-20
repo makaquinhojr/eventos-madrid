@@ -1,0 +1,423 @@
+/* ========================================
+
+EVENTOSMADRID - APPLE STYLE REDESIGN
+
+Design System: iOS/macOS inspired
+
+Performance: GPU-accelerated animations
+
+Accessibility: WCAG AAA compliant
+
+Mobile-First + Progressive Enhancement
+
+======================================== */
+
+
+
+/* ===== VARIABLES CSS (APPLE DESIGN SYSTEM) ===== */
+
+:root {
+
+    --bg: #000000;
+
+    --bg-elevated: #1C1C1E;
+
+    --bg-elevated-2: #2C2C2E;
+
+    --bg-elevated-3: #3A3A3C;
+
+
+
+    --text: #FFFFFF;
+
+    --text-secondary: #EBEBF5;
+
+    --text-tertiary: #ABABAB;
+
+    --text-quaternary: #6E6E73;
+
+
+
+    --separator: rgba(84, 84, 88, 0.6);
+
+    --separator-opaque: #38383A;
+
+
+
+    --accent: #0A84FF;
+
+    --accent-hover: #409CFF;
+
+    --accent-subtle: rgba(10, 132, 255, 0.15);
+
+
+
+    --green: #30D158;
+
+    --green-subtle: rgba(48, 209, 88, 0.15);
+
+
+
+    --orange: #FF9F0A;
+
+    --orange-subtle: rgba(255, 159, 10, 0.15);
+
+
+
+    --red: #FF453A;
+
+    --red-subtle: rgba(255, 69, 58, 0.15);
+
+
+
+    --purple: #BF5AF2;
+
+    --purple-subtle: rgba(191, 90, 242, 0.15);
+
+
+
+    --pink: #FF375F;
+
+    --pink-subtle: rgba(255, 55, 95, 0.15);
+
+
+
+    --yellow: #FFD60A;
+
+    --yellow-subtle: rgba(255, 214, 10, 0.15);
+
+
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
+
+
+
+    --radius-sm: 10px;
+
+    --radius-md: 13px;
+
+    --radius-lg: 20px;
+
+    --radius-xl: 28px;
+
+    --radius-full: 9999px;
+
+
+
+    --space-1: 4px;
+
+    --space-2: 8px;
+
+    --space-3: 12px;
+
+    --space-4: 16px;
+
+    --space-5: 20px;
+
+    --space-6: 24px;
+
+    --space-8: 32px;
+
+    --space-10: 40px;
+
+    --space-12: 48px;
+
+
+
+    --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+
+    --font-mono: "SF Mono", "Monaco", "Menlo", monospace;
+
+
+
+    --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+    --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
+
+    --spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+
+
+    --z-base: 1;
+
+    --z-elevated: 10;
+
+    --z-sticky: 100;
+
+    --z-fixed: 500;
+
+    --z-modal-backdrop: 1000;
+
+    --z-modal: 1001;
+
+    --z-toast: 2000;
+
+}
+
+
+
+/* ===== Tema Claro ===== */
+
+[data-theme="light"] {
+
+    --bg: #FFFFFF;
+
+    --bg-elevated: #F2F2F7;
+
+    --bg-elevated-2: #E5E5EA;
+
+    --bg-elevated-3: #D1D1D6;
+
+
+
+    --text: #000000;
+
+    --text-secondary: #3A3A3C;
+
+    --text-tertiary: #6E6E73;
+
+    --text-quaternary: #ABABAB;
+
+
+
+    --separator: rgba(60, 60, 67, 0.29);
+
+    --separator-opaque: #C6C6C8;
+
+
+
+    --accent: #007AFF;
+
+    --accent-hover: #0051D5;
+
+    --accent-subtle: rgba(0, 122, 255, 0.1);
+
+
+
+    --green: #34C759;
+
+    --green-subtle: rgba(52, 199, 89, 0.1);
+
+
+
+    --orange: #FF9500;
+
+    --orange-subtle: rgba(255, 149, 0, 0.1);
+
+
+
+    --red: #FF3B30;
+
+    --red-subtle: rgba(255, 59, 48, 0.1);
+
+
+
+    --purple: #AF52DE;
+
+    --purple-subtle: rgba(175, 82, 222, 0.1);
+
+
+
+    --pink: #FF2D55;
+
+    --pink-subtle: rgba(255, 45, 85, 0.1);
+
+
+
+    --yellow: #FFCC00;
+
+    --yellow-subtle: rgba(255, 204, 0, 0.1);
+
+
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+
+}
+
+
+
+/* ===== TEMAS PERSONALIZADOS ===== */
+
+.theme-selector {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+
+    gap: var(--space-3);
+
+    margin-top: var(--space-3);
+
+}
+
+
+
+.theme-card {
+
+    background: var(--bg-elevated);
+
+    border: 2px solid var(--separator);
+
+    border-radius: var(--radius-md);
+
+    padding: var(--space-3);
+
+    cursor: pointer;
+
+    transition: all 0.3s var(--ease-out);
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: var(--space-2);
+
+}
+
+
+
+.theme-card:hover {
+
+    background: var(--bg-elevated-2);
+
+    transform: translateY(-4px);
+
+    box-shadow: var(--shadow-md);
+
+}
+
+
+
+.theme-card.active {
+
+    border-color: var(--accent);
+
+    background: var(--accent-subtle);
+
+    box-shadow: 0 0 0 4px var(--accent-subtle);
+
+}
+
+
+
+.theme-preview {
+
+    width: 100%;
+
+    aspect-ratio: 1;
+
+    border-radius: var(--radius-sm);
+
+    overflow: hidden;
+
+    box-shadow: var(--shadow-sm);
+
+}
+
+
+
+.theme-color {
+
+    width: 100%;
+
+    height: 100%;
+
+}
+
+
+
+.theme-name {
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: var(--text-secondary);
+
+    text-align: center;
+
+}
+
+
+
+.theme-card.active .theme-name {
+
+    color: var(--accent);
+
+}
+
+
+
+.color-picker {
+
+    width: 100%;
+
+    height: 50px;
+
+    border: 0.5px solid var(--separator);
+
+    border-radius: var(--radius-md);
+
+    cursor: pointer;
+
+    outline: none;
+
+    background: var(--bg-elevated);
+
+    transition: all 0.2s var(--ease-out);
+
+}
+
+
+
+.color-picker:hover {
+
+    border-color: var(--accent);
+
+    box-shadow: 0 0 0 4px var(--accent-subtle);
+
+}
+
+
+
+/* ===== ANIMACIONES DE TRANSICIÓN DE TEMA ===== */
+@media (prefers-reduced-motion: no-preference) {
+    :root {
+        transition: 
+            --accent 0.3s var(--ease-out),
+            --accent-hover 0.3s var(--ease-out),
+            --accent-subtle 0.3s var(--ease-out);
+    }
+}
+
+/* ===== ANIMACIONES DE TRANSICIÓN DE TEMA ===== */
+
+@media (prefers-reduced-motion: no-preference) {
+
+    :root {
+
+        transition:
+
+            --accent 0.3s var(--ease-out),
+
+            --accent-hover 0.3s var(--ease-out),
+
+            --accent-subtle 0.3s var(--ease-out);
+
+    }
+
+}

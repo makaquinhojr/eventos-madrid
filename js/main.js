@@ -3520,3 +3520,20 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.log('❌ SW error:', err));
     });
 }
+// ===== EXPORTACIONES GLOBALES PARA INLINE HANDLERS =====
+window.toggleFavorite = toggleFavorite;
+window.cerrarModalCompartir = cerrarModalCompartir;
+window.copiarLinkEvento = copiarLinkEvento;
+window.compartirEvento = compartirEvento;
+window.compartirEventoNativo = compartirEventoNativo;
+window.compartirLugar = compartirLugar;
+window.comoLlegar = comoLlegar;
+window.comoLlegarCoords = comoLlegarCoords;
+window.clearFilters = clearFilters;
+window.verEnMapa = verEnMapa;
+window.verLugarEnMapa = verLugarEnMapa;
+window.ejecutarUndo = ejecutarUndo;
+window.removeEventFromRoute = removeEventFromRoute;
+window.shareViaWhatsApp = shareViaWhatsApp;
+window.copyRouteText = copyRouteText;
+window.downloadRouteJSON = downloadRouteJSON;
