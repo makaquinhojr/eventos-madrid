@@ -582,8 +582,6 @@
 
     font-family: var(--font-system);
 
-    outline: none;
-
     transition: all 0.2s var(--ease-out);
 
 }
@@ -1543,8 +1541,6 @@
 
     transition: all 0.2s var(--ease-out);
 
-    outline: none;
-
 }
 
 
@@ -1586,8 +1582,6 @@
     cursor: pointer;
 
     transition: all 0.2s var(--ease-out);
-
-    outline: none;
 
 }
 
@@ -1798,8 +1792,6 @@
     background: var(--bg-elevated-2);
 
     border-radius: var(--radius-full);
-
-    outline: none;
 
     cursor: pointer;
 
@@ -3630,8 +3622,6 @@
     cursor: pointer;
 
     transition: all 0.2s var(--ease-out);
-
-    outline: none;
 
 }
 

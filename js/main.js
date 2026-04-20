@@ -352,6 +352,7 @@ function compartirEvento(eventoId) {
     });
 
     document.body.appendChild(modal);
+    trapFocus(modal);
     requestAnimationFrame(() => modal.classList.add('visible'));
 }
 
@@ -425,7 +426,49 @@ function compartirLugar(lugarId) {
     });
 
     document.body.appendChild(modal);
+    trapFocus(modal);
     requestAnimationFrame(() => modal.classList.add('visible'));
+}
+
+// ===== UTILIDADES DE ACCESIBILIDAD =====
+function trapFocus(element) {
+    if (!element || element.dataset.focusTrapped) {
+        const first = element.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (first) first.focus();
+        return;
+    }
+    
+    element.dataset.focusTrapped = "true";
+    
+    const focusableElements = element.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstFocusableElement = focusableElements[0];
+    const lastFocusableElement = focusableElements[focusableElements.length - 1];
+
+    element.addEventListener('keydown', function(e) {
+        let isTabPressed = e.key === 'Tab' || e.keyCode === 9;
+
+        if (!isTabPressed) {
+            return;
+        }
+
+        if (e.shiftKey) { // if shift key pressed for shift + tab
+            if (document.activeElement === firstFocusableElement) {
+                lastFocusableElement.focus();
+                e.preventDefault();
+            }
+        } else { // if tab key is pressed
+            if (document.activeElement === lastFocusableElement) {
+                firstFocusableElement.focus();
+                e.preventDefault();
+            }
+        }
+    });
+
+    if (firstFocusableElement) {
+        firstFocusableElement.focus();
+    }
 }
 
 // ===== HELPERS DE EVENTOS =====
@@ -654,7 +697,11 @@ function displayEvents(events) {
 
         const icon = L.divIcon({
             html: `
-                <div class="custom-marker" style="
+                <div class="custom-marker" 
+                     role="button" 
+                     tabindex="0" 
+                     aria-label="${event.nombre}"
+                     style="
                     background: ${color};
                     width: 40px;
                     height: 40px;
@@ -675,7 +722,12 @@ function displayEvents(events) {
             popupAnchor: [0, -20]
         });
 
-        const marker = L.marker([event.lat, event.lng], { icon, riseOnHover: true });
+        const marker = L.marker([event.lat, event.lng], { 
+            icon, 
+            riseOnHover: true,
+            keyboard: true,
+            alt: event.nombre
+        });
         marker.eventoId = event.id;
 
         const dateText = formatearFechaSafe(event.fecha, event.fecha_fin);
@@ -754,14 +806,19 @@ function displayLugares(lugares) {
         const emoji = lugaresIcons[lugar.categoria] || '📍';
 
         const icon = L.divIcon({
-            html: `<div class="lugar-marker" style="background:${color};">${emoji}</div>`,
+            html: `<div class="lugar-marker" role="button" tabindex="0" aria-label="${lugar.nombre}" style="background:${color};">${emoji}</div>`,
             className: '',
             iconSize: [36, 36],
             iconAnchor: [18, 18],
             popupAnchor: [0, -20]
         });
 
-        const marker = L.marker([lugar.lat, lugar.lng], { icon, riseOnHover: true });
+        const marker = L.marker([lugar.lat, lugar.lng], { 
+            icon, 
+            riseOnHover: true,
+            keyboard: true,
+            alt: lugar.nombre
+        });
         marker.lugarId = lugar.id;
 
         const precioHTML = lugar.precio === 'gratis'
@@ -2373,6 +2430,7 @@ function initSettingsPanel() {
     const openSettings = () => {
         settingsPanel.classList.add('active');
         settingsPanel.setAttribute('aria-modal', 'true');
+        trapFocus(settingsPanel);
         
         // Inicializar features premium al abrir settings
         initPremiumFeatures();
@@ -2970,6 +3028,7 @@ function initRoutePlanner() {
             if (routePanel) {
                 routePanel.classList.add('active');
                 routePanel.setAttribute('aria-modal', 'true');
+                trapFocus(routePanel);
             }
             
             enableRouteSelection();
@@ -3367,6 +3426,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (panel) {
                 panel.classList.add('active');
                 panel.setAttribute('aria-modal', 'true');
+                trapFocus(panel);
             }
         });
     }
@@ -3389,6 +3449,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (panel) {
                 panel.classList.add('active');
                 panel.setAttribute('aria-modal', 'true');
+                trapFocus(panel);
                 setTimeout(() => initCharts(), 100);
             }
         });
@@ -3412,6 +3473,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (panel) {
                 panel.classList.add('active');
                 panel.setAttribute('aria-modal', 'true');
+                trapFocus(panel);
             }
         });
     }
@@ -3441,6 +3503,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (panel) {
                 panel.classList.add('active');
                 panel.setAttribute('aria-modal', 'true');
+                trapFocus(panel);
             }
         });
     }

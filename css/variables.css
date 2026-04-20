@@ -158,6 +158,8 @@ Mobile-First + Progressive Enhancement
 
     --z-toast: 2000;
 
+    --focus-ring: 0 0 0 4px var(--accent-subtle);
+
 }
 
 
@@ -243,6 +245,8 @@ Mobile-First + Progressive Enhancement
     --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
 
     --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+
+    --focus-ring: 0 0 0 4px var(--accent-subtle);
 
 }
 
@@ -373,8 +377,6 @@ Mobile-First + Progressive Enhancement
     border-radius: var(--radius-md);
 
     cursor: pointer;
-
-    outline: none;
 
     background: var(--bg-elevated);
 
