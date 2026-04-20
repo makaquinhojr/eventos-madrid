@@ -1,0 +1,210 @@
+/* ========================================
+   MOBILE UX/UI ENHANCEMENTS (Apple HIG / Material 3)
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* 1. BOTTOM NAVIGATION BAR (Floating Pill) */
+    .view-toggle {
+        position: fixed !important;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10000;
+        width: 85%;
+        max-width: 350px;
+        background: rgba(var(--bg-elevated-rgb, 20, 20, 20), 0.85) !important;
+        border: 1px solid rgba(150, 150, 150, 0.2);
+        backdrop-filter: blur(25px) saturate(180%);
+        -webkit-backdrop-filter: blur(25px) saturate(180%);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+        border-radius: 40px;
+        padding: 6px !important;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    [data-theme='light'] .view-toggle {
+        background: rgba(255, 255, 255, 0.9) !important;
+        box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+    }
+
+    .view-btn {
+        flex: 1;
+        flex-direction: column !important;
+        padding: 10px 4px !important;
+        gap: 6px !important;
+        border-radius: 30px !important;
+        font-size: 11px !important;
+        background: transparent !important; /* remove active background pill to avoid boxiness */
+    }
+
+    .view-btn.active {
+        color: var(--accent) !important;
+        box-shadow: none !important;
+        background: rgba(150, 150, 150, 0.1) !important;
+    }
+
+    .view-btn i {
+        font-size: 20px !important;
+    }
+
+    /* 2. HEADER REFINEMENT */
+    .top-bar {
+        padding: 12px 16px !important;
+        background: rgba(var(--bg-rgb, 255, 255, 255), 0.95);
+        backdrop-filter: blur(15px);
+    }
+    
+    .logo-text { font-size: 18px !important; }
+    
+    .desktop-only { display: none !important; }
+    
+    .top-bar-actions { gap: 14px !important; }
+
+    /* 3. SCROLLABLE CHIPS (YouTube/Google Maps style) */
+    .quick-filters {
+        top: 56px !important;
+        padding: 10px 16px !important;
+        background: transparent !important;
+        backdrop-filter: none !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        border-bottom: none !important;
+    }
+    
+    .quick-filters::-webkit-scrollbar {
+        display: none;
+    }
+
+    .quick-filter {
+        scroll-snap-align: start;
+        flex-shrink: 0;
+        padding: 10px 18px !important;
+        font-size: 14px !important;
+        border-radius: 24px !important;
+    }
+
+    /* 4. TRUE BOTTOM SHEET FOR MAP MARKERS (Leaflet Override) */
+    .leaflet-popup {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        top: auto !important;
+        transform: translate3d(0, 0, 0) !important; /* Force to bottom override */
+        margin: 0 !important;
+        width: 100% !important;
+        z-index: 9999 !important;
+        animation: slideUpPopup 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    .leaflet-popup-content-wrapper {
+        border-radius: 28px 28px 0 0 !important;
+        box-shadow: 0 -15px 40px rgba(0,0,0,0.15) !important;
+        width: 100vw !important;
+        max-height: 85vh !important;
+        overflow-y: auto !important;
+        padding: 24px 20px 100px 20px !important; /* Extra bottom padding for nav bar */
+        background: var(--bg-elevated) !important;
+    }
+
+    [data-theme='dark'] .leaflet-popup-content-wrapper {
+        background: #1e1e1e !important;
+        box-shadow: 0 -15px 50px rgba(0,0,0,0.5) !important;
+    }
+
+    .leaflet-popup-tip-container {
+        display: none !important; /* Hide triangle */
+    }
+
+    .leaflet-popup-close-button {
+        top: 16px !important;
+        right: 16px !important;
+        background: rgba(150, 150, 150, 0.2) !important;
+        border-radius: 50% !important;
+        width: 32px !important;
+        height: 32px !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        color: var(--text) !important;
+    }
+
+    /* Drag Handle visual for bottom sheet */
+    .leaflet-popup-content-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 5px;
+        background: rgba(150, 150, 150, 0.4);
+        border-radius: 10px;
+    }
+
+    @keyframes slideUpPopup {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* 5. EVENT CARDS MOBILE LAYOUT */
+    .event-card {
+        padding: 16px !important;
+        grid-template-columns: 1fr !important;
+        border-radius: 20px !important;
+    }
+    
+    .event-icon {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 46px !important;
+        height: 46px !important;
+        font-size: 22px !important;
+        border-radius: 14px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .event-title {
+        max-width: calc(100% - 60px);
+        font-size: 17px !important;
+    }
+    
+    .event-actions {
+        flex-direction: row !important;
+        flex-wrap: wrap;
+        gap: 8px !important;
+        margin-top: 12px;
+    }
+    
+    .event-actions-row {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .event-btn {
+        flex: 1 1 100% !important; /* Stack vertically if needed, but flex lets them grow */
+        padding: 12px !important;
+        font-size: 14px !important;
+        border-radius: 12px !important;
+    }
+    
+    .event-btn-calendar, .event-btn-llegar, .event-btn-compartir, .btn-favorite {
+        flex: 1 !important;
+        margin: 0 !important;
+    }
+
+    /* 6. LIST & CALENDAR CONTAINER SPACING */
+    .list-container {
+        padding-top: 120px !important;
+        padding-bottom: 120px !important; /* Avoid cutting off last items behind bottom bar */
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    .calendar-container {
+        padding-bottom: 120px !important;
+    }
+}
