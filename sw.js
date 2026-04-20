@@ -10,7 +10,8 @@ const ARCHIVOS_ESTATICOS = [
     '/eventos-madrid/',
     '/eventos-madrid/index.html',
     '/eventos-madrid/css/style.css',
-    '/eventos-madrid/js/app.js',
+    '/eventos-madrid/js/main.js',
+    '/eventos-madrid/js/i18n.js',
 ];
 
 // ===== DOMINIOS EXTERNOS (no cachear — CORS) =====
@@ -135,7 +136,7 @@ self.addEventListener('fetch', evento => {
  *   que el usuario limpiara la caché manualmente
  */
 async function estrategiaNetworkFirstSinCache(request) {
-    try:
+    try {
         const response = await Promise.race([
             fetch(request.clone()),
             new Promise((_, reject) =>

@@ -1,0 +1,128 @@
+/* ========================================
+   PREMIUM AESTHETICS & MICRO-ANIMATIONS
+   Glassmorphism, hover states, modern shadows
+   ======================================== */
+
+/* 1. Glassmorphism & Modern Shadows for Cards */
+.event-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border-radius: var(--radius-xl, 16px);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    will-change: transform;
+}
+
+[data-theme='dark'] .event-card {
+    background: rgba(30, 30, 30, 0.75);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.event-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* 2. Micro-Animations for Buttons */
+.btn-primary, .btn-action, .btn-icon, .toggle-btn {
+    transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:active, .btn-action:active, .btn-icon:active {
+    transform: scale(0.94);
+}
+
+/* Ripple effect on buttons inside event card or main nav */
+.btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 150%;
+    height: 150%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+    opacity: 0;
+}
+
+.btn-primary:hover::after {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+/* 3. Badges Enhancement */
+.badge {
+    background: linear-gradient(135deg, var(--bg-badge, #eee) 0%, rgba(255,255,255,0.7) 100%);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+.badge:hover {
+    transform: scale(1.05);
+    filter: brightness(1.05);
+}
+[data-theme='dark'] .badge {
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* 4. List Rendering Animation for New Items */
+@keyframes slideUpFade {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.event-card.entering {
+    animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 5. Custom Scrollbar for sleekness */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent; 
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(150, 150, 150, 0.3); 
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(150, 150, 150, 0.6); 
+}
+
+/* 6. Dynamic Header / Navbar Blur */
+header {
+    background: rgba(var(--bg-rgb, 255, 255, 255), 0.85) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* 7. Image Loading skeleton gradient */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.skeleton-loading {
+    background: linear-gradient(90deg, rgba(200,200,200,0.2) 25%, rgba(200,200,200,0.4) 50%, rgba(200,200,200,0.2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+}
