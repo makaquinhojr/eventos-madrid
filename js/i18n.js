@@ -1,11 +1,12 @@
-import { translations } from './locales/translations.js';
+
 
 // ===== GESTOR DE IDIOMAS MEJORADO =====
 class I18n {
     constructor() {
         this.currentLang = this.detectLanguage();
         this.translateEvents = localStorage.getItem('translateEvents') === 'true';
-        this.init();
+        this.translations = {};
+        // initialization happens via loadLanguage
     }
 
     detectLanguage() {
@@ -30,12 +31,12 @@ class I18n {
     }
 
     t(key, vars = {}) {
-        const translation = translations[this.currentLang]?.[key];
+        const translation = this.translations[this.currentLang]?.[key];
         if (key === 'months.april' || key === 'months.may') {
-            console.log(`i18n.t DEBUG: key=${key}, currentLang=${this.currentLang}, translation=${translation}, fallback=${translations['es'][key]}`);
+            console.log(`i18n.t DEBUG: key=${key}, currentLang=${this.currentLang}, translation=${translation}, fallback=${(this.translations['es'] || {})[key]}`);
         }
         let text = translation || 
-                   translations['es'][key] || 
+                   (this.translations['es'] || {})[key] || 
                    key;
 
         // Reemplazar {variable} con valores
@@ -46,18 +47,36 @@ class I18n {
         return text;
     }
 
-    setLanguage(lang) {
+
+    async setLanguage(lang) {
         const availableLanguages = ['es', 'en', 'fr', 'pt', 'de', 'it', 'zh', 'ja', 'ko'];
         if (availableLanguages.includes(lang)) {
+            await this.loadLanguage(lang);
+        }
+    }
+
+    async loadLanguage(lang) {
+        try {
+            if (!this.translations[lang]) {
+                const module = await import(`./locales/${lang}.js`);
+                this.translations[lang] = module.default;
+            }
+            // Also ensure we have spanish as fallback
+            if (lang !== 'es' && !this.translations['es']) {
+                const esModule = await import(`./locales/es.js`);
+                this.translations['es'] = esModule.default;
+            }
+            
             this.currentLang = lang;
             localStorage.setItem('language', lang);
             document.documentElement.lang = lang;
             this.updateUI();
             
-            // Forzar recarga del calendario para actualizar traducciones
             if (typeof renderCalendar === 'function') {
                 renderCalendar();
             }
+        } catch(e) {
+            console.error('Error loading lang', e);
         }
     }
 
@@ -224,7 +243,8 @@ class I18n {
 
 const i18n = new I18n();
 
-const initI18n = () => {
+const initI18n = async () => {
+    await i18n.loadLanguage(i18n.currentLang);
     if (document.readyState === 'complete') {
         i18n.updateUI();
     } else {
