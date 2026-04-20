@@ -172,7 +172,7 @@ El código base modularizado con Vite permite añadir nuevas funcionalidades com
 Proyecto de desarrollo de software enfocado a smart-cities e innovación tecnológica para la Comunidad de Madrid.
 
 [![GitHub](https://img.shields.io/badge/GitHub-makaquinhojr-181717?style=for-the-badge&logo=github)](https://github.com/makaquinhojr)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Conectar-0A66C2?style=for-the-badge&logo=linkedin)](https://linkedin.com)
+[![Instagram](https://img.shields.io/badge/Instagram-ddiegosb._-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/ddiegosb._?igsh=NzN0OWF0bGkyazVk)
 [![Email](https://img.shields.io/badge/Email-Contacto-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:dlopeztostado09@gmail.com)
 
 </div>
