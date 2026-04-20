@@ -3491,6 +3491,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+window.addEventListener('languageChanged', () => {
+    if (typeof applyFiltersImmediate === 'function') {
+        applyFiltersImmediate();
+    }
+});
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/eventos-madrid/sw.js')

@@ -72,6 +72,8 @@ class I18n {
             document.documentElement.lang = lang;
             this.updateUI();
             
+            window.dispatchEvent(new Event('languageChanged'));
+            
             if (typeof renderCalendar === 'function') {
                 renderCalendar();
             }
