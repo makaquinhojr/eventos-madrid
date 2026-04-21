@@ -4,13 +4,7 @@ export default defineConfig({
   base: '/eventos-madrid/',
   build: {
     target: 'esnext',
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
-    },
+    minify: false,
     rollupOptions: {
       output: {
         manualChunks(id) {

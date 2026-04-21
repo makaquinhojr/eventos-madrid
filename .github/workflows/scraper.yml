@@ -29,7 +29,8 @@ jobs:
       - name: 📦 Instalar dependencias
         run: |
           pip install --upgrade pip
-          pip install requests beautifulsoup4 geopy python-dateutil
+          pip install requests beautifulsoup4 geopy python-dateutil pip-audit
+          pip-audit
 
       - name: 🤖 Ejecutar scraper
         env:

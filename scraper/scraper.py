@@ -881,9 +881,20 @@ class EventosScraper:
         print(f"📅 Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print()
 
-        self.scrape_esmadrid()
-        self.scrape_ticketmaster()
-        self.scrape_football()
+        # Wrap each source in try-except for resilience
+        sources = [
+            ("ES Madrid", self.scrape_esmadrid),
+            ("Ticketmaster", self.scrape_ticketmaster),
+            ("Football", self.scrape_football)
+        ]
+
+        for name, func in sources:
+            try:
+                func()
+            except Exception as e:
+                print(f"\n❌ ERROR CRÍTICO en {name}: {e}")
+                self.stats['errores'] += 1
+
         self.eliminar_duplicados()
 
         total = self.guardar_eventos()

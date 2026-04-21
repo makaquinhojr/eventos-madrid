@@ -50,6 +50,7 @@ let routePolyline = null;
 let routeMarkers = [];
 
 // ===== ICONOS Y COLORES =====
+import DOMPurify from 'dompurify';
 import { icons, colors, lugaresIcons, lugaresColors, ZONAS_COORDS } from './modules/constants.js';
 // ===== FUNCIÓN T (TRADUCCIÓN) =====
 function t(key) {
@@ -158,6 +159,8 @@ function renderFavoritesList() {
         const emoji = icons[evento.tipo] || '📍';
         const color = colors[evento.tipo] || '#6B7280';
         const fecha = formatDate(evento.fecha);
+        const safeNombre = DOMPurify.sanitize(evento.nombre);
+        const safeLugar = DOMPurify.sanitize(evento.lugar);
 
         return `
             <div class="favorite-item" style="animation: fadeUp 0.3s ease-out;">
@@ -165,10 +168,10 @@ function renderFavoritesList() {
                     ${emoji}
                 </div>
                 <div class="favorite-item-info">
-                    <div class="favorite-item-title">${evento.nombre}</div>
+                    <div class="favorite-item-title">${safeNombre}</div>
                     <div class="favorite-item-meta">
                         <span>📅 ${fecha}</span>
-                        <span>📍 ${evento.lugar}</span>
+                        <span>📍 ${safeLugar}</span>
                     </div>
                 </div>
                 <button class="btn-remove-favorite" onclick="toggleFavorite(${evento.id})" aria-label="Quitar de favoritos">
@@ -232,6 +235,10 @@ function compartirEvento(eventoId) {
     const modal = document.createElement('div');
     modal.id = 'modal-compartir';
     modal.className = 'modal-compartir-overlay';
+    
+    const safeNombre = DOMPurify.sanitize(evento.nombre);
+    const safeUrl = url.replace(/"/g, '&quot;'); // Simple escaping for URL in attribute
+    
     modal.innerHTML = `
         <div class="modal-compartir">
             <div class="modal-compartir-header">
@@ -240,7 +247,7 @@ function compartirEvento(eventoId) {
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="modal-compartir-nombre">${evento.nombre}</div>
+            <div class="modal-compartir-nombre">${safeNombre}</div>
             <div class="modal-compartir-acciones">
                 <a class="modal-compartir-btn whatsapp"
                    href="https://wa.me/?text=${encodeURIComponent(texto + '\n\n🗺️ Ver en EventosMadrid: ' + url)}"
@@ -254,7 +261,7 @@ function compartirEvento(eventoId) {
                     <i class="fab fa-x-twitter"></i>
                     <span>${i18n.t('event.share_twitter')}</span>
                 </a>
-                <button class="modal-compartir-btn copiar" onclick="copiarLinkEvento('${url}', this)">
+                <button class="modal-compartir-btn copiar" onclick="copiarLinkEvento('${safeUrl}', this)">
                     <i class="fas fa-link"></i>
                     <span>${i18n.t('event.copy_link')}</span>
                 </button>
@@ -670,12 +677,16 @@ function displayEvents(events) {
             </div>
         `;
 
+        const safeNombre = DOMPurify.sanitize(event.nombre);
+        const safeLugar = DOMPurify.sanitize(event.lugar);
+        const safeZona = DOMPurify.sanitize(i18n.t('zone.' + zona, zona));
+
         marker.bindPopup(`
             <div class="popup-evento">
-                <h3>${event.nombre}</h3>
+                <h3>${safeNombre}</h3>
                 <p><strong>📅</strong> ${dateText}</p>
-                <p><strong>📍</strong> ${event.lugar}</p>
-                <p><strong>🗺️</strong> ${i18n.t('zone.' + zona, zona)}</p>
+                <p><strong>📍</strong> ${safeLugar}</p>
+                <p><strong>🗺️</strong> ${safeZona}</p>
                 <p><strong>💰</strong> ${
                     event.precio === 'gratis'
                         ? `<strong style="color:#30D158;">${i18n.t('badge.free')}</strong>`
@@ -744,19 +755,25 @@ function displayLugares(lugares) {
             ? `<p><strong>🚶</strong> ${getDistanciaHTMLCoords(lugar.lat, lugar.lng)}</p>`
             : '';
 
+        const safeNombre = DOMPurify.sanitize(lugar.nombre);
+        const safeLugar = DOMPurify.sanitize(lugar.lugar);
+        const safeZona = DOMPurify.sanitize(i18n.t('zone.' + (lugar.zona || inferirZona(lugar.lat, lugar.lng))));
+        const safeHorario = DOMPurify.sanitize(lugar.horario || 'Consultar horario');
+        const safeDescripcion = DOMPurify.sanitize(lugar.descripcion || '');
+
         marker.bindPopup(`
             <div class="popup-evento popup-lugar">
                 <div class="popup-lugar-badge">
                     ${emoji} ${categoriaNombre(lugar.categoria)}
                 </div>
-                <h3>${lugar.nombre}</h3>
-                <p><strong>📍</strong> ${lugar.lugar}</p>
-                <p><strong>🗺️</strong> ${i18n.t('zone.' + (lugar.zona || inferirZona(lugar.lat, lugar.lng)))}</p>
+                <h3>${safeNombre}</h3>
+                <p><strong>📍</strong> ${safeLugar}</p>
+                <p><strong>🗺️</strong> ${safeZona}</p>
                 <p><strong>💰</strong> ${precioHTML}</p>
-                <p><strong>🕐</strong> ${lugar.horario || 'Consultar horario'}</p>
+                <p><strong>🕐</strong> ${safeHorario}</p>
                 ${distanciaHTML}
-                ${lugar.descripcion
-                    ? `<p style="color:var(--text-secondary);font-size:13px;margin-top:8px;line-height:1.4;">${lugar.descripcion}</p>`
+                ${safeDescripcion
+                    ? `<p style="color:var(--text-secondary);font-size:13px;margin-top:8px;line-height:1.4;">${safeDescripcion}</p>`
                     : ''}
                 <div class="popup-actions">
                     <a href="${lugar.url}" target="_blank" class="popup-link">${i18n.t('event.more_info')} →</a>
@@ -1050,6 +1067,9 @@ function renderEventCard(evento) {
     const color = colors[evento.tipo] || '#6B7280';
     const densityClass = currentDensity === 'compact' ? 'compact' : '';
 
+    const safeNombre = DOMPurify.sanitize(evento.nombre);
+    const safeLugar = DOMPurify.sanitize(evento.lugar);
+
     return `
         <div class="event-card ${densityClass}">
             <div class="event-icon ${evento.tipo}" style="background:linear-gradient(135deg, ${color}dd 0%, ${color} 100%);">
@@ -1057,7 +1077,7 @@ function renderEventCard(evento) {
             </div>
             <div class="event-info">
                 <div class="event-title">
-                    ${evento.nombre}
+                    ${safeNombre}
                     ${proximidadBadge}
                     ${precioBadge}
                     ${zonaBadge}
@@ -1069,14 +1089,14 @@ function renderEventCard(evento) {
                     </div>
                     <div class="event-meta-item">
                         <i class="fas fa-map-marker-alt"></i>
-                        ${evento.lugar}
+                        ${safeLugar}
                     </div>
                     ${distanciaItem}
                 </div>
                 ${descripcion
                     ? `<div class="event-description">${descripcion}</div>`
                     : `<div class="event-description sin-descripcion">
-                           📍 ${evento.lugar} · ${evento.precio === 'gratis' ? i18n.t('badge.free') : evento.precio_desde || i18n.t('badge.paid')}
+                           📍 ${safeLugar} · ${evento.precio === 'gratis' ? i18n.t('badge.free') : evento.precio_desde || i18n.t('badge.paid')}
                        </div>`
                 }
             </div>
@@ -1127,6 +1147,9 @@ function renderLugaresList(lugares) {
             const color = lugaresColors[lugar.categoria] || '#6B7280';
             const categoriaNom = categoriaNombre(lugar.categoria);
             const zona = lugar.zona || inferirZona(lugar.lat, lugar.lng);
+            const safeNombre = DOMPurify.sanitize(lugar.nombre);
+            const safeLugar = DOMPurify.sanitize(lugar.lugar);
+            const safeHorario = DOMPurify.sanitize(lugar.horario || 'Consultar horario');
 
             const precioBadge = lugar.precio === 'gratis'
                 ? `<span class="event-badge gratis">💚 ${i18n.t('badge.free')}</span>`
@@ -1148,7 +1171,7 @@ function renderLugaresList(lugares) {
                     </div>
                     <div class="event-info">
                         <div class="event-title">
-                            ${lugar.nombre}
+                            ${safeNombre}
                             ${categoriaBadge}
                             ${precioBadge}
                             ${zonaBadge}
@@ -1156,11 +1179,11 @@ function renderLugaresList(lugares) {
                         <div class="event-meta">
                             <div class="event-meta-item">
                                 <i class="fas fa-map-marker-alt"></i>
-                                ${lugar.lugar}
+                                ${safeLugar}
                             </div>
                             <div class="event-meta-item">
                                 <i class="fas fa-clock"></i>
-                                ${lugar.horario || 'Consultar horario'}
+                                ${safeHorario}
                             </div>
                             ${distanciaItem}
                         </div>
@@ -2220,14 +2243,16 @@ function parsearFecha(fechaStr) {
 
 function limpiarDescripcion(descripcion, maxLength = 150) {
     if (!descripcion) return '';
-    let texto = descripcion
-        .replace(/<[^>]*>/g, '')
+    
+    // ✅ Seguridad: Usamos DOMPurify para limpiar cualquier HTML malicioso
+    let texto = DOMPurify.sanitize(descripcion, { ALLOWED_TAGS: [], KEEP_CONTENT: true })
         .replace(/&nbsp;/g, ' ')
         .replace(/&amp;/g, '&')
         .replace(/&lt;/g, '<')
         .replace(/&gt;/g, '>')
         .replace(/\s+/g, ' ')
         .trim();
+
     if (texto.length < 10) return '';
     if (texto.length > maxLength) {
         const ultimoEspacio = texto.lastIndexOf(' ', maxLength);
