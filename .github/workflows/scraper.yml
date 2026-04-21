@@ -35,7 +35,6 @@ jobs:
       - name: 🤖 Ejecutar scraper
         env:
           TICKETMASTER_KEY: ${{ secrets.TICKETMASTER_KEY }}
-          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
           cd scraper
           python scraper.py

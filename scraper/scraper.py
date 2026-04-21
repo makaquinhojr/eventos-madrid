@@ -35,7 +35,6 @@ class EventosScraper:
         self.stats = {
             'esmadrid': 0,
             'ticketmaster': 0,
-            'football': 0,
             'duplicados': 0,
             'errores': 0,
             'nuevos': 0,
@@ -677,173 +676,6 @@ class EventosScraper:
 
     # ===== FUENTE 3: API-FOOTBALL =====
 
-    def scrape_football(self):
-        print("\n🔍 Scrapeando API-Football...")
-
-        api_key = os.environ.get('API_FOOTBALL_KEY', '')
-        if not api_key:
-            print("   ⚠️ API_FOOTBALL_KEY no configurada — saltando")
-            return
-
-        equipos_madrid = [
-            {
-                'id': 541,
-                'nombre': 'Real Madrid',
-                'estadio': 'Santiago Bernabéu',
-                'lat': 40.4531,
-                'lng': -3.6883
-            },
-            {
-                'id': 530,
-                'nombre': 'Atlético de Madrid',
-                'estadio': 'Wanda Metropolitano',
-                'lat': 40.4361,
-                'lng': -3.5995
-            },
-            {
-                'id': 728,
-                'nombre': 'Rayo Vallecano',
-                'estadio': 'Estadio de Vallecas',
-                'lat': 40.3919,
-                'lng': -3.6546
-            },
-            {
-                'id': 547,
-                'nombre': 'Getafe CF',
-                'estadio': 'Coliseum Alfonso Pérez',
-                'lat': 40.3058,
-                'lng': -3.7326
-            },
-            {
-                'id': 724,
-                'nombre': 'Leganés',
-                'estadio': 'Estadio Municipal de Butarque',
-                'lat': 40.3281,
-                'lng': -3.7638
-            },
-        ]
-
-        headers = {'x-apisports-key': api_key}
-
-        total = 0
-        hoy = date.today()
-        fecha_fin_busq = (hoy + timedelta(days=30)).isoformat()
-
-        temporada = datetime.now().year
-        if datetime.now().month < 7:
-            temporada -= 1
-
-        for equipo in equipos_madrid:
-            try:
-                print(f"   ⚽ Buscando partidos de {equipo['nombre']}...")
-
-                response = requests.get(
-                    'https://v3.football.api-sports.io/fixtures',
-                    headers=headers,
-                    params={
-                        'team': equipo['id'],
-                        'season': temporada,
-                        'from': hoy.isoformat(),
-                        'to': fecha_fin_busq,
-                        'timezone': 'Europe/Madrid'
-                    },
-                    timeout=15
-                )
-
-                if response.status_code != 200:
-                    print(f"   ❌ Error {response.status_code}")
-                    continue
-
-                data = response.json()
-
-                errores_api = data.get('errors', {})
-                if errores_api:
-                    print(f"   ⚠️ Error API Football: {errores_api}")
-                    continue
-
-                remaining = response.headers.get(
-                    'x-ratelimit-requests-remaining'
-                )
-                if remaining and int(remaining) < 5:
-                    print("   ⚠️ Límite de peticiones casi agotado")
-
-                partidos = data.get('response', [])
-                print(f"   📄 {len(partidos)} partidos encontrados")
-
-                for partido in partidos:
-                    try:
-                        fixture = partido.get('fixture', {})
-                        teams = partido.get('teams', {})
-                        league = partido.get('league', {})
-
-                        home = teams.get('home', {})
-                        away = teams.get('away', {})
-
-                        nombre_home = home.get('name', '')
-                        nombre_away = away.get('name', '')
-                        nombre = f"{nombre_home} vs {nombre_away}"
-
-                        fecha_raw = fixture.get('date', '')
-                        fecha = self.parsear_fecha(fecha_raw)
-                        if not fecha:
-                            continue
-
-                        competicion = league.get('name', 'Fútbol')
-                        ronda = league.get('round', '')
-                        descripcion = competicion
-                        if ronda:
-                            descripcion += f" · {ronda}"
-
-                        es_local = home.get('id') == equipo['id']
-
-                        if es_local:
-                            lat = equipo['lat']
-                            lng = equipo['lng']
-                            lugar = equipo['estadio']
-                        else:
-                            venue = fixture.get('venue', {})
-                            lugar = venue.get('name', 'Estadio visitante')
-                            ciudad = venue.get('city', '')
-                            if ciudad and ciudad.lower() not in lugar.lower():
-                                lugar = f"{lugar} ({ciudad})"
-                            lat, lng = 40.4168, -3.7038
-
-                        fixture_id = fixture.get('id', '')
-                        url = (f"https://www.flashscore.es/"
-                               f"partido/{fixture_id}/"
-                               if fixture_id else '')
-
-                        zona = self.asignar_zona(lat, lng)
-
-                        evento = {
-                            'nombre': nombre,
-                            'fecha': fecha,
-                            'tipo': 'deporte',
-                            'lat': lat,
-                            'lng': lng,
-                            'lugar': lugar,
-                            'zona': zona,
-                            'precio': 'pago',
-                            'descripcion': descripcion,
-                            'url': url,
-                            'fuente': 'football'
-                        }
-
-                        self.eventos.append(evento)
-                        total += 1
-
-                    except Exception as e:
-                        self.stats['errores'] += 1
-                        continue
-
-                time.sleep(2)
-
-            except Exception as e:
-                print(f"   ❌ Error con {equipo['nombre']}: {e}")
-                continue
-
-        self.stats['football'] = total
-        print(f"   📊 Total partidos extraídos: {total}")
 
     # ===== ELIMINAR DUPLICADOS =====
 
@@ -884,8 +716,7 @@ class EventosScraper:
         # Wrap each source in try-except for resilience
         sources = [
             ("ES Madrid", self.scrape_esmadrid),
-            ("Ticketmaster", self.scrape_ticketmaster),
-            ("Football", self.scrape_football)
+            ("Ticketmaster", self.scrape_ticketmaster)
         ]
 
         for name, func in sources:
@@ -905,7 +736,6 @@ class EventosScraper:
         print("=" * 60)
         print(f"🏛️  ES Madrid:      {self.stats['esmadrid']:>5} eventos")
         print(f"🎟️  Ticketmaster:   {self.stats['ticketmaster']:>5} eventos")
-        print(f"⚽  Football:       {self.stats['football']:>5} eventos")
         print(f"➕  Nuevos:         {self.stats['nuevos']:>5}")
         print(f"🔄  Duplicados:     {self.stats['duplicados']:>5}")
         print(f"⚠️   Errores:        {self.stats['errores']:>5}")
