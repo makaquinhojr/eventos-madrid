@@ -3398,6 +3398,143 @@
 .btn-remove-favorite:active { transform: scale(0.9); }
 
 
+/* ===== ENHANCED FAVORITES ===== */
+
+.favorite-item-main {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    cursor: pointer;
+    flex: 1;
+    min-width: 0;
+    padding: 4px;
+    border-radius: var(--radius-md);
+    transition: background 0.2s var(--ease-out);
+}
+
+.favorite-item-main:hover {
+    background: var(--bg-elevated-2);
+}
+
+.favorite-item-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    flex-shrink: 0;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 0.5px solid var(--separator);
+}
+
+.favorite-item {
+    flex-direction: column;
+}
+
+.fav-action-btn {
+    background: var(--bg-elevated-2);
+    border: none;
+    color: var(--text-tertiary);
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    transition: all 0.2s var(--ease-out);
+    flex-shrink: 0;
+}
+
+.fav-action-btn:hover {
+    transform: scale(1.1);
+}
+
+.fav-action-btn:active {
+    transform: scale(0.9);
+}
+
+.fav-action-btn.fav-action-map:hover {
+    background: var(--accent-subtle);
+    color: var(--accent);
+}
+
+.fav-action-btn.fav-action-route:hover {
+    background: rgba(48, 209, 88, 0.15);
+    color: #30D158;
+}
+
+.fav-action-btn.fav-action-share:hover {
+    background: rgba(191, 90, 242, 0.15);
+    color: #BF5AF2;
+}
+
+.fav-action-btn.fav-action-remove:hover {
+    background: var(--red-subtle);
+    color: var(--red);
+}
+
+.favorites-actions {
+    padding: 0 0 var(--space-4) 0;
+}
+
+.favorites-plan-route-btn {
+    width: 100%;
+    padding: 14px 20px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    border-radius: var(--radius-lg) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--accent) 0%, #BF5AF2 100%) !important;
+    border: none !important;
+    color: white !important;
+    cursor: pointer;
+    transition: all 0.3s var(--ease-out);
+    box-shadow: 0 4px 16px rgba(10, 132, 255, 0.3);
+}
+
+.favorites-plan-route-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(10, 132, 255, 0.4);
+}
+
+.favorites-plan-route-btn:active {
+    transform: translateY(0);
+}
+
+.favorites-plan-route-btn i {
+    font-size: 16px;
+}
+
+/* ===== RTL SUPPORT (ARABIC) ===== */
+
+[lang="ar"] {
+    direction: rtl;
+    text-align: right;
+}
+
+[lang="ar"] .favorite-item-actions,
+[lang="ar"] .event-actions-row,
+[lang="ar"] .popup-acciones-extra {
+    direction: rtl;
+}
+
+[lang="ar"] .favorite-item-main {
+    flex-direction: row-reverse;
+}
+
+[lang="ar"] .favorite-item-meta {
+    text-align: right;
+}
+
+[lang="ar"] .view-toggle,
+[lang="ar"] .bottom-nav {
+    direction: ltr;
+}
+
 
 /* ===== SETTINGS ===== */
 

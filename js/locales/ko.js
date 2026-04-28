@@ -5,6 +5,7 @@ export default {
         'btn.calendar': '달력',
         'btn.places': '장소',
         'btn.stats': '통계',
+        'btn.routes': '경로',
         
         'filters.title': '🔍 필터',
         'filters.search.placeholder': '🔍 이벤트, 장소 검색...',
@@ -64,6 +65,9 @@ export default {
         'favorites.empty.desc': '❤️ 를 눌러 이벤트 추가',
         'favorites.added': '❤️ 즐겨찾기에 추가됨',
         'favorites.removed': '💔 즐겨찾기에서 제거됨',
+        'favorites.plan_route': '🗺️ 즐겨찾기로 경로 계획',
+        'favorites.plan_route.success': '✅ {count}개의 즐겨찾기 이벤트로 경로 생성',
+        'favorites.plan_route.empty': '⚠️ 경로를 계획하려면 즐겨찾기를 2개 이상 추가하세요',
         
         'stats.title': '📊 통계',
         'stats.concerts': '콘서트',
@@ -154,6 +158,9 @@ export default {
         'route.clear.confirm': '경로를 지우시겠습니까?',
         'route.mode.enabled': '🗺️ 이벤트를 클릭하여 추가',
         'route.mode.disabled': '🗺️ 경로 플래너 비활성화됨',
+        'route.cleared': '🗑️ 경로가 지워졌습니다',
+        'route.stop': '정류장',
+        'route.copy_error': '❌ 복사할 수 없습니다',
         
         'toast.theme_dark': '🌙 다크 모드 활성화',
         'toast.theme_light': '☀️ 라이트 모드 활성화',
@@ -186,6 +193,7 @@ export default {
         'lang.zh': '🇨🇳 中文',
         'lang.ja': '🇯🇵 日本語',
         'lang.ko': '🇰🇷 한국어',
+        'lang.ar': '🇸🇦 العربية',
         
         'event.view_map': '지도에서 보기',
         'event.more_info': '더 보기',

@@ -6,6 +6,7 @@ export default {
         'btn.calendar': 'Calendario',
         'btn.places': 'Lugares',
         'btn.stats': 'Stats',
+        'btn.routes': 'Rutas',
         
         // ===== FILTROS =====
         'filters.title': '🔍 Filtros',
@@ -95,6 +96,9 @@ export default {
         'favorites.empty.desc': 'Añade eventos tocando el ❤️',
         'favorites.added': '❤️ Añadido a favoritos',
         'favorites.removed': '💔 Eliminado de favoritos',
+        'favorites.plan_route': '🗺️ Planificar ruta con favoritos',
+        'favorites.plan_route.success': '✅ Ruta creada con {count} eventos favoritos',
+        'favorites.plan_route.empty': '⚠️ Añade al menos 2 favoritos para planificar ruta',
         
         // ===== ESTADÍSTICAS =====
         'stats.title': '📊 Estadísticas',
@@ -190,6 +194,9 @@ export default {
         'route.clear.confirm': '¿Seguro que quieres limpiar la ruta?',
         'route.mode.enabled': '🗺️ Click en eventos para añadir a tu ruta',
         'route.mode.disabled': '🗺️ Modo planificador desactivado',
+        'route.cleared': '🗑️ Ruta limpiada',
+        'route.stop': 'Parada',
+        'route.copy_error': '❌ No se pudo copiar',
         
         // ===== TOAST =====
         'toast.theme_dark': '🌙 Modo oscuro activado',
@@ -225,6 +232,7 @@ export default {
         'lang.zh': '🇨🇳 中文',
         'lang.ja': '🇯🇵 日本語',
         'lang.ko': '🇰🇷 한국어',
+        'lang.ar': '🇸🇦 العربية',
         
         // ===== BOTONES DE EVENTO =====
         'event.view_map': 'Ver en mapa',

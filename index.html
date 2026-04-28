@@ -41,14 +41,7 @@
     <script type="module" src="js/i18n.js"></script>
 </head>
 <body>
-<!-- Planificador de Rutas -->
-<button class="route-planner-btn" id="route-planner-btn" 
-        aria-label="Planificador de rutas"
-        title="Planificador de rutas">
-    <i class="fas fa-route" aria-hidden="true"></i>
-    <span class="desktop-only">Rutas</span>
-    <span class="route-count" id="route-count" style="display:none;">0</span>
-</button>
+
 <!-- ===== SKIP LINK (ACCESIBILIDAD) ===== -->
 <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
 
@@ -137,13 +130,14 @@
             <span class="desktop-only" data-i18n="btn.stats">Stats</span>
         </button>
 
-        <!-- Planificador de Rutas (icono) -->
-<button class="route-planner-toggle" id="route-planner-toggle" 
-        aria-label="Planificador de rutas"
-        style="display: none;">
-    <i class="fas fa-route" aria-hidden="true"></i>
-    <span class="route-count" id="route-count" style="display:none;">0</span>
-</button>
+        <!-- Planificador de Rutas -->
+        <button class="route-planner-btn" id="route-planner-btn" 
+                aria-label="Planificador de rutas"
+                title="Planificador de rutas">
+            <i class="fas fa-route" aria-hidden="true"></i>
+            <span class="desktop-only" data-i18n="btn.routes">Rutas</span>
+            <span class="route-count" id="route-count" style="display:none;">0</span>
+        </button>
         <!-- Settings -->
         <button class="settings-toggle" id="settings-toggle" 
                 aria-label="Abrir ajustes">
@@ -786,6 +780,7 @@
                     <option value="zh">🇨🇳 中文</option>
                     <option value="ja">🇯🇵 日本語</option>
                     <option value="ko">🇰🇷 한국어</option>
+                    <option value="ar">🇸🇦 العربية</option>
                 </select>
             </div>
 
@@ -990,6 +985,12 @@
         </button>
     </div>
     <div class="panel-content">
+        <div class="favorites-actions" id="favorites-actions" style="display:none;">
+            <button class="event-btn event-btn-primary favorites-plan-route-btn" id="favorites-plan-route">
+                <i class="fas fa-route" aria-hidden="true"></i>
+                <span data-i18n="favorites.plan_route">🗺️ Planificar ruta con favoritos</span>
+            </button>
+        </div>
         <div id="favorites-list" class="favorites-list" role="list"></div>
         <div class="empty-state" id="favorites-empty">
             <i class="fas fa-heart-broken" aria-hidden="true"></i>

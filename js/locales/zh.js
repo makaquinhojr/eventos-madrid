@@ -5,6 +5,7 @@ export default {
         'btn.calendar': '日历',
         'btn.places': '地点',
         'btn.stats': '统计',
+        'btn.routes': '路线',
         
         'filters.title': '🔍 筛选',
         'filters.search.placeholder': '🔍 搜索活动、地点...',
@@ -64,6 +65,9 @@ export default {
         'favorites.empty.desc': '点击 ❤️ 添加活动',
         'favorites.added': '❤️ 已添加到收藏',
         'favorites.removed': '💔 已从收藏移除',
+        'favorites.plan_route': '🗺️ 用收藏规划路线',
+        'favorites.plan_route.success': '✅ 已从 {count} 个收藏活动创建路线',
+        'favorites.plan_route.empty': '⚠️ 至少添加2个收藏才能规划路线',
         
         'stats.title': '📊 统计',
         'stats.concerts': '音乐会',
@@ -154,6 +158,9 @@ export default {
         'route.clear.confirm': '确定要清除路线吗？',
         'route.mode.enabled': '🗺️ 点击活动以添加到路线',
         'route.mode.disabled': '🗺️ 路线规划器已禁用',
+        'route.cleared': '🗑️ 路线已清除',
+        'route.stop': '站点',
+        'route.copy_error': '❌ 无法复制',
         
         'toast.theme_dark': '🌙 已启用深色模式',
         'toast.theme_light': '☀️ 已启用浅色模式',
@@ -186,6 +193,7 @@ export default {
         'lang.zh': '🇨🇳 中文',
         'lang.ja': '🇯🇵 日本語',
         'lang.ko': '🇰🇷 한국어',
+        'lang.ar': '🇸🇦 العربية',
         
         'event.view_map': '在地图上查看',
         'event.more_info': '更多信息',

@@ -5,6 +5,7 @@ export default {
         'btn.calendar': 'Calendário',
         'btn.places': 'Locais',
         'btn.stats': 'Estat.',
+        'btn.routes': 'Rotas',
         
         'filters.title': '🔍 Filtros',
         'filters.search.placeholder': '🔍 Procurar eventos, locais...',
@@ -64,6 +65,9 @@ export default {
         'favorites.empty.desc': 'Adicione eventos tocando no ❤️',
         'favorites.added': '❤️ Adicionado aos favoritos',
         'favorites.removed': '💔 Removido dos favoritos',
+        'favorites.plan_route': '🗺️ Planear rota com favoritos',
+        'favorites.plan_route.success': '✅ Rota criada com {count} eventos favoritos',
+        'favorites.plan_route.empty': '⚠️ Adicione pelo menos 2 favoritos para planear uma rota',
         
         'stats.title': '📊 Estatísticas',
         'stats.concerts': 'Concertos',
@@ -154,6 +158,9 @@ export default {
         'route.clear.confirm': 'Tem certeza de que deseja limpar a rota?',
         'route.mode.enabled': '🗺️ Clique nos eventos para adicionar',
         'route.mode.disabled': '🗺️ Planejador de rotas desativado',
+        'route.cleared': '🗑️ Rota limpa',
+        'route.stop': 'Parada',
+        'route.copy_error': '❌ Não foi possível copiar',
         
         'toast.theme_dark': '🌙 Modo escuro ativado',
         'toast.theme_light': '☀️ Modo claro ativado',
@@ -186,6 +193,7 @@ export default {
         'lang.zh': '🇨🇳 中文',
         'lang.ja': '🇯🇵 日本語',
         'lang.ko': '🇰🇷 한국어',
+        'lang.ar': '🇸🇦 العربية',
         
         'event.view_map': 'Ver no mapa',
         'event.more_info': 'Mais info',

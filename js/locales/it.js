@@ -5,6 +5,7 @@ export default {
         'btn.calendar': 'Calendario',
         'btn.places': 'Luoghi',
         'btn.stats': 'Stat.',
+        'btn.routes': 'Percorsi',
         
         'filters.title': '🔍 Filtri',
         'filters.search.placeholder': '🔍 Cerca eventi, luoghi...',
@@ -64,6 +65,9 @@ export default {
         'favorites.empty.desc': 'Aggiungi eventi toccando il ❤️',
         'favorites.added': '❤️ Aggiunto ai preferiti',
         'favorites.removed': '💔 Rimosso dai preferiti',
+        'favorites.plan_route': '🗺️ Pianifica percorso con i preferiti',
+        'favorites.plan_route.success': '✅ Percorso creato da {count} eventi preferiti',
+        'favorites.plan_route.empty': '⚠️ Aggiungi almeno 2 preferiti per pianificare un percorso',
         
         'stats.title': '📊 Statistiche',
         'stats.concerts': 'Concerti',
@@ -154,6 +158,9 @@ export default {
         'route.clear.confirm': 'Sei sicuro di voler cancellare il percorso?',
         'route.mode.enabled': '🗺️ Fai clic sugli eventi per aggiungerli',
         'route.mode.disabled': '🗺️ Pianificatore percorso disattivato',
+        'route.cleared': '🗑️ Percorso cancellato',
+        'route.stop': 'Tappa',
+        'route.copy_error': '❌ Impossibile copiare',
         
         'toast.theme_dark': '🌙 Modalità scura attivata',
         'toast.theme_light': '☀️ Modalità chiara attivata',
@@ -186,6 +193,7 @@ export default {
         'lang.zh': '🇨🇳 中文',
         'lang.ja': '🇯🇵 日本語',
         'lang.ko': '🇰🇷 한국어',
+        'lang.ar': '🇸🇦 العربية',
         
         'event.view_map': 'Vedi sulla mappa',
         'event.more_info': 'Più info',

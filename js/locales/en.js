@@ -5,6 +5,7 @@ export default {
         'btn.calendar': 'Calendar',
         'btn.places': 'Places',
         'btn.stats': 'Stats',
+        'btn.routes': 'Routes',
         
         'filters.title': '🔍 Filters',
         'filters.search.placeholder': '🔍 Search events, places...',
@@ -64,6 +65,9 @@ export default {
         'favorites.empty.desc': 'Add events by tapping the ❤️',
         'favorites.added': '❤️ Added to favorites',
         'favorites.removed': '💔 Removed from favorites',
+        'favorites.plan_route': '🗺️ Plan route with favorites',
+        'favorites.plan_route.success': '✅ Route created from {count} favorite events',
+        'favorites.plan_route.empty': '⚠️ Add at least 2 favorites to plan a route',
         
         'stats.title': '📊 Statistics',
         'stats.concerts': 'Concerts',
@@ -154,6 +158,9 @@ export default {
         'route.clear.confirm': 'Are you sure you want to clear the route?',
         'route.mode.enabled': '🗺️ Click on events to add to your route',
         'route.mode.disabled': '🗺️ Route planner disabled',
+        'route.cleared': '🗑️ Route cleared',
+        'route.stop': 'Stop',
+        'route.copy_error': '❌ Could not copy',
         
         'toast.theme_dark': '🌙 Dark mode enabled',
         'toast.theme_light': '☀️ Light mode enabled',
@@ -186,6 +193,7 @@ export default {
         'lang.zh': '🇨🇳 中文',
         'lang.ja': '🇯🇵 日本語',
         'lang.ko': '🇰🇷 한국어',
+        'lang.ar': '🇸🇦 العربية',
         
         'event.view_map': 'View on map',
         'event.more_info': 'More info',

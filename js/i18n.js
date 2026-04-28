@@ -11,7 +11,7 @@ class I18n {
 
     detectLanguage() {
         const saved = localStorage.getItem('language');
-        const availableLanguages = ['es', 'en', 'fr', 'pt', 'de', 'it', 'zh', 'ja', 'ko'];
+        const availableLanguages = ['es', 'en', 'fr', 'pt', 'de', 'it', 'zh', 'ja', 'ko', 'ar'];
         
         if (saved && availableLanguages.includes(saved)) {
             return saved;
@@ -49,7 +49,7 @@ class I18n {
 
 
     async setLanguage(lang) {
-        const availableLanguages = ['es', 'en', 'fr', 'pt', 'de', 'it', 'zh', 'ja', 'ko'];
+        const availableLanguages = ['es', 'en', 'fr', 'pt', 'de', 'it', 'zh', 'ja', 'ko', 'ar'];
         if (availableLanguages.includes(lang)) {
             await this.loadLanguage(lang);
         }
@@ -142,7 +142,7 @@ class I18n {
         const langSelect = document.getElementById('lang-select');
         if (langSelect) {
             const currentValue = langSelect.value;
-            const langs = ['es', 'en', 'fr', 'pt', 'de', 'it', 'zh', 'ja', 'ko'];
+            const langs = ['es', 'en', 'fr', 'pt', 'de', 'it', 'zh', 'ja', 'ko', 'ar'];
             Array.from(langSelect.options).forEach((option, index) => {
                 if (langs[index]) {
                     option.textContent = this.t(`lang.${langs[index]}`);

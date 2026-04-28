@@ -5,6 +5,7 @@ export default {
         'btn.calendar': 'Kalender',
         'btn.places': 'Orte',
         'btn.stats': 'Stats',
+        'btn.routes': 'Routen',
         
         'filters.title': '🔍 Filter',
         'filters.search.placeholder': '🔍 Veranstaltungen, Orte suchen...',
@@ -64,6 +65,9 @@ export default {
         'favorites.empty.desc': 'Fügen Sie Veranstaltungen hinzu, indem Sie auf ❤️ tippen',
         'favorites.added': '❤️ Zu Favoriten hinzugefügt',
         'favorites.removed': '💔 Aus Favoriten entfernt',
+        'favorites.plan_route': '🗺️ Route mit Favoriten planen',
+        'favorites.plan_route.success': '✅ Route aus {count} Lieblings-Events erstellt',
+        'favorites.plan_route.empty': '⚠️ Fügen Sie mindestens 2 Favoriten hinzu, um eine Route zu planen',
         
         'stats.title': '📊 Statistiken',
         'stats.concerts': 'Konzerte',
@@ -154,6 +158,9 @@ export default {
         'route.clear.confirm': 'Sind Sie sicher, dass Sie die Route löschen möchten?',
         'route.mode.enabled': '🗺️ Klicken Sie auf Veranstaltungen, um sie hinzuzufügen',
         'route.mode.disabled': '🗺️ Routenplaner deaktiviert',
+        'route.cleared': '🗑️ Route gelöscht',
+        'route.stop': 'Halt',
+        'route.copy_error': '❌ Kopieren fehlgeschlagen',
         
         'toast.theme_dark': '🌙 Dunkler Modus aktiviert',
         'toast.theme_light': '☀️ Heller Modus aktiviert',
@@ -186,6 +193,7 @@ export default {
         'lang.zh': '🇨🇳 中文',
         'lang.ja': '🇯🇵 日本語',
         'lang.ko': '🇰🇷 한국어',
+        'lang.ar': '🇸🇦 العربية',
         
         'event.view_map': 'Auf Karte anzeigen',
         'event.more_info': 'Mehr Info',

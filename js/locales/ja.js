@@ -5,6 +5,7 @@ export default {
         'btn.calendar': 'カレンダー',
         'btn.places': '場所',
         'btn.stats': '統計',
+        'btn.routes': 'ルート',
         
         'filters.title': '🔍 フィルター',
         'filters.search.placeholder': '🔍 イベント、場所を検索...',
@@ -64,6 +65,9 @@ export default {
         'favorites.empty.desc': '❤️ をタップしてイベントを追加',
         'favorites.added': '❤️ お気に入りに追加しました',
         'favorites.removed': '💔 お気に入りから削除しました',
+        'favorites.plan_route': '🗺️ お気に入りでルートを計画',
+        'favorites.plan_route.success': '✅ {count}件のお気に入りイベントからルートを作成',
+        'favorites.plan_route.empty': '⚠️ ルートを計画するには、少なくとも2つのお気に入りを追加してください',
         
         'stats.title': '📊 統計',
         'stats.concerts': 'コンサート',
@@ -154,6 +158,9 @@ export default {
         'route.clear.confirm': 'ルートをクリアしてもよろしいですか？',
         'route.mode.enabled': '🗺️ イベントをクリックして追加',
         'route.mode.disabled': '🗺️ ルートプランナーが無効',
+        'route.cleared': '🗑️ ルートがクリアされました',
+        'route.stop': 'ストップ',
+        'route.copy_error': '❌ コピーできませんでした',
         
         'toast.theme_dark': '🌙 ダークモードが有効になりました',
         'toast.theme_light': '☀️ ライトモードが有効になりました',
@@ -186,6 +193,7 @@ export default {
         'lang.zh': '🇨🇳 中文',
         'lang.ja': '🇯🇵 日本語',
         'lang.ko': '🇰🇷 한국어',
+        'lang.ar': '🇸🇦 العربية',
         
         'event.view_map': '地図で見る',
         'event.more_info': '詳細情報',

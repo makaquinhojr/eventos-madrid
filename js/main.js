@@ -123,6 +123,7 @@ function isFavorite(eventoId) {
 function updateFavoritesCount() {
     const badge = document.getElementById('favorites-count');
     const bottomBadge = document.getElementById('bottom-favorites-badge');
+    const favActions = document.getElementById('favorites-actions');
 
     if (favorites.length > 0) {
         if (badge) {
@@ -133,9 +134,11 @@ function updateFavoritesCount() {
             bottomBadge.textContent = favorites.length;
             bottomBadge.style.display = 'flex';
         }
+        if (favActions) favActions.style.display = 'block';
     } else {
         if (badge) badge.style.display = 'none';
         if (bottomBadge) bottomBadge.style.display = 'none';
+        if (favActions) favActions.style.display = 'none';
     }
 }
 
@@ -164,22 +167,96 @@ function renderFavoritesList() {
 
         return `
             <div class="favorite-item" style="animation: fadeUp 0.3s ease-out;">
-                <div class="favorite-item-icon ${evento.tipo}" style="background:linear-gradient(135deg, ${color}dd 0%, ${color} 100%);">
-                    ${emoji}
-                </div>
-                <div class="favorite-item-info">
-                    <div class="favorite-item-title">${safeNombre}</div>
-                    <div class="favorite-item-meta">
-                        <span>📅 ${fecha}</span>
-                        <span>📍 ${safeLugar}</span>
+                <div class="favorite-item-main" onclick="verEnMapaFromFavorites(${evento.id})" role="button" tabindex="0" aria-label="${safeNombre}">
+                    <div class="favorite-item-icon ${evento.tipo}" style="background:linear-gradient(135deg, ${color}dd 0%, ${color} 100%);">
+                        ${emoji}
+                    </div>
+                    <div class="favorite-item-info">
+                        <div class="favorite-item-title">${safeNombre}</div>
+                        <div class="favorite-item-meta">
+                            <span>📅 ${fecha}</span>
+                            <span>📍 ${safeLugar}</span>
+                        </div>
                     </div>
                 </div>
-                <button class="btn-remove-favorite" onclick="toggleFavorite(${evento.id})" aria-label="Quitar de favoritos">
-                    <i class="fas fa-times"></i>
-                </button>
+                <div class="favorite-item-actions">
+                    <button class="fav-action-btn fav-action-map" onclick="verEnMapaFromFavorites(${evento.id})" title="${i18n.t('event.view_map')}">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </button>
+                    <button class="fav-action-btn fav-action-route" onclick="comoLlegar(${evento.id})" title="${i18n.t('event.how_to_get')}">
+                        <i class="fas fa-route"></i>
+                    </button>
+                    <button class="fav-action-btn fav-action-share" onclick="compartirEventoNativo(${evento.id})" title="${i18n.t('event.share')}">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <button class="fav-action-btn fav-action-remove" onclick="toggleFavorite(${evento.id})" aria-label="${i18n.t('favorites.removed')}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
         `;
     }).join('');
+}
+
+function verEnMapaFromFavorites(eventoId) {
+    // Close favorites panel
+    const panel = document.getElementById('favorites-panel');
+    if (panel) {
+        panel.classList.remove('active');
+        panel.setAttribute('aria-modal', 'false');
+    }
+    // Switch to map view and navigate
+    if (currentView !== 'map') {
+        switchView('map');
+    }
+    verEnMapa(eventoId);
+}
+
+function planRouteFromFavorites() {
+    const favoritosEventos = allEvents.filter(e => favorites.includes(e.id));
+    
+    if (favoritosEventos.length < 2) {
+        mostrarToast(i18n.t('favorites.plan_route.empty'), 'error');
+        return;
+    }
+
+    // Close favorites panel
+    const panel = document.getElementById('favorites-panel');
+    if (panel) {
+        panel.classList.remove('active');
+        panel.setAttribute('aria-modal', 'false');
+    }
+
+    // Switch to map view
+    if (currentView !== 'map') {
+        switchView('map');
+    }
+
+    // Clear current route and populate with favorites
+    selectedRouteEvents = [...favoritosEventos];
+    
+    // Activate route planner mode
+    routePlannerMode = true;
+    const routePlannerBtn = document.getElementById('route-planner-btn');
+    if (routePlannerBtn) routePlannerBtn.classList.add('active');
+    document.body.classList.add('route-mode');
+
+    // Open route panel
+    const routePanel = document.getElementById('route-panel');
+    if (routePanel) {
+        routePanel.classList.add('active');
+        routePanel.setAttribute('aria-modal', 'true');
+    }
+
+    // Optimize the route using nearest-neighbor
+    if (selectedRouteEvents.length >= 2) {
+        optimizeRoute();
+    }
+    
+    updateRoutePanel();
+    updateRouteOnMap();
+
+    mostrarToast(i18n.t('favorites.plan_route.success', { count: favoritosEventos.length }), 'success');
 }
 
 // ===== COMPARTIR NATIVO =====
@@ -2972,12 +3049,12 @@ function initRoutePlanner() {
             }
             
             enableRouteSelection();
-            mostrarToast('🗺️ Click en eventos para añadir a tu ruta', 'success');
+            mostrarToast(i18n.t('route.mode.enabled'), 'success');
         } else {
             routePlannerBtn.classList.remove('active');
             document.body.classList.remove('route-mode');
             disableRouteSelection();
-            mostrarToast('🗺️ Modo planificador desactivado');
+            mostrarToast(i18n.t('route.mode.disabled'));
         }
     });
 
@@ -3032,7 +3109,7 @@ function addEventToRoute(eventoId) {
     if (!evento) return;
 
     if (selectedRouteEvents.find(e => e.id === eventoId)) {
-        mostrarToast('⚠️ Este evento ya está en tu ruta', 'error');
+        mostrarToast(i18n.t('route.already_added'), 'error');
         return;
     }
 
@@ -3040,7 +3117,7 @@ function addEventToRoute(eventoId) {
     updateRoutePanel();
     updateRouteOnMap();
     
-    mostrarToast(`✅ "${evento.nombre.substring(0, 30)}..." añadido a la ruta`);
+    mostrarToast(`✅ "${evento.nombre.substring(0, 30)}..." ${i18n.t('route.added').replace('✅ ', '')}`);
     
     if ('vibrate' in navigator) {
         navigator.vibrate(50);
@@ -3051,7 +3128,7 @@ function removeEventFromRoute(eventoId) {
     selectedRouteEvents = selectedRouteEvents.filter(e => e.id !== eventoId);
     updateRoutePanel();
     updateRouteOnMap();
-    mostrarToast('🗑️ Evento eliminado de la ruta');
+    mostrarToast(i18n.t('route.removed'));
 }
 
 function updateRoutePanel() {
@@ -3120,7 +3197,7 @@ function updateRoutePanel() {
                 <div class="route-event-distance">${distanceText}</div>
                 <button class="route-event-remove" 
                         onclick="removeEventFromRoute(${evento.id})"
-                        aria-label="Eliminar de ruta">
+                        aria-label="${i18n.t('route.removed')}">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -3166,7 +3243,7 @@ function updateRouteOnMap() {
             .addTo(map)
             .bindPopup(`
                 <div class="popup-evento">
-                    <h3>🗺️ Parada ${index + 1}</h3>
+                    <h3>🗺️ ${i18n.t('route.stop')} ${index + 1}</h3>
                     <p><strong>📍</strong> ${evento.nombre}</p>
                     <p><strong>📅</strong> ${formatDate(evento.fecha)}</p>
                 </div>
@@ -3220,7 +3297,7 @@ function optimizeRoute() {
     updateRoutePanel();
     updateRouteOnMap();
     
-    mostrarToast('✨ Ruta optimizada - Distancia mínima calculada', 'success');
+    mostrarToast(i18n.t('route.optimized'), 'success');
 }
 
 function exportRoute() {
@@ -3230,7 +3307,7 @@ function exportRoute() {
         `${index + 1}. ${evento.nombre}\n   📅 ${formatDate(evento.fecha)}\n   📍 ${evento.lugar}\n`
     ).join('\n');
 
-    const fullText = `🗺️ MI RUTA EN EVENTOSMADRID\n\n${routeText}\n🌐 Creada en: ${window.location.href}`;
+    const fullText = `🗺️ ${i18n.t('route.title').replace('🗺️ ', '').toUpperCase()} - EVENTOSMADRID\n\n${routeText}\n🌐 ${window.location.href}`;
 
     showExportModal(fullText);
 }
@@ -3241,7 +3318,7 @@ function showExportModal(text) {
     modal.innerHTML = `
         <div class="route-export-content">
             <div class="route-export-header">
-                <h3>📤 Compartir ruta</h3>
+                <h3>${i18n.t('route.export_title')}</h3>
                 <button class="close-panel" onclick="this.closest('.route-export-modal').remove()">
                     <i class="fas fa-times"></i>
                 </button>
@@ -3249,15 +3326,15 @@ function showExportModal(text) {
             <div class="route-export-options">
                 <button class="route-export-btn" onclick="shareViaWhatsApp('${encodeURIComponent(text)}')">
                     <i class="fab fa-whatsapp"></i>
-                    <span>WhatsApp</span>
+                    <span>${i18n.t('route.export.whatsapp')}</span>
                 </button>
                 <button class="route-export-btn" onclick="copyRouteText(\`${text.replace(/`/g, '\\`')}\`)">
                     <i class="fas fa-copy"></i>
-                    <span>Copiar texto</span>
+                    <span>${i18n.t('route.export.copy')}</span>
                 </button>
                 <button class="route-export-btn" onclick="downloadRouteJSON()">
                     <i class="fas fa-download"></i>
-                    <span>Descargar JSON</span>
+                    <span>${i18n.t('route.export.download')}</span>
                 </button>
             </div>
         </div>
@@ -3279,10 +3356,10 @@ function shareViaWhatsApp(text) {
 async function copyRouteText(text) {
     try {
         await navigator.clipboard.writeText(text);
-        mostrarToast('✅ Ruta copiada al portapapeles', 'success');
+        mostrarToast(i18n.t('route.export.copied'), 'success');
         document.querySelector('.route-export-modal')?.remove();
     } catch {
-        mostrarToast('❌ No se pudo copiar', 'error');
+        mostrarToast(i18n.t('route.copy_error'), 'error');
     }
 }
 
@@ -3303,18 +3380,18 @@ function downloadRouteJSON() {
     a.click();
     URL.revokeObjectURL(url);
     
-    mostrarToast('💾 Ruta descargada', 'success');
+    mostrarToast(i18n.t('route.export.downloaded'), 'success');
     document.querySelector('.route-export-modal')?.remove();
 }
 
 function clearRoute() {
     if (selectedRouteEvents.length === 0) return;
 
-    if (confirm('¿Seguro que quieres limpiar la ruta?')) {
+    if (confirm(i18n.t('route.clear.confirm'))) {
         selectedRouteEvents = [];
         updateRoutePanel();
         updateRouteOnMap();
-        mostrarToast('🗑️ Ruta limpiada');
+        mostrarToast(i18n.t('route.cleared'));
     }
 }
 
@@ -3427,6 +3504,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 panel.setAttribute('aria-modal', 'false');
             }
         });
+    }
+
+    const favPlanRoute = document.getElementById('favorites-plan-route');
+    if (favPlanRoute) {
+        favPlanRoute.addEventListener('click', planRouteFromFavorites);
     }
 
     document.querySelectorAll('[data-view]').forEach(btn => {
@@ -3546,3 +3628,5 @@ window.removeEventFromRoute = removeEventFromRoute;
 window.shareViaWhatsApp = shareViaWhatsApp;
 window.copyRouteText = copyRouteText;
 window.downloadRouteJSON = downloadRouteJSON;
+window.verEnMapaFromFavorites = verEnMapaFromFavorites;
+window.planRouteFromFavorites = planRouteFromFavorites;

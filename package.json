@@ -20,7 +20,11 @@
   },
   "homepage": "https://github.com/makaquinhojr/eventos-madrid#readme",
   "dependencies": {
-    "dompurify": "^3.4.0"
+    "@fortawesome/fontawesome-free": "^7.2.0",
+    "chart.js": "^4.5.1",
+    "dompurify": "^3.4.0",
+    "leaflet": "^1.9.4",
+    "leaflet.markercluster": "^1.5.3"
   },
   "devDependencies": {
     "vite": "^8.0.9"
