@@ -1542,7 +1542,19 @@ function renderActivePills() {
         const activeType = allTypes.find(t => document.querySelector(`.chip input[value="${t}"]`)?.checked);
         if (activeType) {
             pills.push({
-                label: `🎭 ${i18n.t('filters.type.' + activeType, activeType)}`,
+                label: (() => {
+                    const typeMapping = {
+                        'concierto': 'concerts',
+                        'fiesta': 'parties',
+                        'mercado': 'markets',
+                        'cultural': 'cultural',
+                        'gastronomia': 'gastro',
+                        'deporte': 'sports',
+                        'infantil': 'kids'
+                    };
+                    const translationKey = typeMapping[activeType] || activeType;
+                    return `🎭 ${i18n.t('filters.type.' + translationKey, activeType)}`;
+                })(),
                 remove: () => {
                     document.querySelectorAll('.chip input[type="checkbox"]').forEach(cb => {
                         if (allTypes.includes(cb.value)) cb.checked = true;
