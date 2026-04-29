@@ -230,33 +230,6 @@
 
 
 
-.filter-pill {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 6px;
-
-    padding: 6px 12px;
-
-    background: var(--bg-elevated);
-
-    border: 0.5px solid var(--separator);
-
-    border-radius: var(--radius-full);
-
-    font-size: 13px;
-
-    font-weight: 500;
-
-    color: var(--text-secondary);
-
-    white-space: nowrap;
-
-    animation: slideIn 0.3s var(--spring);
-
-}
 
 
 

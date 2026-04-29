@@ -45,13 +45,13 @@ export default {
         'filters.when.month': 'Este mes',
         
         'filters.type': 'Tipo de Evento',
-        'filters.type.concerts': '🎵 Conciertos',
-        'filters.type.parties': '🎪 Fiestas',
-        'filters.type.markets': '🛍️ Mercados',
+        'filters.type.concierto': '🎵 Conciertos',
+        'filters.type.fiesta': '🎪 Fiestas',
+        'filters.type.mercado': '🛍️ Mercados',
         'filters.type.cultural': '🎭 Cultural',
-        'filters.type.gastro': '🍽️ Gastro',
-        'filters.type.sports': '⚽ Deportes',
-        'filters.type.kids': '👶 Infantil',
+        'filters.type.gastronomia': '🍽️ Gastro',
+        'filters.type.deporte': '⚽ Deportes',
+        'filters.type.infantil': '👶 Infantil',
         
         'filters.price': 'Precio',
         'filters.price.free': '💚 Gratis',
@@ -73,6 +73,9 @@ export default {
         'filters.zone': '📍 Zona',
         'filters.zone.all': '📍 Toda la Comunidad',
         'filters.clear': 'Limpiar filtros',
+        'filters.clear_all': 'Limpiar todo',
+        'filters.hidden': 'ocultos',
+        'filters.remove': 'Quitar filtro',
         
         // ===== LISTA =====
         'list.title': '📅 Eventos en Madrid',

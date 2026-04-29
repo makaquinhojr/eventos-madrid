@@ -1487,8 +1487,10 @@ function renderActivePills() {
     const container = document.getElementById('active-filters');
     if (!container) return;
 
+    container.innerHTML = '';
     const pills = [];
 
+    // Categoría: Fecha
     const dateFilter = document.getElementById('filtro-fecha')?.value;
     if (dateFilter && dateFilter !== 'todos') {
         const labels = {
@@ -1507,6 +1509,7 @@ function renderActivePills() {
         });
     }
 
+    // Categoría: Zona
     const zonaFilter = document.getElementById('filtro-zona')?.value;
     if (zonaFilter && zonaFilter !== 'todas') {
         pills.push({
@@ -1519,13 +1522,14 @@ function renderActivePills() {
         });
     }
 
+    // Categoría: Tipos de evento
     const allTypes = ['concierto', 'fiesta', 'mercado', 'cultural', 'gastronomia', 'deporte', 'infantil'];
-    const activeTypes = Array.from(document.querySelectorAll('.chip input[type="checkbox"]'))
+    const hiddenTypes = Array.from(document.querySelectorAll('.chip input[type="checkbox"]'))
         .filter(cb => allTypes.includes(cb.value) && !cb.checked);
 
-    if (activeTypes.length > 0 && activeTypes.length < allTypes.length) {
+    if (hiddenTypes.length > 0 && hiddenTypes.length < allTypes.length) {
         pills.push({
-            label: `🎭 ${activeTypes.length} tipo${activeTypes.length > 1 ? 's' : ''} oculto${activeTypes.length > 1 ? 's' : ''}`,
+            label: `🎭 ${hiddenTypes.length} ${i18n.t('filters.hidden')}`,
             remove: () => {
                 document.querySelectorAll('.chip input[type="checkbox"]').forEach(cb => {
                     if (allTypes.includes(cb.value)) cb.checked = true;
@@ -1533,9 +1537,27 @@ function renderActivePills() {
                 applyFilters();
             }
         });
+    } else if (hiddenTypes.length === allTypes.length - 1) {
+        // Si solo hay uno activo, mostrar cuál es
+        const activeType = allTypes.find(t => document.querySelector(`.chip input[value="${t}"]`)?.checked);
+        if (activeType) {
+            pills.push({
+                label: `🎭 ${i18n.t('filters.type.' + activeType, activeType)}`,
+                remove: () => {
+                    document.querySelectorAll('.chip input[type="checkbox"]').forEach(cb => {
+                        if (allTypes.includes(cb.value)) cb.checked = true;
+                    });
+                    applyFilters();
+                }
+            });
+        }
     }
 
+    // Categoría: Precio
     const precioMax = parseInt(document.getElementById('filtro-precio-max')?.value || 100);
+    const gratisChecked = document.querySelector('.chip input[value="gratis"]')?.checked;
+    const pagoChecked = document.querySelector('.chip input[value="pago"]')?.checked;
+
     if (precioMax < 100) {
         pills.push({
             label: precioMax === 0 ? '💚 Solo gratis' : `💰 Hasta ${precioMax}€`,
@@ -1544,11 +1566,29 @@ function renderActivePills() {
                 if (slider) {
                     slider.value = 100;
                     slider.dispatchEvent(new Event('input'));
+                    applyFilters();
                 }
+            }
+        });
+    } else if (!pagoChecked && gratisChecked) {
+        pills.push({
+            label: '💚 Solo gratis',
+            remove: () => {
+                document.querySelectorAll('.chip input[value="pago"], .chip input[value="gratis"]').forEach(cb => cb.checked = true);
+                applyFilters();
+            }
+        });
+    } else if (pagoChecked && !gratisChecked) {
+        pills.push({
+            label: '💰 Solo de pago',
+            remove: () => {
+                document.querySelectorAll('.chip input[value="pago"], .chip input[value="gratis"]').forEach(cb => cb.checked = true);
+                applyFilters();
             }
         });
     }
 
+    // Categoría: Búsqueda
     const search = document.getElementById('search')?.value;
     if (search && search.trim()) {
         pills.push({
@@ -1561,21 +1601,44 @@ function renderActivePills() {
         });
     }
 
-    if (pills.length === 0) {
-        container.innerHTML = '';
-        return;
+    if (pills.length === 0) return;
+
+    // Botón Limpiar Todo (si hay más de 2 filtros)
+    if (pills.length > 2) {
+        const clearAllPill = document.createElement('div');
+        clearAllPill.className = 'filter-pill clear-all';
+        clearAllPill.innerHTML = `
+            <span style="font-weight:600; color:var(--accent-color);">${i18n.t('filters.clear_all', 'Limpiar todo')}</span>
+            <i class="fas fa-redo-alt" style="margin-left:8px; font-size:12px;"></i>
+        `;
+        clearAllPill.style.cursor = 'pointer';
+        clearAllPill.style.border = '1.5px solid var(--accent-color)';
+        clearAllPill.onclick = clearFilters;
+        container.appendChild(clearAllPill);
     }
 
-    container.innerHTML = pills.map((pill, index) => `
-        <div class="filter-pill" style="animation-delay: ${index * 0.05}s;">
-            ${pill.label}
-            <button class="remove-filter"
-                    onclick="event.preventDefault(); (${pill.remove.toString()})();"
-                    aria-label="Quitar filtro">
-                ×
-            </button>
-        </div>
-    `).join('');
+    // Renderizar pills
+    pills.forEach((pill, index) => {
+        const pillEl = document.createElement('div');
+        pillEl.className = 'filter-pill';
+        pillEl.style.animationDelay = `${index * 0.05}s`;
+        
+        const labelSpan = document.createElement('span');
+        labelSpan.textContent = pill.label;
+        pillEl.appendChild(labelSpan);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-filter';
+        removeBtn.innerHTML = '×';
+        removeBtn.setAttribute('aria-label', i18n.t('filters.remove', 'Quitar filtro'));
+        removeBtn.onclick = (e) => {
+            e.preventDefault();
+            pill.remove();
+        };
+        
+        pillEl.appendChild(removeBtn);
+        container.appendChild(pillEl);
+    });
 }
 
 function mostrarZonaActiva(zona) {
@@ -1650,6 +1713,7 @@ function clearFilters() {
 // ===== QUICK FILTERS =====
 function initQuickFilters() {
     const quickFilters = document.querySelectorAll('.quick-filter');
+    const allTypes = ['concierto', 'fiesta', 'mercado', 'cultural', 'gastronomia', 'deporte', 'infantil'];
 
     quickFilters.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -1667,17 +1731,31 @@ function initQuickFilters() {
                     if (el) el.value = isActive ? 'todos' : 'finde';
                     break;
                 }
-                case 'gratis':
-                    document.querySelectorAll('.chip input[value="pago"]').forEach(cb => {
-                        cb.checked = isActive;
-                    });
-                    document.querySelectorAll('.chip input[value="gratis"]').forEach(cb => {
-                        cb.checked = true;
-                    });
+                case 'gratis': {
+                    if (isActive) {
+                        // Restore prices
+                        document.querySelectorAll('.chip input[value="pago"], .chip input[value="gratis"]').forEach(cb => cb.checked = true);
+                    } else {
+                        // Only gratis
+                        document.querySelectorAll('.chip input[value="pago"]').forEach(cb => cb.checked = false);
+                        document.querySelectorAll('.chip input[value="gratis"]').forEach(cb => cb.checked = true);
+                    }
                     break;
+                }
                 case 'infantil': {
-                    const infantilCb = document.querySelector('.chip input[value="infantil"]');
-                    if (infantilCb) infantilCb.checked = !isActive;
+                    if (isActive) {
+                        // Restore all types
+                        document.querySelectorAll('.chip input[type="checkbox"]').forEach(cb => {
+                            if (allTypes.includes(cb.value)) cb.checked = true;
+                        });
+                    } else {
+                        // Exclusive mode: only infantil
+                        document.querySelectorAll('.chip input[type="checkbox"]').forEach(cb => {
+                            if (allTypes.includes(cb.value)) {
+                                cb.checked = (cb.value === 'infantil');
+                            }
+                        });
+                    }
                     break;
                 }
             }
