@@ -10,7 +10,7 @@
 
     padding: 5px 12px;
 
-    background: var(--red-subtle);
+    background: var(--accent-subtle);
 
     border: none;
 
@@ -20,7 +20,7 @@
 
     font-weight: 600;
 
-    color: var(--red);
+    color: var(--accent);
 
     cursor: pointer;
 
@@ -32,7 +32,7 @@
 
 .hoy-badge:hover {
 
-    background: var(--red);
+    background: var(--accent);
 
     color: white;
 
@@ -74,9 +74,9 @@
 
 .event-counter {
 
-    background: var(--bg-elevated);
+    background: var(--accent-subtle);
 
-    color: var(--text-secondary);
+    color: var(--accent);
 
     padding: 5px 12px;
 
