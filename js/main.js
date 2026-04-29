@@ -1455,6 +1455,24 @@ function applyFiltersImmediate() {
     actualizarContadorFiltros();
     mostrarZonaActiva(zonaFilter);
     renderActivePills();
+
+    // Sync quick filters visual state
+    document.querySelectorAll('.quick-filter').forEach(btn => {
+        const filter = btn.dataset.filter;
+        let shouldBeActive = false;
+        if (filter === 'hoy') shouldBeActive = (dateFilter === 'hoy');
+        else if (filter === 'finde') shouldBeActive = (dateFilter === 'finde');
+        else if (filter === 'gratis') shouldBeActive = (prices.length === 1 && prices.includes('gratis'));
+        else if (filter === 'infantil') shouldBeActive = (types.length > 0 && types.includes('infantil') && types.length < 7);
+        
+        if (shouldBeActive) {
+            btn.classList.add('active');
+            btn.setAttribute('aria-pressed', 'true');
+        } else {
+            btn.classList.remove('active');
+            btn.setAttribute('aria-pressed', 'false');
+        }
+    });
 }
 
 // ===== PILLS DE FILTROS ACTIVOS =====
@@ -1631,9 +1649,6 @@ function initQuickFilters() {
             const filter = btn.dataset.filter;
             const isActive = btn.classList.contains('active');
 
-            btn.classList.toggle('active');
-            btn.setAttribute('aria-pressed', (!isActive).toString());
-
             switch (filter) {
                 case 'hoy': {
                     const el = document.getElementById('filtro-fecha');
@@ -1648,6 +1663,9 @@ function initQuickFilters() {
                 case 'gratis':
                     document.querySelectorAll('.chip input[value="pago"]').forEach(cb => {
                         cb.checked = isActive;
+                    });
+                    document.querySelectorAll('.chip input[value="gratis"]').forEach(cb => {
+                        cb.checked = true;
                     });
                     break;
                 case 'infantil': {
@@ -2695,10 +2713,15 @@ function initSwipeGestures() {
     const views = ['map', 'list', 'calendar'];
 
     document.addEventListener('touchstart', e => {
+        if (e.target.closest('#map, .leaflet-container, .chip-wrapper, input[type="range"]')) {
+            touchStartX = null;
+            return;
+        }
         touchStartX = e.changedTouches[0].screenX;
     }, { passive: true });
 
     document.addEventListener('touchend', e => {
+        if (touchStartX === null) return;
         touchEndX = e.changedTouches[0].screenX;
         handleSwipe();
     }, { passive: true });
@@ -3099,9 +3122,7 @@ function enableRouteSelection() {
 }
 
 function disableRouteSelection() {
-    markersLayer.eachLayer(marker => {
-        marker.off('click');
-    });
+    displayEvents(currentFilteredEvents.length ? currentFilteredEvents : allEvents);
 }
 
 function addEventToRoute(eventoId) {
