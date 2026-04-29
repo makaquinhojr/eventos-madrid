@@ -204,6 +204,10 @@ function verEnMapaFromFavorites(eventoId) {
     if (panel) {
         panel.classList.remove('active');
         panel.setAttribute('aria-modal', 'false');
+        
+        // Return focus to toggle button
+        const toggle = document.getElementById('favorites-toggle');
+        if (toggle) toggle.focus();
     }
     // Switch to map view and navigate
     if (currentView !== 'map') {
@@ -220,12 +224,15 @@ function planRouteFromFavorites() {
         return;
     }
 
-    // Close favorites panel
-    const panel = document.getElementById('favorites-panel');
-    if (panel) {
-        panel.classList.remove('active');
-        panel.setAttribute('aria-modal', 'false');
-    }
+    // Close all other panels
+    document.querySelectorAll('.filters-panel, .stats-panel, .favorites-panel, .settings-panel').forEach(p => {
+        p.classList.remove('active');
+        p.setAttribute('aria-modal', 'false');
+    });
+
+    // Return focus to toggle button temporarily
+    const favToggle = document.getElementById('favorites-toggle');
+    if (favToggle) favToggle.focus();
 
     // Switch to map view
     if (currentView !== 'map') {
@@ -246,15 +253,15 @@ function planRouteFromFavorites() {
     if (routePanel) {
         routePanel.classList.add('active');
         routePanel.setAttribute('aria-modal', 'true');
+        trapFocus(routePanel);
     }
 
+    // Enable route selection markers
+    enableRouteSelection();
+
     // Optimize the route using nearest-neighbor
-    if (selectedRouteEvents.length >= 2) {
-        optimizeRoute();
-    }
-    
-    updateRoutePanel();
-    updateRouteOnMap();
+    // Note: optimizeRoute already calls updateRoutePanel and updateRouteOnMap
+    optimizeRoute();
 
     mostrarToast(i18n.t('favorites.plan_route.success', { count: favoritosEventos.length }), 'success');
 }
@@ -3267,6 +3274,11 @@ function updateRouteOnMap() {
                     <h3>🗺️ ${i18n.t('route.stop')} ${index + 1}</h3>
                     <p><strong>📍</strong> ${evento.nombre}</p>
                     <p><strong>📅</strong> ${formatDate(evento.fecha)}</p>
+                    <div class="popup-actions" style="margin-top: 12px; border-top: 0.5px solid var(--separator); padding-top: 8px;">
+                        <button class="popup-btn-extra compartir" onclick="compartirEventoNativo(${evento.id})" style="width: 100%; justify-content: center;">
+                            <i class="fas fa-share-alt"></i> ${i18n.t('event.share')}
+                        </button>
+                    </div>
                 </div>
             `);
         
@@ -3611,11 +3623,41 @@ document.addEventListener('DOMContentLoaded', () => {
         cerrarModalCompartir();
         document.querySelectorAll(
             '.filters-panel.active, .stats-panel.active, ' +
-            '.favorites-panel.active, .settings-panel.active'
+            '.favorites-panel.active, .settings-panel.active, .route-panel.active'
         ).forEach(panel => {
             const closeBtn = panel.querySelector('.close-panel');
             if (closeBtn) closeBtn.click();
         });
+    });
+
+    // Close panels when clicking outside (mobile only)
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+            const panels = document.querySelectorAll(
+                '.filters-panel.active, .stats-panel.active, .favorites-panel.active, .settings-panel.active, .route-panel.active'
+            );
+            
+            panels.forEach(panel => {
+                // Determine the toggle button that opened this panel
+                let toggleBtn = null;
+                const panelId = panel.id;
+                
+                if (panelId === 'favorites-panel') toggleBtn = document.getElementById('favorites-toggle') || document.getElementById('bottom-nav-favorites');
+                else if (panelId === 'settings-panel') toggleBtn = document.getElementById('settings-toggle') || document.getElementById('bottom-nav-settings');
+                else if (panelId === 'filters-panel') toggleBtn = document.getElementById('fab-filters');
+                else if (panelId === 'stats-panel') toggleBtn = document.getElementById('stats-toggle');
+                else if (panelId === 'route-panel') toggleBtn = document.getElementById('route-planner-btn');
+
+                if (!panel.contains(e.target) && (!toggleBtn || !toggleBtn.contains(e.target))) {
+                    const closeBtn = panel.querySelector('.close-panel');
+                    if (closeBtn) closeBtn.click();
+                    else {
+                        panel.classList.remove('active');
+                        panel.setAttribute('aria-modal', 'false');
+                    }
+                }
+            });
+        }
     });
 });
 
