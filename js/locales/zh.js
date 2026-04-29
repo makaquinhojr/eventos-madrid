@@ -10,6 +10,7 @@ export default {
         'filters.title': '🔍 筛选',
         'filters.search.placeholder': '🔍 搜索活动、地点...',
         'filters.search.aria': '搜索活动',
+        'filters.quick_access': '⚡ 快速访问',
         
         'filters.events': '🎭 活动筛选',
         'filters.when': '时间',

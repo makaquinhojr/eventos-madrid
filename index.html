@@ -152,38 +152,6 @@
     </div>
 </header>
 
-<!-- ===== QUICK FILTERS (STICKY) ===== -->
-<div class="quick-filters" role="toolbar" aria-label="Filtros rápidos">
-    <button class="quick-filter" 
-            id="quick-filter-hoy" 
-            data-filter="hoy" 
-            aria-label="Filtrar eventos de hoy"
-            aria-pressed="false">
-        🔥 <span data-i18n="filters.when.today">Hoy</span>
-    </button>
-    <button class="quick-filter" 
-            id="quick-filter-finde" 
-            data-filter="finde" 
-            aria-label="Filtrar eventos de fin de semana"
-            aria-pressed="false">
-        🎉 <span data-i18n="filters.when.weekend">Fin de semana</span>
-    </button>
-    <button class="quick-filter" 
-            id="quick-filter-gratis" 
-            data-filter="gratis" 
-            aria-label="Filtrar eventos gratis"
-            aria-pressed="false">
-        💚 <span data-i18n="filters.price.free">Gratis</span>
-    </button>
-    <button class="quick-filter" 
-            id="quick-filter-infantil" 
-            data-filter="infantil" 
-            aria-label="Filtrar eventos infantiles"
-            aria-pressed="false">
-        👶 <span data-i18n="filters.type.kids">Infantil</span>
-    </button>
-</div>
-
 <!-- ===== ACTIVE FILTERS PILLS ===== -->
 <div class="active-filters" 
      id="active-filters" 
@@ -405,6 +373,51 @@
                    aria-label="Buscar eventos"
                    autocomplete="off"
                    spellcheck="false">
+        </div>
+
+        <!-- Grupo: Acceso Rápido -->
+        <div class="filter-group">
+            <button class="filter-group-header" 
+                    id="quick-access-header" 
+                    aria-expanded="true" 
+                    aria-controls="quick-access-content">
+                <span class="filter-group-title" data-i18n="filters.quick_access">
+                    ⚡ Acceso Rápido
+                </span>
+                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="filter-group-content" id="quick-access-content">
+                <div class="quick-filters-grid">
+                    <button class="quick-filter" 
+                            id="quick-filter-hoy" 
+                            data-filter="hoy" 
+                            aria-label="Filtrar eventos de hoy"
+                            aria-pressed="false">
+                        🔥 <span data-i18n="filters.when.today">Hoy</span>
+                    </button>
+                    <button class="quick-filter" 
+                            id="quick-filter-finde" 
+                            data-filter="finde" 
+                            aria-label="Filtrar eventos de fin de semana"
+                            aria-pressed="false">
+                        🎉 <span data-i18n="filters.when.weekend">Fin de semana</span>
+                    </button>
+                    <button class="quick-filter" 
+                            id="quick-filter-gratis" 
+                            data-filter="gratis" 
+                            aria-label="Filtrar eventos gratis"
+                            aria-pressed="false">
+                        💚 <span data-i18n="filters.price.free">Gratis</span>
+                    </button>
+                    <button class="quick-filter" 
+                            id="quick-filter-infantil" 
+                            data-filter="infantil" 
+                            aria-label="Filtrar eventos infantiles"
+                            aria-pressed="false">
+                        👶 <span data-i18n="filters.type.kids">Infantil</span>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Grupo: Filtros de Eventos -->

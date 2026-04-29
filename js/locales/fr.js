@@ -10,6 +10,7 @@ export default {
         'filters.title': '🔍 Filtres',
         'filters.search.placeholder': '🔍 Chercher événements, lieux...',
         'filters.search.aria': 'Chercher événements',
+        'filters.quick_access': '⚡ Accès Rapide',
         
         'filters.events': '🎭 Filtres d\'événements',
         'filters.when': 'Quand',

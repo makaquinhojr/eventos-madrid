@@ -10,6 +10,7 @@ export default {
         'filters.title': '🔍 فلاتر',
         'filters.search.placeholder': '🔍 بحث عن فعاليات، أماكن...',
         'filters.search.aria': 'بحث عن فعاليات',
+        'filters.quick_access': '⚡ وصول سريع',
         
         'filters.events': '🎭 فلاتر الفعاليات',
         'filters.when': 'متى',

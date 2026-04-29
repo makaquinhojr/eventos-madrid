@@ -10,6 +10,7 @@ export default {
         'filters.title': '🔍 フィルター',
         'filters.search.placeholder': '🔍 イベント、場所を検索...',
         'filters.search.aria': 'イベントを検索',
+        'filters.quick_access': '⚡ クイックアクセス',
         
         'filters.events': '🎭 イベントフィルター',
         'filters.when': '日時',

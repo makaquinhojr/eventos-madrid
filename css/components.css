@@ -96,90 +96,50 @@
 
 
 
-/* ===== QUICK FILTERS (APPLE FLOATING ISLAND) ===== */
-.quick-filters {
-    position: fixed;
-    top: 72px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: calc(var(--z-fixed) - 1);
-    background: rgba(28, 28, 30, 0.65);
-    backdrop-filter: saturate(180%) blur(25px);
-    -webkit-backdrop-filter: saturate(180%) blur(25px);
-    border: 0.5px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-full);
-    padding: 5px;
-    display: flex;
-    gap: 2px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 
-                inset 0 0 0 0.5px rgba(255, 255, 255, 0.05);
-    white-space: nowrap;
-    animation: slideDownFade 0.6s var(--ease-out);
-    max-width: 95vw;
-    overflow-x: auto;
-    scrollbar-width: none;
-}
-
-.quick-filters::-webkit-scrollbar {
-    display: none;
-}
-
-[data-theme="light"] .quick-filters {
-    background: rgba(255, 255, 255, 0.75);
-    border: 0.5px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
-                inset 0 0 0 0.5px rgba(255, 255, 255, 0.5);
+/* ===== QUICK FILTERS IN PANEL ===== */
+.quick-filters-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 8px 0;
 }
 
 .quick-filter {
-    background: transparent;
-    border: none;
+    background: var(--bg-elevated);
+    border: 0.5px solid var(--separator);
     color: var(--text-secondary);
-    padding: 8px 16px;
-    border-radius: var(--radius-full);
+    padding: 12px 10px;
+    border-radius: var(--radius-lg);
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    white-space: nowrap;
-    font-family: var(--font-system);
+    transition: all 0.2s var(--ease-out);
     display: flex;
     align-items: center;
-    gap: 6px;
-    letter-spacing: -0.2px;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
 }
 
-.quick-filter span {
-    transition: transform 0.3s var(--ease-out);
+[data-theme="light"] .quick-filter {
+    background: #f2f2f7;
 }
 
 .quick-filter:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-elevated-2);
     color: var(--text);
-}
-
-[data-theme="light"] .quick-filter:hover {
-    background: rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
 }
 
 .quick-filter.active {
     background: var(--accent);
     color: white;
-    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-}
-
-.quick-filter.active span {
-    transform: scale(1.05);
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.2);
 }
 
 .quick-filter:active { 
-    transform: scale(0.94) translateY(1px); 
-}
-
-@keyframes slideDownFade {
-    from { opacity: 0; transform: translate(-50%, -20px); }
-    to { opacity: 1; transform: translate(-50%, 0); }
+    transform: scale(0.96); 
 }
 
 
