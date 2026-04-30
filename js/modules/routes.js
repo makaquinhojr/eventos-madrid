@@ -1,3 +1,4 @@
+import L from 'leaflet';
 import { AppState } from './store.js';
 
 export function initRoutePlanner(mostrarToast, i18n, trapFocus, displayEvents, formatDate, calcularDistancia, formatearDistancia) {

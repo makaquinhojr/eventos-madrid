@@ -60,11 +60,31 @@ window.clearFilters = () => Filters.clearFilters({ onEventsFiltered: refreshView
 async function initApp() {
     MapManager.initMap();
     initThemeSystem();
-    initHeatmapMode();
-    initRoutePlanner();
+    initHeatmapMode(UI.mostrarToast);
+    initRoutePlanner(
+        UI.mostrarToast, 
+        window.i18n, 
+        UI.trapFocus, 
+        refreshViews, 
+        UI.formatDate, 
+        UI.calcularDistancia, 
+        UI.formatearDistancia
+    );
     
     setupEventListeners();
-    await loadData();
+    
+    try {
+        await loadData();
+    } catch (err) {
+        console.error('Failed to load data:', err);
+    } finally {
+        // Hide loader
+        const loader = document.getElementById('loader');
+        if (loader) {
+            loader.classList.add('oculto');
+            setTimeout(() => loader.style.display = 'none', 500);
+        }
+    }
     
     UI.mostrarToast('🚀 ' + t('common.ready'), 'success');
 }

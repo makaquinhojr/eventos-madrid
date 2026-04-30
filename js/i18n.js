@@ -70,10 +70,6 @@ class I18n {
             this.updateUI();
             
             window.dispatchEvent(new Event('languageChanged'));
-            
-            if (typeof renderCalendar === 'function') {
-                renderCalendar();
-            }
         } catch(e) {
             console.error('Error loading lang', e);
         }

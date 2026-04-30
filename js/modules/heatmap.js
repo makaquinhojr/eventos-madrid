@@ -1,3 +1,4 @@
+import L from 'leaflet';
 import { AppState } from './store.js';
 
 export function initHeatmapMode(mostrarToast) {
