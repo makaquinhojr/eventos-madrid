@@ -3,9 +3,8 @@
    Modularized & Optimized for Vite
    ======================================== */
 
-// Global CSS & Assets
-
 // Modules
+import L from 'leaflet';
 import { AppState } from './modules/store.js';
 import { initThemeSystem } from './modules/theme.js';
 import { initHeatmapMode } from './modules/heatmap.js';
@@ -131,13 +130,30 @@ function refreshViews() {
     if (AppState.currentView === 'list') Renderers.renderListView(evs, t);
     Renderers.renderLugaresList(lugs, t);
     
-    const counter = document.getElementById('eventos-totales');
+    const counter = document.getElementById('event-count');
     if (counter) counter.textContent = evs.length;
 
     // Actualizar estadísticas si el panel está abierto
     if (document.getElementById('stats-panel').classList.contains('active')) {
         Stats.initCharts(evs, t);
     }
+
+    // Update Quick Filter Buttons Active State
+    updateQuickFilterButtons();
+}
+
+function updateQuickFilterButtons() {
+    const dateFilter = document.getElementById('filtro-fecha')?.value;
+    const qHoy = document.getElementById('quick-filter-hoy');
+    if (qHoy) qHoy.classList.toggle('active', dateFilter === 'hoy');
+
+    const cbGratis = document.querySelector('.chip input[value="gratis"]');
+    const qGratis = document.getElementById('quick-filter-gratis');
+    if (qGratis) qGratis.classList.toggle('active', cbGratis?.checked);
+
+    const cbInfantil = document.querySelector('.chip input[value="infantil"]');
+    const qInfantil = document.getElementById('quick-filter-infantil');
+    if (qInfantil) qInfantil.classList.toggle('active', cbInfantil?.checked);
 }
 
 function switchView(view) {
@@ -200,7 +216,6 @@ function setupEventListeners() {
     document.querySelectorAll('.quick-filter').forEach(btn => {
         btn.addEventListener('click', () => {
             const filter = btn.dataset.filter;
-            // Simplified toggle logic for quick filters
             if (filter === 'hoy') {
                 const f = document.getElementById('filtro-fecha');
                 if (f) f.value = f.value === 'hoy' ? 'todos' : 'hoy';
@@ -236,10 +251,10 @@ function setupEventListeners() {
     setupPanel('settings-toggle', 'settings-panel', 'close-settings');
     setupPanel('bottom-nav-favorites', 'favorites-panel', 'close-favorites');
     setupPanel('bottom-nav-settings', 'settings-panel', 'close-settings');
-    setupPanel('routes-toggle', 'route-panel', 'close-route-panel');
+    // Removed redundant route setup as it's handled in initRoutePlanner
 
     // Language Select
-    const langSelect = document.getElementById('language-select');
+    const langSelect = document.getElementById('lang-select');
     if (langSelect) {
         langSelect.value = i18n.currentLang;
         langSelect.addEventListener('change', (e) => {
@@ -298,8 +313,8 @@ function setupEventListeners() {
 document.addEventListener('DOMContentLoaded', initApp);
 
 // Service Worker
-if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/eventos-madrid/sw.js').catch(err => console.log('SW error:', err));
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error:', err));
     });
 }

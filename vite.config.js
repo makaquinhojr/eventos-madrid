@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
-export default defineConfig({
-  base: '/eventos-madrid/',
+export default defineConfig(({ command }) => ({
+  base: command === 'build' ? '/eventos-madrid/' : '/',
   build: {
     target: 'esnext',
     minify: false,
@@ -22,6 +22,7 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true
+    open: true,
+    host: true
   }
-});
+}));

@@ -147,8 +147,8 @@ export function clearFilters(callbacks) {
     const precioF = document.getElementById('filtro-precio-max');
     if (precioF) {
         precioF.value = 100;
-        const val = document.getElementById('precio-val');
-        if (val) val.textContent = '100€+';
+        const val = document.getElementById('precio-valor-label');
+        if (val) val.textContent = 'Cualquiera';
     }
 
     document.querySelectorAll('.chip input').forEach(cb => cb.checked = false);
