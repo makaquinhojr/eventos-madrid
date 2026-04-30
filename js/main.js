@@ -4,10 +4,6 @@
    ======================================== */
 
 // Global CSS & Assets
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet.markercluster/dist/MarkerCluster.css';
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 // Modules
 import { AppState } from './modules/store.js';
