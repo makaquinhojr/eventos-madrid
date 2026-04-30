@@ -1,5 +1,5 @@
 import { n as __toESM } from "./rolldown-runtime-DHFQXTcm.js";
-import "./i18n-3Jlp9XJN.js";
+import "./i18n-daayPf3l.js";
 import { i as require_leaflet_src, n as purify, r as require_leaflet_markercluster_src, t as auto_default } from "./vendor-BZICkswp.js";
 //#region \0vite/modulepreload-polyfill.js
 (function polyfill() {
@@ -176,6 +176,7 @@ function lightenColor(hex, percent) {
 }
 //#endregion
 //#region js/modules/heatmap.js
+var import_leaflet_src = /* @__PURE__ */ __toESM(require_leaflet_src());
 function initHeatmapMode(mostrarToast) {
 	const heatmapToggle = document.getElementById("heatmap-toggle");
 	const heatmapControls = document.getElementById("heatmap-controls");
@@ -206,7 +207,7 @@ function activateHeatmap(mostrarToast) {
 		if (toggle) toggle.checked = false;
 		return;
 	}
-	if (!AppState.heatmapLayer) AppState.heatmapLayer = L.layerGroup().addTo(AppState.map);
+	if (!AppState.heatmapLayer) AppState.heatmapLayer = import_leaflet_src.default.layerGroup().addTo(AppState.map);
 	const coordMap = {};
 	eventos.forEach((evento) => {
 		const key = `${evento.lat.toFixed(3)},${evento.lng.toFixed(3)}`;
@@ -221,7 +222,7 @@ function activateHeatmap(mostrarToast) {
 	Object.values(coordMap).forEach((point) => {
 		const intensity = point.count / maxCount;
 		const radius = AppState.heatmapRadius * 30 * (.5 + intensity);
-		L.circle([point.lat, point.lng], {
+		import_leaflet_src.default.circle([point.lat, point.lng], {
 			radius,
 			fillColor: getHeatColor(intensity),
 			fillOpacity: .3 + intensity * .3,
@@ -319,7 +320,7 @@ function enableRouteSelection() {
 	AppState.markersLayer.eachLayer((marker) => {
 		marker.off("click");
 		marker.on("click", (e) => {
-			L.DomEvent.stopPropagation(e);
+			import_leaflet_src.default.DomEvent.stopPropagation(e);
 			addEventToRoute(marker.eventoId);
 		});
 	});
@@ -415,13 +416,13 @@ function updateRouteOnMap(i18n, formatDate) {
 	}
 	if (AppState.selectedRouteEvents.length === 0) return;
 	AppState.selectedRouteEvents.forEach((evento, index) => {
-		const icon = L.divIcon({
+		const icon = import_leaflet_src.default.divIcon({
 			html: `<div class="route-marker">${index + 1}</div>`,
 			className: "",
 			iconSize: [36, 36],
 			iconAnchor: [18, 18]
 		});
-		const marker = L.marker([evento.lat, evento.lng], { icon }).addTo(AppState.map).bindPopup(`
+		const marker = import_leaflet_src.default.marker([evento.lat, evento.lng], { icon }).addTo(AppState.map).bindPopup(`
                 <div class="popup-evento">
                     <h3>🗺️ ${i18n.t("route.stop")} ${index + 1}</h3>
                     <p><strong>📍</strong> ${evento.nombre}</p>
@@ -437,7 +438,7 @@ function updateRouteOnMap(i18n, formatDate) {
 	});
 	if (AppState.selectedRouteEvents.length >= 2) {
 		const latlngs = AppState.selectedRouteEvents.map((e) => [e.lat, e.lng]);
-		AppState.routePolyline = L.polyline(latlngs, {
+		AppState.routePolyline = import_leaflet_src.default.polyline(latlngs, {
 			color: getComputedStyle(document.documentElement).getPropertyValue("--accent").trim(),
 			weight: 4,
 			opacity: .8,
@@ -698,9 +699,6 @@ function mostrarToastConUndo(mensaje, undoCallback, tipo = "normal") {
 function mostrarToast$1(mensaje, tipo = "normal") {
 	mostrarToastConUndo(mensaje, null, tipo);
 }
-//#endregion
-//#region js/modules/map-manager.js
-var import_leaflet_src = /* @__PURE__ */ __toESM(require_leaflet_src());
 require_leaflet_markercluster_src();
 function initMap() {
 	const map = import_leaflet_src.default.map("map", { zoomControl: false }).setView([40.4168, -3.7038], 12);
@@ -1398,10 +1396,20 @@ window.clearFilters = () => clearFilters({
 async function initApp() {
 	initMap();
 	initThemeSystem();
-	initHeatmapMode();
-	initRoutePlanner();
+	initHeatmapMode(mostrarToast$1);
+	initRoutePlanner(mostrarToast$1, window.i18n, trapFocus, refreshViews, formatDate$1, calcularDistancia$1, formatearDistancia$1);
 	setupEventListeners();
-	await loadData();
+	try {
+		await loadData();
+	} catch (err) {
+		console.error("Failed to load data:", err);
+	} finally {
+		const loader = document.getElementById("loader");
+		if (loader) {
+			loader.classList.add("oculto");
+			setTimeout(() => loader.style.display = "none", 500);
+		}
+	}
 	mostrarToast$1("🚀 " + t("common.ready"), "success");
 }
 async function loadData() {
