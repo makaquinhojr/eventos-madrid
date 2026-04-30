@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.tile.thunderforest.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' ws: localhost:* https://libretranslate.de;">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.tile.thunderforest.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' ws: localhost:* https://libretranslate.de;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     
     <!-- PWA -->
@@ -24,6 +24,10 @@
     <meta property="og:url" content="https://makaquinhojr.github.io/eventos-madrid/">
     
     <!-- Dependencies CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"">
     <!-- Custom CSS -->
 
     <!-- Import Map for bare specifiers -->
@@ -32,18 +36,17 @@
     <script type="importmap">
     {
       "imports": {
-        "leaflet": "/node_modules/leaflet/dist/leaflet-src.js",
-        "leaflet.markercluster": "/node_modules/leaflet.markercluster/dist/leaflet.markercluster.js",
-        "dompurify": "/node_modules/dompurify/dist/purify.es.mjs",
-        "chart.js/auto": "/node_modules/chart.js/auto/auto.js"
+        "leaflet": "https://esm.sh/leaflet@1.9.4",
+        "leaflet.markercluster": "https://esm.sh/leaflet.markercluster@1.5.3",
+        "dompurify": "https://esm.sh/dompurify@3.0.9",
+        "chart.js/auto": "https://esm.sh/chart.js@4.4.2/auto"
       }
     }
     </script>
-  <script type="module" crossorigin src="/eventos-madrid/assets/index-DJwLZKXu.js"></script>
+  <script type="module" crossorigin src="/eventos-madrid/assets/index-CtJ8XpK2.js"></script>
   <link rel="modulepreload" crossorigin href="/eventos-madrid/assets/rolldown-runtime-DHFQXTcm.js">
-  <link rel="modulepreload" crossorigin href="/eventos-madrid/assets/i18n-n89UGnUb.js">
-  <link rel="modulepreload" crossorigin href="/eventos-madrid/assets/vendor-C8yhHQPS.js">
-  <link rel="stylesheet" crossorigin href="/eventos-madrid/assets/vendor-CP6jftN9.css">
+  <link rel="modulepreload" crossorigin href="/eventos-madrid/assets/i18n-3Jlp9XJN.js">
+  <link rel="modulepreload" crossorigin href="/eventos-madrid/assets/vendor-BZICkswp.js">
   <link rel="stylesheet" crossorigin href="/eventos-madrid/assets/index-BxyG2t0f.css">
 </head>
 <body>
