@@ -17,9 +17,10 @@ import * as Sharing from './modules/sharing.js';
 import * as Filters from './modules/filters.js';
 import * as Renderers from './modules/renderers.js';
 import * as Stats from './modules/stats.js';
+import { i18n } from './i18n.js';
 
 // --- Global Helpers ---
-const t = (key, vars) => window.i18n ? window.i18n.t(key, vars) : key;
+const t = (key, vars) => i18n ? i18n.t(key, vars) : key;
 
 // --- Global exposure for HTML onclick handlers (legacy support) ---
 window.comoLlegar = (id) => {
@@ -63,7 +64,7 @@ async function initApp() {
     initHeatmapMode(UI.mostrarToast);
     initRoutePlanner(
         UI.mostrarToast, 
-        window.i18n, 
+        i18n, 
         UI.trapFocus, 
         refreshViews, 
         UI.formatDate, 
@@ -91,7 +92,10 @@ async function initApp() {
 
 async function loadData() {
     try {
-        const [evRes, lugRes] = await Promise.all([fetch('data/eventos.json'), fetch('data/lugares.json')]);
+        const [evRes, lugRes] = await Promise.all([
+            fetch('data/eventos.json'), 
+            fetch('data/lugares.json')
+        ]);
         const events = await evRes.json();
         const lugares = await lugRes.json();
 
@@ -159,6 +163,58 @@ function setupEventListeners() {
         refreshViews();
     });
 
+    // Filtros checkboxes, selects and range
+    const filterCallbacks = { onEventsFiltered: refreshViews, onLugaresFiltered: refreshViews };
+    
+    document.querySelectorAll('.chip input, .lugar-categoria-cb, #filtro-fecha, #filtro-zona, #filtro-precio-max, #filtro-distancia')
+        .forEach(el => {
+            const eventType = el.type === 'checkbox' || el.tagName === 'SELECT' ? 'change' : 'input';
+            el.addEventListener(eventType, () => Filters.applyFilters(filterCallbacks));
+        });
+
+    // Update range labels
+    const precioMax = document.getElementById('filtro-precio-max');
+    if (precioMax) {
+        precioMax.addEventListener('input', (e) => {
+            const label = document.getElementById('precio-valor-label');
+            if (label) label.textContent = e.target.value >= 100 ? t('filters.price.any') : e.target.value + '€';
+        });
+    }
+
+    const sortSelect = document.getElementById('sort-by');
+    if (sortSelect) sortSelect.addEventListener('change', (e) => {
+        AppState.currentSort = e.target.value;
+        refreshViews();
+    });
+
+    // View Density
+    document.querySelectorAll('.density-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            AppState.currentDensity = btn.dataset.density;
+            document.querySelectorAll('.density-btn').forEach(b => b.classList.toggle('active', b === btn));
+            refreshViews();
+        });
+    });
+
+    // Quick filters
+    document.querySelectorAll('.quick-filter').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filter = btn.dataset.filter;
+            // Simplified toggle logic for quick filters
+            if (filter === 'hoy') {
+                const f = document.getElementById('filtro-fecha');
+                if (f) f.value = f.value === 'hoy' ? 'todos' : 'hoy';
+            } else if (filter === 'gratis') {
+                const cb = document.querySelector('.chip input[value="gratis"]');
+                if (cb) cb.checked = !cb.checked;
+            } else if (filter === 'infantil') {
+                const cb = document.querySelector('.chip input[value="infantil"]');
+                if (cb) cb.checked = !cb.checked;
+            }
+            Filters.applyFilters(filterCallbacks);
+        });
+    });
+
     // Panel toggles
     const setupPanel = (toggleId, panelId, closeId, onOpen) => {
         const toggle = document.getElementById(toggleId);
@@ -179,6 +235,64 @@ function setupEventListeners() {
     });
     setupPanel('settings-toggle', 'settings-panel', 'close-settings');
     setupPanel('bottom-nav-favorites', 'favorites-panel', 'close-favorites');
+    setupPanel('bottom-nav-settings', 'settings-panel', 'close-settings');
+    setupPanel('routes-toggle', 'route-panel', 'close-route-panel');
+
+    // Language Select
+    const langSelect = document.getElementById('language-select');
+    if (langSelect) {
+        langSelect.value = i18n.currentLang;
+        langSelect.addEventListener('change', (e) => {
+            i18n.setLanguage(e.target.value);
+        });
+    }
+
+    // Plan Favorite Route
+    const btnPlanRoute = document.getElementById('plan-favorite-route');
+    if (btnPlanRoute) btnPlanRoute.addEventListener('click', () => {
+        const favEvents = AppState.favorites.map(id => AppState.getEventById(id)).filter(Boolean);
+        if (favEvents.length === 0) return UI.mostrarToast(t('favorites.empty_route'), 'warning');
+        
+        // Open route panel
+        document.getElementById('route-panel').classList.add('active');
+        
+        // Clear existing route and add favorites
+        AppState.selectedRouteEvents = [...favEvents];
+        window.dispatchEvent(new CustomEvent('updateRoute'));
+    });
+
+    // Clear filters button
+    const btnClear = document.getElementById('btn-clear');
+    if (btnClear) btnClear.addEventListener('click', window.clearFilters);
+
+    // Geolocate
+    const btnGeolocate = document.getElementById('btn-geolocate');
+    if (btnGeolocate) btnGeolocate.addEventListener('click', () => {
+        if (!navigator.geolocation) return UI.mostrarToast('Geolocation not supported', 'error');
+        btnGeolocate.classList.add('loading');
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                btnGeolocate.classList.remove('loading');
+                const { latitude, longitude } = pos.coords;
+                AppState.userLocation = { lat: latitude, lng: longitude };
+                if (AppState.map) {
+                    AppState.map.setView([latitude, longitude], 15);
+                    if (AppState.userMarker) AppState.map.removeLayer(AppState.userMarker);
+                    AppState.userMarker = L.circleMarker([latitude, longitude], {
+                        color: '#0A84FF', fillOpacity: 1, radius: 8, weight: 3
+                    }).addTo(AppState.map);
+                }
+                Filters.applyFilters(filterCallbacks);
+                UI.mostrarToast('📍 ' + t('common.location_ready'), 'success');
+            },
+            () => {
+                btnGeolocate.classList.remove('loading');
+                UI.mostrarToast('❌ ' + t('common.location_error'), 'error');
+            }
+        );
+    });
+
+    window.addEventListener('languageChanged', refreshViews);
 }
 
 document.addEventListener('DOMContentLoaded', initApp);

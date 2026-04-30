@@ -236,7 +236,8 @@ class I18n {
     }
 }
 
-const i18n = new I18n();
+export const i18n = new I18n();
+window.i18n = i18n;
 
 const initI18n = async () => {
     await i18n.loadLanguage(i18n.currentLang);
@@ -250,4 +251,3 @@ const initI18n = async () => {
 };
 
 initI18n();
-window.i18n = i18n;
