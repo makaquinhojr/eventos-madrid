@@ -1,6 +1,6 @@
 import { n as __toESM } from "./rolldown-runtime-DHFQXTcm.js";
-import { t as i18n } from "./i18n-WTaZlGcT.js";
-import { i as require_leaflet_src, n as purify, r as require_leaflet_markercluster_src, t as auto_default } from "./vendor-BZICkswp.js";
+import { i as require_leaflet_src, n as purify, r as require_leaflet_markercluster_src, t as auto_default } from "./vendor-CoTyeJNM.js";
+import { t as i18n } from "./i18n-C_kteIG7.js";
 //#region \0vite/modulepreload-polyfill.js
 (function polyfill() {
 	const relList = document.createElement("link").relList;
@@ -33,6 +33,7 @@ import { i as require_leaflet_src, n as purify, r as require_leaflet_markerclust
 })();
 //#endregion
 //#region js/modules/store.js
+var import_leaflet_src = /* @__PURE__ */ __toESM(require_leaflet_src());
 var AppState = {
 	map: null,
 	allEvents: [],
@@ -176,7 +177,6 @@ function lightenColor(hex, percent) {
 }
 //#endregion
 //#region js/modules/heatmap.js
-var import_leaflet_src = /* @__PURE__ */ __toESM(require_leaflet_src());
 function initHeatmapMode(mostrarToast) {
 	const heatmapToggle = document.getElementById("heatmap-toggle");
 	const heatmapControls = document.getElementById("heatmap-controls");
@@ -1094,8 +1094,8 @@ function clearFilters(callbacks) {
 	const precioF = document.getElementById("filtro-precio-max");
 	if (precioF) {
 		precioF.value = 100;
-		const val = document.getElementById("precio-val");
-		if (val) val.textContent = "100€+";
+		const val = document.getElementById("precio-valor-label");
+		if (val) val.textContent = "Cualquiera";
 	}
 	document.querySelectorAll(".chip input").forEach((cb) => cb.checked = false);
 	document.querySelectorAll(".lugar-categoria-cb").forEach((cb) => cb.checked = true);
@@ -1441,9 +1441,21 @@ function refreshViews() {
 	}
 	if (AppState.currentView === "list") renderListView(evs, t);
 	renderLugaresList(lugs, t);
-	const counter = document.getElementById("eventos-totales");
+	const counter = document.getElementById("event-count");
 	if (counter) counter.textContent = evs.length;
 	if (document.getElementById("stats-panel").classList.contains("active")) initCharts(evs, t);
+	updateQuickFilterButtons();
+}
+function updateQuickFilterButtons() {
+	const dateFilter = document.getElementById("filtro-fecha")?.value;
+	const qHoy = document.getElementById("quick-filter-hoy");
+	if (qHoy) qHoy.classList.toggle("active", dateFilter === "hoy");
+	const cbGratis = document.querySelector(".chip input[value=\"gratis\"]");
+	const qGratis = document.getElementById("quick-filter-gratis");
+	if (qGratis) qGratis.classList.toggle("active", cbGratis?.checked);
+	const cbInfantil = document.querySelector(".chip input[value=\"infantil\"]");
+	const qInfantil = document.getElementById("quick-filter-infantil");
+	if (qInfantil) qInfantil.classList.toggle("active", cbInfantil?.checked);
 }
 function switchView(view) {
 	AppState.currentView = view;
@@ -1527,8 +1539,7 @@ function setupEventListeners() {
 	setupPanel("settings-toggle", "settings-panel", "close-settings");
 	setupPanel("bottom-nav-favorites", "favorites-panel", "close-favorites");
 	setupPanel("bottom-nav-settings", "settings-panel", "close-settings");
-	setupPanel("routes-toggle", "route-panel", "close-route-panel");
-	const langSelect = document.getElementById("language-select");
+	const langSelect = document.getElementById("lang-select");
 	if (langSelect) {
 		langSelect.value = i18n.currentLang;
 		langSelect.addEventListener("change", (e) => {
@@ -1559,7 +1570,7 @@ function setupEventListeners() {
 			if (AppState.map) {
 				AppState.map.setView([latitude, longitude], 15);
 				if (AppState.userMarker) AppState.map.removeLayer(AppState.userMarker);
-				AppState.userMarker = L.circleMarker([latitude, longitude], {
+				AppState.userMarker = import_leaflet_src.default.circleMarker([latitude, longitude], {
 					color: "#0A84FF",
 					fillOpacity: 1,
 					radius: 8,
@@ -1576,7 +1587,7 @@ function setupEventListeners() {
 	window.addEventListener("languageChanged", refreshViews);
 }
 document.addEventListener("DOMContentLoaded", initApp);
-if ("serviceWorker" in navigator) window.addEventListener("load", () => {
-	navigator.serviceWorker.register("/eventos-madrid/sw.js").catch((err) => console.log("SW error:", err));
+if ("serviceWorker" in navigator && true) window.addEventListener("load", () => {
+	navigator.serviceWorker.register("./sw.js").catch((err) => console.log("SW error:", err));
 });
 //#endregion
