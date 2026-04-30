@@ -38,5 +38,16 @@ export const AppState = {
     routePlannerMode: false,
     selectedRouteEvents: [],
     routePolyline: null,
-    routeMarkers: []
+    routeMarkers: [],
+
+    // Helpers
+    getEventById(id) {
+        return this.allEvents.find(e => e.id === parseInt(id));
+    },
+    getLugarById(id) {
+        return this.allLugares.find(l => l.id === id);
+    },
+    isFavorite(id) {
+        return this.favorites.includes(parseInt(id));
+    }
 };

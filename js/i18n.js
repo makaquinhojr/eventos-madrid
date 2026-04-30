@@ -32,9 +32,6 @@ class I18n {
 
     t(key, vars = {}) {
         const translation = this.translations[this.currentLang]?.[key];
-        if (key === 'months.april' || key === 'months.may') {
-            console.log(`i18n.t DEBUG: key=${key}, currentLang=${this.currentLang}, translation=${translation}, fallback=${(this.translations['es'] || {})[key]}`);
-        }
         let text = translation || 
                    (this.translations['es'] || {})[key] || 
                    key;
