@@ -294,6 +294,7 @@ var I18n = class {
 	}
 };
 var i18n = new I18n();
+window.i18n = i18n;
 var initI18n = async () => {
 	await i18n.loadLanguage(i18n.currentLang);
 	if (document.readyState === "complete") i18n.updateUI();
@@ -302,5 +303,5 @@ var initI18n = async () => {
 	});
 };
 initI18n();
-window.i18n = i18n;
 //#endregion
+export { i18n as t };

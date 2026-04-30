@@ -1,5 +1,5 @@
 import { n as __toESM } from "./rolldown-runtime-DHFQXTcm.js";
-import "./i18n-daayPf3l.js";
+import { t as i18n } from "./i18n-WTaZlGcT.js";
 import { i as require_leaflet_src, n as purify, r as require_leaflet_markercluster_src, t as auto_default } from "./vendor-BZICkswp.js";
 //#region \0vite/modulepreload-polyfill.js
 (function polyfill() {
@@ -1356,7 +1356,7 @@ function formatDateShort(dateStr) {
 }
 //#endregion
 //#region js/main.js
-var t = (key, vars) => window.i18n ? window.i18n.t(key, vars) : key;
+var t = (key, vars) => i18n ? i18n.t(key, vars) : key;
 window.comoLlegar = (id) => {
 	const ev = AppState.getEventById(id);
 	if (ev) window.open(`https://www.google.com/maps/dir/?api=1&destination=${ev.lat},${ev.lng}`, "_blank");
@@ -1397,7 +1397,7 @@ async function initApp() {
 	initMap();
 	initThemeSystem();
 	initHeatmapMode(mostrarToast$1);
-	initRoutePlanner(mostrarToast$1, window.i18n, trapFocus, refreshViews, formatDate$1, calcularDistancia$1, formatearDistancia$1);
+	initRoutePlanner(mostrarToast$1, i18n, trapFocus, refreshViews, formatDate$1, calcularDistancia$1, formatearDistancia$1);
 	setupEventListeners();
 	try {
 		await loadData();
@@ -1467,6 +1467,47 @@ function setupEventListeners() {
 		btnToggleLugares.classList.toggle("active", AppState.mostrarLugares);
 		refreshViews();
 	});
+	const filterCallbacks = {
+		onEventsFiltered: refreshViews,
+		onLugaresFiltered: refreshViews
+	};
+	document.querySelectorAll(".chip input, .lugar-categoria-cb, #filtro-fecha, #filtro-zona, #filtro-precio-max, #filtro-distancia").forEach((el) => {
+		const eventType = el.type === "checkbox" || el.tagName === "SELECT" ? "change" : "input";
+		el.addEventListener(eventType, () => applyFilters(filterCallbacks));
+	});
+	const precioMax = document.getElementById("filtro-precio-max");
+	if (precioMax) precioMax.addEventListener("input", (e) => {
+		const label = document.getElementById("precio-valor-label");
+		if (label) label.textContent = e.target.value >= 100 ? t("filters.price.any") : e.target.value + "€";
+	});
+	const sortSelect = document.getElementById("sort-by");
+	if (sortSelect) sortSelect.addEventListener("change", (e) => {
+		AppState.currentSort = e.target.value;
+		refreshViews();
+	});
+	document.querySelectorAll(".density-btn").forEach((btn) => {
+		btn.addEventListener("click", () => {
+			AppState.currentDensity = btn.dataset.density;
+			document.querySelectorAll(".density-btn").forEach((b) => b.classList.toggle("active", b === btn));
+			refreshViews();
+		});
+	});
+	document.querySelectorAll(".quick-filter").forEach((btn) => {
+		btn.addEventListener("click", () => {
+			const filter = btn.dataset.filter;
+			if (filter === "hoy") {
+				const f = document.getElementById("filtro-fecha");
+				if (f) f.value = f.value === "hoy" ? "todos" : "hoy";
+			} else if (filter === "gratis") {
+				const cb = document.querySelector(".chip input[value=\"gratis\"]");
+				if (cb) cb.checked = !cb.checked;
+			} else if (filter === "infantil") {
+				const cb = document.querySelector(".chip input[value=\"infantil\"]");
+				if (cb) cb.checked = !cb.checked;
+			}
+			applyFilters(filterCallbacks);
+		});
+	});
 	const setupPanel = (toggleId, panelId, closeId, onOpen) => {
 		const toggle = document.getElementById(toggleId);
 		const panel = document.getElementById(panelId);
@@ -1485,6 +1526,54 @@ function setupEventListeners() {
 	});
 	setupPanel("settings-toggle", "settings-panel", "close-settings");
 	setupPanel("bottom-nav-favorites", "favorites-panel", "close-favorites");
+	setupPanel("bottom-nav-settings", "settings-panel", "close-settings");
+	setupPanel("routes-toggle", "route-panel", "close-route-panel");
+	const langSelect = document.getElementById("language-select");
+	if (langSelect) {
+		langSelect.value = i18n.currentLang;
+		langSelect.addEventListener("change", (e) => {
+			i18n.setLanguage(e.target.value);
+		});
+	}
+	const btnPlanRoute = document.getElementById("plan-favorite-route");
+	if (btnPlanRoute) btnPlanRoute.addEventListener("click", () => {
+		const favEvents = AppState.favorites.map((id) => AppState.getEventById(id)).filter(Boolean);
+		if (favEvents.length === 0) return mostrarToast$1(t("favorites.empty_route"), "warning");
+		document.getElementById("route-panel").classList.add("active");
+		AppState.selectedRouteEvents = [...favEvents];
+		window.dispatchEvent(new CustomEvent("updateRoute"));
+	});
+	const btnClear = document.getElementById("btn-clear");
+	if (btnClear) btnClear.addEventListener("click", window.clearFilters);
+	const btnGeolocate = document.getElementById("btn-geolocate");
+	if (btnGeolocate) btnGeolocate.addEventListener("click", () => {
+		if (!navigator.geolocation) return mostrarToast$1("Geolocation not supported", "error");
+		btnGeolocate.classList.add("loading");
+		navigator.geolocation.getCurrentPosition((pos) => {
+			btnGeolocate.classList.remove("loading");
+			const { latitude, longitude } = pos.coords;
+			AppState.userLocation = {
+				lat: latitude,
+				lng: longitude
+			};
+			if (AppState.map) {
+				AppState.map.setView([latitude, longitude], 15);
+				if (AppState.userMarker) AppState.map.removeLayer(AppState.userMarker);
+				AppState.userMarker = L.circleMarker([latitude, longitude], {
+					color: "#0A84FF",
+					fillOpacity: 1,
+					radius: 8,
+					weight: 3
+				}).addTo(AppState.map);
+			}
+			applyFilters(filterCallbacks);
+			mostrarToast$1("📍 " + t("common.location_ready"), "success");
+		}, () => {
+			btnGeolocate.classList.remove("loading");
+			mostrarToast$1("❌ " + t("common.location_error"), "error");
+		});
+	});
+	window.addEventListener("languageChanged", refreshViews);
 }
 document.addEventListener("DOMContentLoaded", initApp);
 if ("serviceWorker" in navigator) window.addEventListener("load", () => {
