@@ -14,6 +14,7 @@ import * as Favorites from './modules/favorites.js';
 import * as Sharing from './modules/sharing.js';
 import * as Filters from './modules/filters.js';
 import * as Renderers from './modules/renderers.js';
+import * as Stats from './modules/stats.js';
 
 // --- Global Helpers ---
 const t = (key, vars) => window.i18n ? window.i18n.t(key, vars) : key;
@@ -106,6 +107,11 @@ function refreshViews() {
     
     const counter = document.getElementById('eventos-totales');
     if (counter) counter.textContent = evs.length;
+
+    // Actualizar estadísticas si el panel está abierto
+    if (document.getElementById('stats-panel').classList.contains('active')) {
+        Stats.initCharts(evs, t);
+    }
 }
 
 function switchView(view) {
@@ -132,17 +138,23 @@ function setupEventListeners() {
     });
 
     // Panel toggles
-    const setupPanel = (toggleId, panelId, closeId) => {
+    const setupPanel = (toggleId, panelId, closeId, onOpen) => {
         const toggle = document.getElementById(toggleId);
         const panel = document.getElementById(panelId);
         const close = document.getElementById(closeId);
-        if (toggle && panel) toggle.addEventListener('click', () => panel.classList.add('active'));
+        if (toggle && panel) toggle.addEventListener('click', () => {
+            panel.classList.add('active');
+            if (onOpen) onOpen();
+        });
         if (close && panel) close.addEventListener('click', () => panel.classList.remove('active'));
     };
 
     setupPanel('fab-filters', 'filters-panel', 'close-panel');
     setupPanel('favorites-toggle', 'favorites-panel', 'close-favorites');
-    setupPanel('stats-toggle', 'stats-panel', 'close-stats');
+    setupPanel('stats-toggle', 'stats-panel', 'close-stats', () => {
+        const evs = AppState.currentFilteredEvents.length ? AppState.currentFilteredEvents : AppState.allEvents;
+        setTimeout(() => Stats.initCharts(evs, t), 300);
+    });
     setupPanel('settings-toggle', 'settings-panel', 'close-settings');
     setupPanel('bottom-nav-favorites', 'favorites-panel', 'close-favorites');
 }
