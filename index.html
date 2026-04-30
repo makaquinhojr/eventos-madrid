@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.tile.thunderforest.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' ws: localhost:* https://libretranslate.de;">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/eventos-madrid/assets/manifest-CqcXfLiT.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EventosMadrid">
+    
+    <!-- Meta Tags -->
+    <title>EventosMadrid - Descubre eventos en Madrid</title>
+    <meta name="description" content="Más de 1,240 eventos culturales y de ocio en tiempo real en Madrid.">
+    <meta name="keywords" content="eventos madrid, conciertos madrid, ocio madrid, cultura madrid">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="EventosMadrid - Descubre eventos en Madrid">
+    <meta property="og:description" content="Más de 1,240 eventos culturales y de ocio en tiempo real">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://makaquinhojr.github.io/eventos-madrid/">
+    
+    <!-- Custom CSS -->
+
+    <!-- i18n (debe cargarse primero) -->
+  <script type="module" crossorigin src="/eventos-madrid/assets/index-DgEtKAyw.js"></script>
+  <link rel="modulepreload" crossorigin href="/eventos-madrid/assets/rolldown-runtime-DHFQXTcm.js">
+  <link rel="modulepreload" crossorigin href="/eventos-madrid/assets/i18n-3Jlp9XJN.js">
+  <link rel="modulepreload" crossorigin href="/eventos-madrid/assets/vendor-Dk6DVwBl.js">
+  <link rel="stylesheet" crossorigin href="/eventos-madrid/assets/vendor-CP6jftN9.css">
+  <link rel="stylesheet" crossorigin href="/eventos-madrid/assets/index-BxyG2t0f.css">
+</head>
+<body>
+
+ 
+<!-- ===== SKIP LINK (ACCESIBILIDAD) ===== -->
+<a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
+<!-- ===== LOADER ===== -->
+<div class="loader-overlay" id="loader">
+    <div class="loader-contenido">
+        <div class="loader-emoji">🎉</div>
+        <h2 class="loader-titulo" data-i18n="loader.title">EventosMadrid</h2>
+        <p class="loader-subtitulo" data-i18n="loader.subtitle">Cargando eventos...</p>
+        <div class="loader-barra">
+            <div class="loader-progreso" id="loader-progreso"></div>
+        </div>
+        <p class="loader-count" id="loader-count"></p>
+    </div>
+</div>
+
+<!-- ===== HEADER (BLUR GLASS APPLE-STYLE) ===== -->
+<header class="top-bar" role="banner">
+    <div class="logo">
+        <span class="logo-icon">🎉</span>
+        <span class="logo-text" data-i18n="logo.text">EventosMadrid</span>
+    </div>
+
+    <nav class="view-toggle" 
+         role="tablist" 
+         aria-label="Cambiar vista">
+        <button class="view-btn active" 
+                id="view-map-btn"
+                role="tab"
+                aria-selected="true"
+                aria-controls="map"
+                data-view="map"
+                aria-label="Vista de mapa">
+            <i class="fas fa-map" aria-hidden="true"></i>
+            <span data-i18n="btn.map">Mapa</span>
+        </button>
+        <button class="view-btn" 
+                id="view-list-btn"
+                role="tab"
+                aria-selected="false"
+                aria-controls="list-view"
+                data-view="list"
+                aria-label="Vista de lista">
+            <i class="fas fa-list" aria-hidden="true"></i>
+            <span data-i18n="btn.list">Lista</span>
+        </button>
+        <button class="view-btn" 
+                id="view-calendar-btn"
+                role="tab"
+                aria-selected="false"
+                aria-controls="calendar-view"
+                data-view="calendar"
+                aria-label="Vista de calendario">
+            <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+            <span data-i18n="btn.calendar">Calendario</span>
+        </button>
+    </nav>
+
+    <div class="top-bar-actions">
+        <!-- Badge HOY -->
+        <button class="hoy-badge" id="hoy-badge" style="display:none" aria-label="Eventos hoy">
+            <span class="hoy-badge-dot" aria-hidden="true"></span>
+            <span id="hoy-badge-count">0</span>
+            <span class="desktop-only" data-i18n="badge.today">hoy</span>
+        </button>
+
+        <!-- Toggle Lugares -->
+        <button class="btn-lugares active" id="btn-toggle-lugares" 
+                aria-label="Mostrar lugares de interés" 
+                aria-pressed="true">
+            <i class="fas fa-landmark" aria-hidden="true"></i>
+            <span class="desktop-only" data-i18n="btn.places">Lugares</span>
+        </button>
+
+        <!-- Favoritos -->
+        <button class="favorites-toggle" id="favorites-toggle" 
+                aria-label="Abrir favoritos">
+            <i class="fas fa-heart" aria-hidden="true"></i>
+            <span class="favorites-count" id="favorites-count" style="display:none;">0</span>
+        </button>
+
+        <!-- Stats -->
+        <button class="stats-toggle" id="stats-toggle" 
+                aria-label="Abrir estadísticas">
+            <i class="fas fa-chart-bar" aria-hidden="true"></i>
+            <span class="desktop-only" data-i18n="btn.stats">Stats</span>
+        </button>
+
+        <!-- Planificador de Rutas -->
+        <button class="route-planner-btn" id="route-planner-btn" 
+                aria-label="Planificador de rutas"
+                title="Planificador de rutas">
+            <i class="fas fa-route" aria-hidden="true"></i>
+            <span class="desktop-only" data-i18n="btn.routes">Rutas</span>
+            <span class="route-count" id="route-count" style="display:none;">0</span>
+        </button>
+        <!-- Settings -->
+        <button class="settings-toggle" id="settings-toggle" 
+                aria-label="Abrir ajustes">
+            <i class="fas fa-cog" aria-hidden="true"></i>
+        </button>
+
+        <!-- Contador total de eventos -->
+        <div class="event-counter" 
+             id="event-count" 
+             aria-live="polite" 
+             aria-label="Total de eventos">0</div>
+    </div>
+</header>
+
+<!-- ===== ACTIVE FILTERS PILLS ===== -->
+<div class="active-filters" 
+     id="active-filters" 
+     role="status" 
+     aria-live="polite" 
+     aria-atomic="true">
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main id="main-content">
+
+    <!-- ===== VISTA MAPA ===== -->
+    <div id="map" 
+         class="view-container active" 
+         role="application" 
+         aria-label="Mapa interactivo de eventos"></div>
+
+    <!-- ===== VISTA LISTA ===== -->
+    <div id="list-view" 
+         class="view-container" 
+         role="region" 
+         aria-label="Lista de eventos">
+        <div class="list-container">
+            <div class="list-header">
+                <div class="list-header-left">
+                    <h2 data-i18n="list.title">📅 Eventos en Madrid</h2>
+                    <p class="list-subtitle" id="list-subtitle">
+                        Mostrando todos los eventos
+                    </p>
+                </div>
+                <div class="list-header-right">
+                    <!-- View Density Toggle -->
+                    <div class="view-density" role="group" aria-label="Densidad de vista">
+                        <button class="density-btn active" 
+                                id="density-comfortable" 
+                                data-density="comfortable"
+                                aria-label="Vista cómoda"
+                                aria-pressed="true">
+                            <i class="fas fa-th-large" aria-hidden="true"></i>
+                        </button>
+                        <button class="density-btn" 
+                                id="density-compact" 
+                                data-density="compact"
+                                aria-label="Vista compacta"
+                                aria-pressed="false">
+                            <i class="fas fa-list" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
+                    <label class="sort-label" for="sort-by" data-i18n="list.sort">Ordenar:</label>
+                    <select id="sort-by" class="sort-select" aria-label="Ordenar eventos">
+                        <option value="date" data-i18n="list.sort.date">📅 Fecha</option>
+                        <option value="name" data-i18n="list.sort.name">🔤 Nombre</option>
+                        <option value="type" data-i18n="list.sort.type">🎭 Tipo</option>
+                        <option value="distance" data-i18n="list.sort.distance">📍 Distancia</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Skeleton Loading -->
+            <div id="skeleton-list" 
+                 class="skeleton-list" 
+                 style="display:none;" 
+                 aria-hidden="true">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
+
+            <!-- Lista de eventos -->
+            <div id="events-list" class="events-list" role="list"></div>
+
+            <!-- Scroll sentinel infinite scroll -->
+            <div id="scroll-sentinel" style="height:1px;" aria-hidden="true"></div>
+
+            <!-- Sección de Lugares -->
+            <div class="lugares-section" id="lugares-section">
+                <div class="lugares-header" 
+                     id="lugares-header" 
+                     role="button" 
+                     tabindex="0"
+                     aria-expanded="true" 
+                     aria-controls="lugares-list">
+                    <h2 data-i18n="list.places">🏛️ Lugares de Interés</h2>
+                    <button class="lugares-toggle-btn" 
+                            id="lugares-toggle-btn" 
+                            aria-label="Contraer lugares">
+                        <i class="fas fa-chevron-up" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <div id="lugares-list" class="lugares-list" role="list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== VISTA CALENDARIO ===== -->
+    <div id="calendar-view" 
+         class="view-container" 
+         role="region" 
+         aria-label="Calendario de eventos">
+        <!-- Header fijo del calendario -->
+        <div class="calendar-header-fixed">
+            <div class="calendar-header">
+                <button class="calendar-nav" 
+                        id="calendar-prev" 
+                        aria-label="Mes anterior">
+                    <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                </button>
+                <h2 id="calendar-month-year" aria-live="polite">Enero 2025</h2>
+                <button class="calendar-nav" 
+                        id="calendar-next" 
+                        aria-label="Mes siguiente">
+                    <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Contenido del calendario -->
+        <div class="calendar-container">
+            <div class="calendar-weekdays" role="row">
+                <div class="weekday" role="columnheader" abbr="Lunes">L</div>
+                <div class="weekday" role="columnheader" abbr="Martes">M</div>
+                <div class="weekday" role="columnheader" abbr="Miércoles">X</div>
+                <div class="weekday" role="columnheader" abbr="Jueves">J</div>
+                <div class="weekday" role="columnheader" abbr="Viernes">V</div>
+                <div class="weekday" role="columnheader" abbr="Sábado">S</div>
+                <div class="weekday" role="columnheader" abbr="Domingo">D</div>
+            </div>
+            <div class="calendar-grid" id="calendar-grid" role="grid"></div>
+            
+            <!-- Eventos del día seleccionado -->
+            <div class="calendar-day-events" 
+                 id="calendar-day-events" 
+                 style="display:none;" 
+                 role="region" 
+                 aria-live="polite">
+                <h3 id="calendar-day-title"></h3>
+                <div id="calendar-day-list" role="list"></div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- ===== BOTTOM NAVIGATION (MÓVIL) ===== -->
+<nav class="bottom-nav" role="navigation" aria-label="Navegación principal">
+    <button class="bottom-nav-item active" 
+            id="bottom-nav-map" 
+            data-view="map" 
+            aria-label="Vista de mapa" 
+            aria-current="page">
+        <i class="fas fa-map" aria-hidden="true"></i>
+        <span data-i18n="btn.map">Mapa</span>
+    </button>
+    <button class="bottom-nav-item" 
+            id="bottom-nav-list" 
+            data-view="list" 
+            aria-label="Vista de lista">
+        <i class="fas fa-list" aria-hidden="true"></i>
+        <span data-i18n="btn.list">Lista</span>
+    </button>
+    <button class="bottom-nav-item" 
+            id="bottom-nav-favorites" 
+            aria-label="Favoritos">
+        <i class="fas fa-heart" aria-hidden="true"></i>
+        <span data-i18n="favorites.title">Favoritos</span>
+        <div class="badge" id="bottom-favorites-badge" style="display:none;">0</div>
+    </button>
+    <button class="bottom-nav-item" 
+            id="bottom-nav-calendar" 
+            data-view="calendar" 
+            aria-label="Vista de calendario">
+        <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+        <span data-i18n="btn.calendar">Calendario</span>
+    </button>
+    <button class="bottom-nav-item" 
+            id="bottom-nav-settings" 
+            aria-label="Ajustes">
+        <i class="fas fa-cog" aria-hidden="true"></i>
+        <span data-i18n="settings.title">Ajustes</span>
+    </button>
+</nav>
+
+<!-- ===== FAB FILTROS ===== -->
+<button class="fab-filters" id="fab-filters" aria-label="Abrir panel de filtros">
+    <i class="fas fa-sliders-h" aria-hidden="true"></i>
+    <span data-i18n="filters.title">Filtros</span>
+    <span class="filtros-count" id="filtros-count-badge" style="display:none;">0</span>
+</button>
+
+<!-- ===== SCROLL TO TOP FAB ===== -->
+<button class="fab-scroll-top" id="fab-scroll-top" aria-label="Volver arriba">
+    <i class="fas fa-chevron-up" aria-hidden="true"></i>
+</button>
+
+<!-- ===== PANEL FILTROS ===== -->
+<aside class="filters-panel" 
+       id="filters-panel" 
+       role="dialog" 
+       aria-labelledby="filters-title" 
+       aria-modal="false">
+    <div class="panel-header">
+        <h2 id="filters-title" data-i18n="filters.title">🔍 Filtros</h2>
+        <button class="close-panel" id="close-panel" aria-label="Cerrar panel de filtros">
+            <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+    </div>
+
+    <div class="panel-content">
+        <!-- Búsqueda -->
+        <div class="filter-section">
+            <input type="text" 
+                   id="search" 
+                   class="search-box" 
+                   placeholder="Buscar eventos, lugares..."
+                   data-i18n-placeholder="filters.search.placeholder"
+                   aria-label="Buscar eventos"
+                   autocomplete="off"
+                   spellcheck="false">
+        </div>
+
+        <!-- Grupo: Acceso Rápido -->
+        <div class="filter-group">
+            <button class="filter-group-header" 
+                    id="quick-access-header" 
+                    aria-expanded="true" 
+                    aria-controls="quick-access-content">
+                <span class="filter-group-title" data-i18n="filters.quick_access">
+                    ⚡ Acceso Rápido
+                </span>
+                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="filter-group-content" id="quick-access-content">
+                <div class="quick-filters-grid">
+                    <button class="quick-filter" 
+                            id="quick-filter-hoy" 
+                            data-filter="hoy" 
+                            aria-label="Filtrar eventos de hoy"
+                            aria-pressed="false">
+                        🔥 <span data-i18n="filters.when.today">Hoy</span>
+                    </button>
+                    <button class="quick-filter" 
+                            id="quick-filter-finde" 
+                            data-filter="finde" 
+                            aria-label="Filtrar eventos de fin de semana"
+                            aria-pressed="false">
+                        🎉 <span data-i18n="filters.when.weekend">Fin de semana</span>
+                    </button>
+                    <button class="quick-filter" 
+                            id="quick-filter-gratis" 
+                            data-filter="gratis" 
+                            aria-label="Filtrar eventos gratis"
+                            aria-pressed="false">
+                        💚 <span data-i18n="filters.price.free">Gratis</span>
+                    </button>
+                    <button class="quick-filter" 
+                            id="quick-filter-infantil" 
+                            data-filter="infantil" 
+                            aria-label="Filtrar eventos infantiles"
+                            aria-pressed="false">
+                        👶 <span data-i18n="filters.type.kids">Infantil</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grupo: Filtros de Eventos -->
+        <div class="filter-group">
+            <button class="filter-group-header" 
+                    id="eventos-header" 
+                    aria-expanded="true" 
+                    aria-controls="eventos-content">
+                <span class="filter-group-title" data-i18n="filters.events">
+                    🎭 Filtros de Eventos
+                </span>
+                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="filter-group-content" id="eventos-content">
+                <!-- Cuándo -->
+                <div class="filter-section">
+                    <label class="filter-label" for="filtro-fecha" data-i18n="filters.when">
+                        Cuándo
+                    </label>
+                    <select id="filtro-fecha" class="filter-select" aria-label="Filtrar por fecha">
+                        <option value="todos" data-i18n="filters.when.all">Todos</option>
+                        <option value="hoy" data-i18n="filters.when.today">Hoy</option>
+                        <option value="finde" data-i18n="filters.when.weekend">Este fin de semana</option>
+                        <option value="semana" data-i18n="filters.when.week">Próximos 7 días</option>
+                        <option value="mes" data-i18n="filters.when.month">Este mes</option>
+                    </select>
+                </div>
+
+                <!-- Tipo de evento -->
+                <div class="filter-section">
+                    <label class="filter-label" data-i18n="filters.type">Tipo de Evento</label>
+                    <div class="filter-chips" role="group" aria-label="Tipos de evento">
+                        <label class="chip">
+                            <input type="checkbox" value="concierto" checked>
+                            <span class="chip-content concierto" data-i18n="filters.type.concerts">
+                                🎵 Conciertos
+                            </span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="fiesta" checked>
+                            <span class="chip-content fiesta" data-i18n="filters.type.parties">
+                                🎪 Fiestas
+                            </span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="mercado" checked>
+                            <span class="chip-content mercado" data-i18n="filters.type.markets">
+                                🛍️ Mercados
+                            </span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="cultural" checked>
+                            <span class="chip-content cultural" data-i18n="filters.type.cultural">
+                                🎭 Cultural
+                            </span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="gastronomia" checked>
+                            <span class="chip-content gastronomia" data-i18n="filters.type.gastro">
+                                🍽️ Gastro
+                            </span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="deporte" checked>
+                            <span class="chip-content deporte" data-i18n="filters.type.sports">
+                                ⚽ Deportes
+                            </span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="infantil" checked>
+                            <span class="chip-content infantil" data-i18n="filters.type.kids">
+                                👶 Infantil
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Precio -->
+                <div class="filter-section">
+                    <label class="filter-label" data-i18n="filters.price">Precio</label>
+                    <div class="filter-chips" role="group" aria-label="Precio">
+                        <label class="chip">
+                            <input type="checkbox" value="gratis" checked>
+                            <span class="chip-content gratis" data-i18n="filters.price.free">
+                                💚 Gratis
+                            </span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="pago" checked>
+                            <span class="chip-content pago" data-i18n="filters.price.paid">
+                                💰 De pago
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Precio máximo -->
+                <div class="filter-section">
+                    <label class="filter-label" for="filtro-precio-max">
+                        <span data-i18n="filters.price.max">Precio máximo</span>
+                        <span class="precio-valor" id="precio-valor-label" 
+                              data-i18n="filters.price.any">Cualquiera</span>
+                    </label>
+                    <input type="range" 
+                           id="filtro-precio-max" 
+                           class="precio-slider"
+                           min="0" 
+                           max="100" 
+                           value="100" 
+                           step="5"
+                           aria-label="Precio máximo"
+                           aria-valuemin="0"
+                           aria-valuemax="100"
+                           aria-valuenow="100">
+                    <div class="precio-marks" aria-hidden="true">
+                        <span>Gratis</span>
+                        <span>50€</span>
+                        <span>100€+</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grupo: Filtros de Lugares -->
+        <div class="filter-group">
+            <button class="filter-group-header" 
+                    id="lugares-header-filter" 
+                    aria-expanded="true" 
+                    aria-controls="lugares-content">
+                <span class="filter-group-title" data-i18n="filters.places">
+                    🏛️ Filtros de Lugares
+                </span>
+                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="filter-group-content" id="lugares-content">
+                <div class="filter-section">
+                    <label class="chip">
+                        <input type="checkbox" id="lugares-select-all" checked>
+                        <span class="chip-content lugares-all" data-i18n="filters.places.all">
+                            ✓ Todos
+                        </span>
+                    </label>
+                </div>
+
+                <div class="filter-section">
+                    <label class="filter-label" data-i18n="filters.places.categories">
+                        Categorías
+                    </label>
+                    <div class="filter-chips" role="group" aria-label="Categorías de lugares">
+                        <label class="chip">
+                            <input type="checkbox" class="lugar-categoria-cb" value="museo" checked>
+                            <span class="chip-content lugar-museo" data-i18n="filters.places.museums">🏛️ Museos</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" class="lugar-categoria-cb" value="monumento" checked>
+                            <span class="chip-content lugar-monumento" data-i18n="filters.places.monuments">🗿 Monumentos</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" class="lugar-categoria-cb" value="teatro" checked>
+                            <span class="chip-content lugar-teatro" data-i18n="filters.places.theaters">🎭 Teatros</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" class="lugar-categoria-cb" value="sala" checked>
+                            <span class="chip-content lugar-sala" data-i18n="filters.places.halls">🎵 Salas</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" class="lugar-categoria-cb" value="parque" checked>
+                            <span class="chip-content lugar-parque" data-i18n="filters.places.parks">🌳 Parques</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" class="lugar-categoria-cb" value="galeria" checked>
+                            <span class="chip-content lugar-galeria" data-i18n="filters.places.galleries">🖼️ Galerías</span>
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" class="lugar-categoria-cb" value="mercado" checked>
+                            <span class="chip-content lugar-mercado" data-i18n="filters.places.markets">🛍️ Mercados</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtro de Distancia -->
+        <div class="filter-section" id="distance-filter-section" style="display:none;">
+            <label class="filter-label" for="filtro-distancia">
+                <span>📍 Distancia máxima</span>
+                <span class="distancia-valor" id="distancia-valor-label">5 km</span>
+            </label>
+            <input type="range" 
+                   id="filtro-distancia" 
+                   class="precio-slider"
+                   min="1" 
+                   max="20" 
+                   value="5" 
+                   step="1"
+                   aria-label="Distancia máxima"
+                   aria-valuemin="1"
+                   aria-valuemax="20"
+                   aria-valuenow="5">
+            <div class="precio-marks" aria-hidden="true">
+                <span>1 km</span>
+                <span>10 km</span>
+                <span>20 km</span>
+            </div>
+            <div class="distancia-info" id="distancia-info">
+                <i class="fas fa-info-circle" aria-hidden="true"></i> 
+                Activa tu ubicación para usar este filtro
+            </div>
+        </div>
+
+        <!-- Zona -->
+        <div class="filter-section">
+            <label class="filter-label" for="filtro-zona" data-i18n="filters.zone">
+                📍 Zona
+            </label>
+            <select id="filtro-zona" class="filter-select" aria-label="Filtrar por zona">
+                <option value="todas">📍 Toda la Comunidad</option>
+                <optgroup label="Madrid Capital">
+                    <option value="Centro">Centro</option>
+                    <option value="Arganzuela">Arganzuela</option>
+                    <option value="Retiro">Retiro</option>
+                    <option value="Salamanca">Salamanca</option>
+                    <option value="Chamartín">Chamartín</option>
+                    <option value="Tetuán">Tetuán</option>
+                    <option value="Chamberí">Chamberí</option>
+                    <option value="Fuencarral">Fuencarral</option>
+                    <option value="Moncloa">Moncloa</option>
+                    <option value="Latina">Latina</option>
+                    <option value="Carabanchel">Carabanchel</option>
+                    <option value="Usera">Usera</option>
+                    <option value="Puente de Vallecas">Vallecas</option>
+                    <option value="Moratalaz">Moratalaz</option>
+                    <option value="Ciudad Lineal">Ciudad Lineal</option>
+                    <option value="Hortaleza">Hortaleza</option>
+                    <option value="Villaverde">Villaverde</option>
+                    <option value="Villa de Vallecas">Villa de Vallecas</option>
+                    <option value="Vicálvaro">Vicálvaro</option>
+                    <option value="San Blas">San Blas</option>
+                    <option value="Barajas">Barajas</option>
+                </optgroup>
+                <optgroup label="Municipios">
+                    <option value="Getafe">Getafe</option>
+                    <option value="Leganés">Leganés</option>
+                    <option value="Alcorcón">Alcorcón</option>
+                    <option value="Móstoles">Móstoles</option>
+                    <option value="Fuenlabrada">Fuenlabrada</option>
+                    <option value="Alcalá de Henares">Alcalá de Henares</option>
+                    <option value="Torrejón de Ardoz">Torrejón de Ardoz</option>
+                    <option value="Alcobendas">Alcobendas</option>
+                    <option value="Las Rozas">Las Rozas</option>
+                    <option value="Pozuelo">Pozuelo</option>
+                    <option value="Majadahonda">Majadahonda</option>
+                    <option value="Collado Villalba">Collado Villalba</option>
+                    <option value="Tres Cantos">Tres Cantos</option>
+                    <option value="San Sebastián de los Reyes">San Sebastián de los Reyes</option>
+                    <option value="Coslada">Coslada</option>
+                    <option value="Rivas Vaciamadrid">Rivas Vaciamadrid</option>
+                    <option value="Aranjuez">Aranjuez</option>
+                    <option value="Valdemoro">Valdemoro</option>
+                    <option value="Parla">Parla</option>
+                    <option value="Torrelodones">Torrelodones</option>
+                    <option value="Boadilla del Monte">Boadilla del Monte</option>
+                    <option value="Arganda del Rey">Arganda del Rey</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <!-- Limpiar Filtros -->
+        <button class="btn-clear" id="btn-clear">
+            <i class="fas fa-redo" aria-hidden="true"></i>
+            <span data-i18n="filters.clear">Limpiar filtros</span>
+        </button>
+    </div>
+</aside>
+
+<!-- ===== PANEL AJUSTES ===== -->
+<aside class="settings-panel" 
+       id="settings-panel" 
+       role="dialog" 
+       aria-labelledby="settings-title" 
+       aria-modal="false">
+    <div class="panel-header">
+        <h2 id="settings-title" data-i18n="settings.title">⚙️ Ajustes</h2>
+        <button class="close-panel" id="close-settings" aria-label="Cerrar panel de ajustes">
+            <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+    </div>
+
+    <div class="panel-content">
+        <!-- Apariencia -->
+        <div class="settings-section">
+            <h3 class="settings-section-title" data-i18n="settings.appearance">
+                🎨 Apariencia
+            </h3>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label" 
+                           for="theme-toggle"
+                           data-i18n="settings.theme">Modo oscuro</label>
+                    <p class="setting-description" data-i18n="settings.theme.desc">
+                        Cambiar entre tema claro y oscuro
+                    </p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="theme-toggle" class="toggle-checkbox" 
+                           aria-label="Activar modo oscuro">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label" for="contrast-toggle" data-i18n="settings.contrast">♿ Alto contraste</label>
+                    <p class="setting-description" data-i18n="settings.contrast.desc">Mejora la legibilidad para baja visión</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="contrast-toggle" class="toggle-checkbox" 
+                           aria-label="Activar alto contraste">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label" for="large-text-toggle" data-i18n="settings.large_text">🔍 Textos grandes</label>
+                    <p class="setting-description" data-i18n="settings.large_text.desc">Aumenta el tamaño de la fuente</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="large-text-toggle" class="toggle-checkbox" 
+                           aria-label="Activar textos grandes">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label" for="reduce-motion-toggle" data-i18n="settings.reduce_motion">🎬 Reducir animaciones</label>
+                    <p class="setting-description" data-i18n="settings.reduce_motion.desc">Para sensibilidad al movimiento</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="reduce-motion-toggle" class="toggle-checkbox" 
+                           aria-label="Reducir animaciones">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Idioma -->
+        <div class="settings-section">
+            <h3 class="settings-section-title" data-i18n="settings.language">
+                🌐 Idioma
+            </h3>
+
+            <div class="setting-item setting-item--column">
+                <div class="setting-info">
+                    <label class="setting-label" 
+                           for="lang-select"
+                           data-i18n="settings.language.select">
+                        Seleccionar idioma
+                    </label>
+                    <p class="setting-description" data-i18n="settings.language.desc">
+                        Elige tu idioma preferido
+                    </p>
+                </div>
+                <select id="lang-select" class="settings-select" aria-label="Seleccionar idioma">
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="pt">🇵🇹 Português</option>
+                    <option value="de">🇩🇪 Deutsch</option>
+                    <option value="it">🇮🇹 Italiano</option>
+                    <option value="zh">🇨🇳 中文</option>
+                    <option value="ja">🇯🇵 日本語</option>
+                    <option value="ko">🇰🇷 한국어</option>
+                    <option value="ar">🇸🇦 العربية</option>
+                </select>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label" 
+                           for="translate-events-toggle"
+                           data-i18n="settings.translate_events">
+                        Traducir eventos
+                    </label>
+                    <p class="setting-description" data-i18n="settings.translate_events.desc">
+                        Traducir nombres automáticamente
+                    </p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="translate-events-toggle" class="toggle-checkbox" 
+                           aria-label="Traducir eventos automáticamente">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Notificaciones -->
+        <div class="settings-section">
+            <h3 class="settings-section-title" data-i18n="settings.notifications">
+                🔔 Notificaciones
+            </h3>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label" 
+                           for="notifications-toggle"
+                           data-i18n="settings.notifications.push">
+                        Notificaciones push
+                    </label>
+                    <p class="setting-description" data-i18n="settings.notifications.desc">
+                        Recibir alertas de nuevos eventos
+                    </p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="notifications-toggle" 
+                           class="toggle-checkbox" checked 
+                           aria-label="Activar notificaciones push">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+<!-- Temas Personalizados -->
+<div class="settings-section">
+    <h3 class="settings-section-title" data-i18n="themes.title">
+        🎨 Temas Personalizados
+    </h3>
+
+    <div class="setting-item setting-item--column">
+        <div class="setting-info">
+            <label class="setting-label" data-i18n="themes.select">Seleccionar tema</label>
+            <p class="setting-description" data-i18n="themes.select.desc">Elige un tema prediseñado o crea el tuyo</p>
+        </div>
+        <div class="theme-selector">
+            <button class="theme-card active" data-theme-preset="default">
+                <div class="theme-preview">
+                    <div class="theme-color" style="background: linear-gradient(135deg, #0A84FF 0%, #BF5AF2 100%);"></div>
+                </div>
+                <span class="theme-name">Default</span>
+            </button>
+            <button class="theme-card" data-theme-preset="sunset">
+                <div class="theme-preview">
+                    <div class="theme-color" style="background: linear-gradient(135deg, #FF6B6B 0%, #FFA500 100%);"></div>
+                </div>
+                <span class="theme-name">Sunset</span>
+            </button>
+            <button class="theme-card" data-theme-preset="forest">
+                <div class="theme-preview">
+                    <div class="theme-color" style="background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);"></div>
+                </div>
+                <span class="theme-name">Forest</span>
+            </button>
+            <button class="theme-card" data-theme-preset="ocean">
+                <div class="theme-preview">
+                    <div class="theme-color" style="background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);"></div>
+                </div>
+                <span class="theme-name">Ocean</span>
+            </button>
+            <button class="theme-card" data-theme-preset="berry">
+                <div class="theme-preview">
+                    <div class="theme-color" style="background: linear-gradient(135deg, #E91E63 0%, #9C27B0 100%);"></div>
+                </div>
+                <span class="theme-name">Berry</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="setting-item">
+        <div class="setting-info">
+            <label class="setting-label" for="custom-color-toggle" data-i18n="themes.custom">🎨 Personalizar color</label>
+            <p class="setting-description" data-i18n="themes.custom.desc">Usa tu propio color de acento</p>
+        </div>
+        <label class="toggle-switch">
+            <input type="checkbox" id="custom-color-toggle" class="toggle-checkbox">
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+
+    <div class="setting-item setting-item--column" id="custom-color-picker-section" style="display: none;">
+        <div class="setting-info">
+            <label class="setting-label" for="accent-color-picker" data-i18n="themes.accent">Color de acento</label>
+        </div>
+        <input type="color" id="accent-color-picker" class="color-picker" value="#0A84FF">
+    </div>
+</div>
+
+<!-- Modo Exploración -->
+<div class="settings-section">
+    <h3 class="settings-section-title" data-i18n="explore.title">
+        🌈 Modo Exploración
+    </h3>
+
+    <div class="setting-item">
+        <div class="setting-info">
+            <label class="setting-label" for="heatmap-toggle" data-i18n="explore.heatmap">Mapa de calor</label>
+            <p class="setting-description" data-i18n="explore.heatmap.desc">Visualiza densidad de eventos por zona</p>
+        </div>
+        <label class="toggle-switch">
+            <input type="checkbox" id="heatmap-toggle" class="toggle-checkbox">
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+
+    <div class="setting-item setting-item--column" id="heatmap-controls" style="display: none;">
+        <div class="setting-info">
+            <label class="setting-label" for="heatmap-radius" data-i18n="explore.intensity">Intensidad del heatmap</label>
+        </div>
+        <input type="range" id="heatmap-radius" class="precio-slider" 
+               min="10" max="50" value="25" step="5">
+        <div class="precio-marks">
+            <span data-i18n="explore.intensity.low">Sutil</span>
+            <span data-i18n="explore.intensity.medium">Normal</span>
+            <span data-i18n="explore.intensity.high">Intenso</span>
+        </div>
+    </div>
+</div>
+       <!-- Privacidad -->
+        <div class="settings-section">
+            <h3 class="settings-section-title" data-i18n="settings.privacy">
+                🔒 Privacidad
+            </h3>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label" 
+                           for="save-searches-toggle"
+                           data-i18n="settings.privacy.save">
+                        Guardar búsquedas
+                    </label>
+                    <p class="setting-description" data-i18n="settings.privacy.save.desc">
+                        Recordar tus últimas búsquedas
+                    </p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="save-searches-toggle" 
+                           class="toggle-checkbox" checked 
+                           aria-label="Guardar búsquedas">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-item">
+                <button class="btn-clear" id="btn-clear-cache">
+                    <i class="fas fa-trash" aria-hidden="true"></i>
+                    <span data-i18n="settings.privacy.clear">Limpiar datos</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Sobre -->
+        <div class="settings-section">
+            <h3 class="settings-section-title" data-i18n="settings.about">
+                ℹ️ Sobre
+            </h3>
+            <div class="setting-item" style="flex-direction: column; align-items: center; gap: 8px;">
+                <p class="setting-label" data-i18n="settings.about.app">EventosMadrid</p>
+                <p class="setting-description" data-i18n="settings.about.version">v1.0.0</p>
+                <p class="setting-description" style="font-size: 12px; margin-top: 8px;" 
+                   data-i18n="settings.about.desc">
+                    Mapa de eventos culturales y de ocio en Madrid
+                </p>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- ===== PANEL FAVORITOS ===== -->
+<aside class="favorites-panel" 
+       id="favorites-panel" 
+       role="dialog" 
+       aria-labelledby="favorites-title" 
+       aria-modal="false">
+    <div class="panel-header">
+        <h2 id="favorites-title" data-i18n="favorites.title">❤️ Mis Favoritos</h2>
+        <button class="close-panel" id="close-favorites" aria-label="Cerrar panel de favoritos">
+            <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+    </div>
+    <div class="panel-content">
+        <div class="favorites-actions" id="favorites-actions" style="display:none;">
+            <button class="event-btn event-btn-primary favorites-plan-route-btn" id="favorites-plan-route">
+                <i class="fas fa-route" aria-hidden="true"></i>
+                <span data-i18n="favorites.plan_route">🗺️ Planificar ruta con favoritos</span>
+            </button>
+        </div>
+        <div id="favorites-list" class="favorites-list" role="list"></div>
+        <div class="empty-state" id="favorites-empty">
+            <i class="fas fa-heart-broken" aria-hidden="true"></i>
+            <h3 data-i18n="favorites.empty">No tienes favoritos</h3>
+            <p data-i18n="favorites.empty.desc">Añade eventos tocando el ❤️</p>
+        </div>
+    </div>
+</aside>
+
+<!-- ===== PANEL ANALYTICS ===== -->
+<aside class="stats-panel" 
+       id="stats-panel" 
+       role="dialog" 
+       aria-labelledby="stats-title" 
+       aria-modal="false">
+    <div class="panel-header">
+        <h2 id="stats-title" data-i18n="stats.title">📊 Dashboard</h2>
+        <button class="close-panel" id="close-stats" aria-label="Cerrar panel de estadísticas">
+            <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+    </div>
+    <div class="panel-content">
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-icon">🎵</div>
+                <div class="stat-value" id="stat-conciertos">0</div>
+                <div class="stat-name" data-i18n="stats.concerts">Conciertos</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">🎪</div>
+                <div class="stat-value" id="stat-fiestas">0</div>
+                <div class="stat-name" data-i18n="stats.parties">Fiestas</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">🛍️</div>
+                <div class="stat-value" id="stat-mercados">0</div>
+                <div class="stat-name" data-i18n="stats.markets">Mercados</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">🎭</div>
+                <div class="stat-value" id="stat-cultural">0</div>
+                <div class="stat-name" data-i18n="stats.cultural">Cultural</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">🍽️</div>
+                <div class="stat-value" id="stat-gastronomia">0</div>
+                <div class="stat-name" data-i18n="stats.gastro">Gastro</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">⚽</div>
+                <div class="stat-value" id="stat-deporte">0</div>
+                <div class="stat-name" data-i18n="stats.sports">Deportes</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">👶</div>
+                <div class="stat-value" id="stat-infantil">0</div>
+                <div class="stat-name" data-i18n="stats.kids">Infantil</div>
+            </div>
+            <div class="stat-box highlight">
+                <div class="stat-icon">✓</div>
+                <div class="stat-value" id="stat-gratis">0</div>
+                <div class="stat-name" data-i18n="stats.free">Gratis</div>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <h3 class="chart-title" data-i18n="stats.charts.events_by_type">
+                📊 Eventos por Tipo
+            </h3>
+            <div class="chart-container">
+                <canvas id="chart-tipos" aria-label="Gráfico de eventos por tipo"></canvas>
+            </div>
+
+            <h3 class="chart-title" data-i18n="stats.charts.events_by_zone">
+                🗺️ Eventos por Zona
+            </h3>
+            <div class="chart-container">
+                <canvas id="chart-zonas" aria-label="Gráfico de eventos por zona"></canvas>
+            </div>
+
+            <h3 class="chart-title" data-i18n="stats.charts.events_timeline">
+                📅 Eventos en el Tiempo
+            </h3>
+            <div class="chart-container">
+                <canvas id="chart-timeline" aria-label="Gráfico de eventos en el tiempo"></canvas>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- ===== BOTÓN GEOLOCALIZACIÓN ===== -->
+<button class="btn-geolocate" 
+        id="btn-geolocate" 
+        aria-label="Activar mi ubicación">
+    <i class="fas fa-location-arrow" aria-hidden="true"></i>
+</button>
+
+<!-- ===== SCRIPTS ===== -->
+<!-- ===== PANEL PLANIFICADOR DE RUTAS ===== -->
+<aside class="route-panel" 
+       id="route-panel" 
+       role="dialog" 
+       aria-labelledby="route-title" 
+       aria-modal="false">
+    <div class="panel-header">
+        <h2 id="route-title">🗺️ Mi Ruta</h2>
+        <button class="close-panel" id="close-route" aria-label="Cerrar planificador">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <div class="panel-content">
+        <div class="route-info-box">
+            <div class="route-stat">
+                <span class="route-stat-label">Eventos seleccionados</span>
+                <span class="route-stat-value" id="route-events-count">0</span>
+            </div>
+            <div class="route-stat">
+                <span class="route-stat-label">Distancia total</span>
+                <span class="route-stat-value" id="route-total-distance">0 km</span>
+            </div>
+            <div class="route-stat">
+                <span class="route-stat-label">Tiempo estimado</span>
+                <span class="route-stat-value" id="route-total-time">0 min</span>
+            </div>
+        </div>
+
+        <div id="route-events-list" class="route-events-list"></div>
+
+        <div class="empty-state" id="route-empty" style="display: none;">
+            <i class="fas fa-route"></i>
+            <h3>Selecciona eventos en el mapa</h3>
+            <p>Haz click en los marcadores para añadirlos a tu ruta</p>
+        </div>
+
+        <div class="route-actions">
+            <button class="event-btn event-btn-primary" id="optimize-route" disabled>
+                <i class="fas fa-magic"></i> Optimizar ruta
+            </button>
+            <button class="event-btn event-btn-secondary" id="export-route" disabled>
+                <i class="fas fa-share-alt"></i> Compartir ruta
+            </button>
+            <button class="btn-clear" id="clear-route">
+                <i class="fas fa-trash"></i> Limpiar ruta
+            </button>
+        </div>
+    </div>
+</aside>
+</body>
+</html>
