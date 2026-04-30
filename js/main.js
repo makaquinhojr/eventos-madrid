@@ -3,12 +3,6 @@
    Modularized & Optimized for Vite
    ======================================== */
 
-// Global CSS & Assets
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet.markercluster/dist/MarkerCluster.css';
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
-
 // Modules
 import { AppState } from './modules/store.js';
 import { initThemeSystem } from './modules/theme.js';
@@ -96,13 +90,16 @@ function refreshViews() {
     const evs = AppState.currentFilteredEvents.length ? AppState.currentFilteredEvents : AppState.allEvents;
     const lugs = AppState.currentFilteredLugares.length ? AppState.currentFilteredLugares : AppState.allLugares;
     
-    MapManager.displayEvents(evs); // This needs adaptation or I just call it here manually
-    // Manual mapping for now to keep it simple in main.js
-    AppState.markersLayer.clearLayers();
-    evs.forEach(e => AppState.markersLayer.addLayer(MapManager.createEventMarker(e, t)));
+    // Refresh Map Markers
+    if (AppState.markersLayer) {
+        AppState.markersLayer.clearLayers();
+        evs.forEach(e => AppState.markersLayer.addLayer(MapManager.createEventMarker(e, t)));
+    }
     
-    AppState.lugaresLayer.clearLayers();
-    if (AppState.mostrarLugares) lugs.forEach(l => AppState.lugaresLayer.addLayer(MapManager.createLugarMarker(l)));
+    if (AppState.lugaresLayer) {
+        AppState.lugaresLayer.clearLayers();
+        if (AppState.mostrarLugares) lugs.forEach(l => AppState.lugaresLayer.addLayer(MapManager.createLugarMarker(l)));
+    }
 
     if (AppState.currentView === 'list') Renderers.renderListView(evs, t);
     Renderers.renderLugaresList(lugs, t);
