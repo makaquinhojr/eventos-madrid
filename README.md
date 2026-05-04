@@ -107,5 +107,4 @@ Proyecto de desarrollo tecnológico y modelado turístico para la modernización
 
 > Distribuido bajo Licencia **MIT**. Arquitectura patentable para despliegues municipales escalables. Ver [LICENSE](LICENSE).
 <div align="center">
-<b>Ingeniería y Diseño hecho con ❤️ en Madrid, España.</b>
 </div>
