@@ -1,5 +1,5 @@
 import { n as __toESM } from "./rolldown-runtime-DHFQXTcm.js";
-import { i as require_leaflet_src, n as purify, r as require_leaflet_markercluster_src, t as auto_default } from "./vendor-CoTyeJNM.js";
+import { i as require_leaflet_src, n as require_leaflet_markercluster_src, r as purify, t as auto_default } from "./vendor-43ZmQHy-.js";
 import { t as i18n } from "./i18n-C_kteIG7.js";
 //#region \0vite/modulepreload-polyfill.js
 (function polyfill() {
@@ -85,6 +85,8 @@ var AppState = {
 //#endregion
 //#region js/modules/theme.js
 function initThemeSystem(mostrarToast, initCharts) {
+	const notify = typeof mostrarToast === "function" ? mostrarToast : () => {};
+	const refreshCharts = typeof initCharts === "function" ? initCharts : () => {};
 	const themeCards = document.querySelectorAll(".theme-card");
 	const customColorToggle = document.getElementById("custom-color-toggle");
 	const customColorSection = document.getElementById("custom-color-picker-section");
@@ -110,9 +112,9 @@ function initThemeSystem(mostrarToast, initCharts) {
 			card.classList.add("active");
 			applyThemePreset(preset);
 			localStorage.setItem("themePreset", preset);
-			mostrarToast(`✨ Tema "${card.querySelector(".theme-name").textContent}" activado`);
+			notify(`✨ Tema "${card.querySelector(".theme-name").textContent}" activado`);
 			const statsPanel = document.getElementById("stats-panel");
-			if (statsPanel && statsPanel.classList.contains("active")) setTimeout(() => initCharts(), 100);
+			if (statsPanel && statsPanel.classList.contains("active")) setTimeout(() => refreshCharts(), 100);
 		});
 	});
 	if (customColorToggle) customColorToggle.addEventListener("change", (e) => {
@@ -120,14 +122,14 @@ function initThemeSystem(mostrarToast, initCharts) {
 			if (customColorSection) customColorSection.style.display = "block";
 			themeCards.forEach((c) => c.classList.remove("active"));
 			if (accentColorPicker) applyCustomColor(accentColorPicker.value);
-			mostrarToast("🎨 Color personalizado activado");
+			notify("🎨 Color personalizado activado");
 		} else {
 			if (customColorSection) customColorSection.style.display = "none";
 			localStorage.removeItem("customAccentColor");
 			applyThemePreset("default");
 			const defaultCard = document.querySelector("[data-theme-preset=\"default\"]");
 			if (defaultCard) defaultCard.classList.add("active");
-			mostrarToast("🎨 Tema por defecto restaurado");
+			notify("🎨 Tema por defecto restaurado");
 		}
 	});
 	if (accentColorPicker) {
@@ -136,7 +138,7 @@ function initThemeSystem(mostrarToast, initCharts) {
 		});
 		accentColorPicker.addEventListener("change", (e) => {
 			localStorage.setItem("customAccentColor", e.target.value);
-			mostrarToast("🎨 Color guardado");
+			notify("🎨 Color guardado");
 		});
 	}
 }
@@ -273,7 +275,23 @@ function hideHeatmapLegend() {
 }
 //#endregion
 //#region js/modules/routes.js
+var routeDeps = {
+	mostrarToast: () => {},
+	i18n: { t: (key) => key },
+	trapFocus: () => {},
+	displayEvents: () => {},
+	formatDate: (value) => value ?? "",
+	calcularDistancia: () => 0,
+	formatearDistancia: (value) => String(value)
+};
 function initRoutePlanner(mostrarToast, i18n, trapFocus, displayEvents, formatDate, calcularDistancia, formatearDistancia) {
+	routeDeps.mostrarToast = mostrarToast || routeDeps.mostrarToast;
+	routeDeps.i18n = i18n || routeDeps.i18n;
+	routeDeps.trapFocus = trapFocus || routeDeps.trapFocus;
+	routeDeps.displayEvents = displayEvents || routeDeps.displayEvents;
+	routeDeps.formatDate = formatDate || routeDeps.formatDate;
+	routeDeps.calcularDistancia = calcularDistancia || routeDeps.calcularDistancia;
+	routeDeps.formatearDistancia = formatearDistancia || routeDeps.formatearDistancia;
 	const routePlannerBtn = document.getElementById("route-planner-btn");
 	const routePanel = document.getElementById("route-panel");
 	const closeRoute = document.getElementById("close-route");
@@ -289,15 +307,15 @@ function initRoutePlanner(mostrarToast, i18n, trapFocus, displayEvents, formatDa
 			if (routePanel) {
 				routePanel.classList.add("active");
 				routePanel.setAttribute("aria-modal", "true");
-				trapFocus(routePanel);
+				routeDeps.trapFocus(routePanel);
 			}
 			enableRouteSelection();
-			mostrarToast(i18n.t("route.mode.enabled"), "success");
+			routeDeps.mostrarToast(routeDeps.i18n.t("route.mode.enabled"), "success");
 		} else {
 			routePlannerBtn.classList.remove("active");
 			document.body.classList.remove("route-mode");
 			disableRouteSelection(displayEvents);
-			mostrarToast(i18n.t("route.mode.disabled"));
+			routeDeps.mostrarToast(routeDeps.i18n.t("route.mode.disabled"));
 		}
 	});
 	if (closeRoute) closeRoute.addEventListener("click", () => {
@@ -310,10 +328,10 @@ function initRoutePlanner(mostrarToast, i18n, trapFocus, displayEvents, formatDa
 			routePanel.setAttribute("aria-modal", "false");
 		}
 	});
-	if (optimizeRouteBtn) optimizeRouteBtn.addEventListener("click", () => optimizeRoute(mostrarToast, i18n, calcularDistancia, formatearDistancia, formatDate));
-	if (exportRouteBtn) exportRouteBtn.addEventListener("click", () => exportRoute(i18n, formatDate));
-	if (clearRouteBtn) clearRouteBtn.addEventListener("click", () => clearRoute(mostrarToast, i18n));
-	window.removeEventFromRoute = (id) => removeEventFromRoute(id, mostrarToast, i18n, formatDate, calcularDistancia, formatearDistancia);
+	if (optimizeRouteBtn) optimizeRouteBtn.addEventListener("click", () => optimizeRoute());
+	if (exportRouteBtn) exportRouteBtn.addEventListener("click", () => exportRoute());
+	if (clearRouteBtn) clearRouteBtn.addEventListener("click", () => clearRoute(routeDeps.mostrarToast, routeDeps.i18n));
+	window.removeEventFromRoute = (id) => removeEventFromRoute(id, routeDeps.mostrarToast, routeDeps.i18n, routeDeps.formatDate, routeDeps.calcularDistancia, routeDeps.formatearDistancia);
 	window.compartirEventoNativo = window.compartirEventoNativo;
 }
 function enableRouteSelection() {
@@ -321,7 +339,7 @@ function enableRouteSelection() {
 		marker.off("click");
 		marker.on("click", (e) => {
 			import_leaflet_src.default.DomEvent.stopPropagation(e);
-			addEventToRoute(marker.eventoId);
+			addEventToRoute(marker.eventoId, routeDeps.mostrarToast, routeDeps.i18n, routeDeps.formatDate, routeDeps.calcularDistancia, routeDeps.formatearDistancia);
 		});
 	});
 }
@@ -383,14 +401,16 @@ function updateRoutePanel(i18n, formatDate, calcularDistancia, formatearDistanci
 			totalTime += timeMinutes;
 			distanceText = formatearDistancia(distance);
 		}
+		const safeName = purify.sanitize(evento.nombre);
+		const safeDate = purify.sanitize(formatDate(evento.fecha));
 		return `
             <div class="route-event-item" style="animation-delay: ${index * .05}s;">
                 <div class="route-event-number">${index + 1}</div>
                 <div class="route-event-info">
-                    <div class="route-event-name">${evento.nombre}</div>
+                    <div class="route-event-name">${safeName}</div>
                     <div class="route-event-time">
                         <i class="fas fa-calendar"></i>
-                        ${formatDate(evento.fecha)}
+                        ${safeDate}
                     </div>
                 </div>
                 <div class="route-event-distance">${distanceText}</div>
@@ -422,11 +442,13 @@ function updateRouteOnMap(i18n, formatDate) {
 			iconSize: [36, 36],
 			iconAnchor: [18, 18]
 		});
+		const safeName = purify.sanitize(evento.nombre);
+		const safeDate = purify.sanitize(formatDate(evento.fecha));
 		const marker = import_leaflet_src.default.marker([evento.lat, evento.lng], { icon }).addTo(AppState.map).bindPopup(`
                 <div class="popup-evento">
                     <h3>🗺️ ${i18n.t("route.stop")} ${index + 1}</h3>
-                    <p><strong>📍</strong> ${evento.nombre}</p>
-                    <p><strong>📅</strong> ${formatDate(evento.fecha)}</p>
+                    <p><strong>📍</strong> ${safeName}</p>
+                    <p><strong>📅</strong> ${safeDate}</p>
                     <div class="popup-actions" style="margin-top: 12px; border-top: 0.5px solid var(--separator); padding-top: 8px;">
                         <button class="popup-btn-extra compartir" onclick="compartirEventoNativo(${evento.id})" style="width: 100%; justify-content: center;">
                             <i class="fas fa-share-alt"></i> ${i18n.t("event.share")}
@@ -448,7 +470,7 @@ function updateRouteOnMap(i18n, formatDate) {
 		AppState.map.fitBounds(AppState.routePolyline.getBounds(), { padding: [50, 50] });
 	}
 }
-function optimizeRoute(mostrarToast, i18n, calcularDistancia, formatearDistancia, formatDate) {
+function optimizeRoute() {
 	if (AppState.selectedRouteEvents.length < 2) return;
 	const optimized = [AppState.selectedRouteEvents[0]];
 	const remaining = AppState.selectedRouteEvents.slice(1);
@@ -457,7 +479,7 @@ function optimizeRoute(mostrarToast, i18n, calcularDistancia, formatearDistancia
 		let nearestIndex = 0;
 		let minDistance = Infinity;
 		remaining.forEach((evento, index) => {
-			const distance = calcularDistancia(current.lat, current.lng, evento.lat, evento.lng);
+			const distance = routeDeps.calcularDistancia(current.lat, current.lng, evento.lat, evento.lng);
 			if (distance < minDistance) {
 				minDistance = distance;
 				nearestIndex = index;
@@ -467,14 +489,14 @@ function optimizeRoute(mostrarToast, i18n, calcularDistancia, formatearDistancia
 		remaining.splice(nearestIndex, 1);
 	}
 	AppState.selectedRouteEvents = optimized;
-	updateRoutePanel(i18n, formatDate, calcularDistancia, formatearDistancia);
-	updateRouteOnMap(i18n, formatDate);
-	mostrarToast(i18n.t("route.optimized"), "success");
+	updateRoutePanel(routeDeps.i18n, routeDeps.formatDate, routeDeps.calcularDistancia, routeDeps.formatearDistancia);
+	updateRouteOnMap(routeDeps.i18n, routeDeps.formatDate);
+	routeDeps.mostrarToast(routeDeps.i18n.t("route.optimized"), "success");
 }
-function exportRoute(i18n, formatDate) {
+function exportRoute() {
 	if (AppState.selectedRouteEvents.length === 0) return;
-	const routeText = AppState.selectedRouteEvents.map((evento, index) => `${index + 1}. ${evento.nombre}\n   📅 ${formatDate(evento.fecha)}\n   📍 ${evento.lugar}\n`).join("\n");
-	showExportModal(`🗺️ ${i18n.t("route.title").replace("🗺️ ", "").toUpperCase()} - EVENTOSMADRID\n\n${routeText}\n🌐 ${window.location.href}`, i18n);
+	const routeText = AppState.selectedRouteEvents.map((evento, index) => `${index + 1}. ${evento.nombre}\n   📅 ${routeDeps.formatDate(evento.fecha)}\n   📍 ${evento.lugar}\n`).join("\n");
+	showExportModal(`🗺️ ${routeDeps.i18n.t("route.title").replace("🗺️ ", "").toUpperCase()} - EVENTOSMADRID\n\n${routeText}\n🌐 ${window.location.href}`, routeDeps.i18n);
 }
 function showExportModal(text, i18n) {
 	const modal = document.createElement("div");
@@ -513,16 +535,16 @@ function showExportModal(text, i18n) {
 	window.downloadRouteJSON = () => downloadRouteJSON(i18n);
 }
 function shareViaWhatsApp(text) {
-	window.open(`https://wa.me/?text=${text}`, "_blank");
+	window.open(`https://wa.me/?text=${text}`, "_blank", "noopener,noreferrer");
 	document.querySelector(".route-export-modal")?.remove();
 }
 async function copyRouteText(text, i18n) {
 	try {
 		await navigator.clipboard.writeText(text);
-		mostrarToast(i18n.t("route.export.copied"), "success");
+		routeDeps.mostrarToast(i18n.t("route.export.copied"), "success");
 		document.querySelector(".route-export-modal")?.remove();
 	} catch {
-		mostrarToast(i18n.t("route.copy_error"), "error");
+		routeDeps.mostrarToast(i18n.t("route.copy_error"), "error");
 	}
 }
 function downloadRouteJSON(i18n) {
@@ -538,14 +560,14 @@ function downloadRouteJSON(i18n) {
 	a.download = `ruta-eventos-${Date.now()}.json`;
 	a.click();
 	URL.revokeObjectURL(url);
-	mostrarToast(i18n.t("route.export.downloaded"), "success");
+	routeDeps.mostrarToast(i18n.t("route.export.downloaded"), "success");
 	document.querySelector(".route-export-modal")?.remove();
 }
 function clearRoute(mostrarToast, i18n) {
 	if (confirm(i18n.t("route.clear.confirm"))) {
 		AppState.selectedRouteEvents = [];
-		updateRoutePanel(i18n, formatDate, calcularDistancia, formatearDistancia);
-		updateRouteOnMap(i18n, formatDate);
+		updateRoutePanel(routeDeps.i18n, routeDeps.formatDate, routeDeps.calcularDistancia, routeDeps.formatearDistancia);
+		updateRouteOnMap(routeDeps.i18n, routeDeps.formatDate);
 		mostrarToast(i18n.t("route.cleared"));
 	}
 }
@@ -589,7 +611,7 @@ var lugaresColors = {
 };
 //#endregion
 //#region js/modules/ui-helpers.js
-function formatDate$1(fechaStr) {
+function formatDate(fechaStr) {
 	if (!fechaStr) return "";
 	try {
 		const fecha = /* @__PURE__ */ new Date(fechaStr + "T00:00:00");
@@ -604,8 +626,8 @@ function formatDate$1(fechaStr) {
 	}
 }
 function formatearFechaSafe(inicio, fin) {
-	const fInicio = formatDate$1(inicio);
-	const fFin = fin && fin !== inicio ? formatDate$1(fin) : null;
+	const fInicio = formatDate(inicio);
+	const fFin = fin && fin !== inicio ? formatDate(fin) : null;
 	return fFin ? `${fInicio} - ${fFin}` : fInicio;
 }
 function limpiarDescripcion(texto, maxLen = 150) {
@@ -614,7 +636,7 @@ function limpiarDescripcion(texto, maxLen = 150) {
 	if (limpio.length <= maxLen) return limpio;
 	return limpio.substring(0, maxLen) + "...";
 }
-function calcularDistancia$1(lat1, lon1, lat2, lon2) {
+function calcularDistancia(lat1, lon1, lat2, lon2) {
 	const R = 6371;
 	const dLat = (lat2 - lat1) * Math.PI / 180;
 	const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -650,16 +672,16 @@ function getLinkHTML(evento, t) {
 		if (!url.startsWith("http")) return false;
 		return url.length > 50 || url.includes("evento") || url.includes("agenda");
 	};
-	if (esLinkUtil(evento.url)) return `<a href="${evento.url}" target="_blank" class="popup-link">${t("event.more_info")} →</a>`;
-	return `<a href="https://www.google.com/search?q=${encodeURIComponent(`${evento.nombre} Madrid`)}" target="_blank" class="popup-link popup-link-google">🔍 ${t("event.search_google")}</a>`;
+	if (esLinkUtil(evento.url)) return `<a href="${evento.url}" target="_blank" rel="noopener noreferrer" class="popup-link">${t("event.more_info")} →</a>`;
+	return `<a href="https://www.google.com/search?q=${encodeURIComponent(`${evento.nombre} Madrid`)}" target="_blank" rel="noopener noreferrer" class="popup-link popup-link-google">🔍 ${t("event.search_google")}</a>`;
 }
-function formatearDistancia$1(km) {
+function formatearDistancia(km) {
 	return km < 1 ? `${Math.round(km * 1e3)} m` : `${km.toFixed(1)} km`;
 }
 function getDistanciaHTMLCoords(lat, lng, userLocation) {
 	if (!userLocation) return "";
-	const distancia = calcularDistancia$1(userLocation.lat, userLocation.lng, lat, lng);
-	const texto = formatearDistancia$1(distancia);
+	const distancia = calcularDistancia(userLocation.lat, userLocation.lng, lat, lng);
+	const texto = formatearDistancia(distancia);
 	return `<span class="distancia-badge" style="color:${distancia < 1 ? "#30D158" : distancia < 5 ? "#FF9F0A" : "#FF453A"}">
         <i class="fas fa-walking"></i> ${texto}
     </span>`;
@@ -696,26 +718,36 @@ function mostrarToastConUndo(mensaje, undoCallback, tipo = "normal") {
 		}, 300);
 	}, 5e3);
 }
-function mostrarToast$1(mensaje, tipo = "normal") {
+function mostrarToast(mensaje, tipo = "normal") {
 	mostrarToastConUndo(mensaje, null, tipo);
 }
 require_leaflet_markercluster_src();
+window.L = import_leaflet_src.default;
 function initMap() {
+	console.log("Initializing Leaflet map...");
 	const map = import_leaflet_src.default.map("map", { zoomControl: false }).setView([40.4168, -3.7038], 12);
 	import_leaflet_src.default.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "© OpenStreetMap contributors" }).addTo(map);
 	import_leaflet_src.default.control.zoom({ position: "bottomright" }).addTo(map);
 	AppState.map = map;
-	AppState.markersLayer = import_leaflet_src.default.markerClusterGroup({
-		chunkedLoading: true,
-		maxClusterRadius: 60,
-		spiderfyOnMaxZoom: true,
-		showCoverageOnHover: false,
-		animate: true
-	}).addTo(map);
+	if (typeof import_leaflet_src.default.markerClusterGroup === "function") {
+		console.log("MarkerClusterGroup initialized");
+		AppState.markersLayer = import_leaflet_src.default.markerClusterGroup({
+			chunkedLoading: true,
+			maxClusterRadius: 60,
+			spiderfyOnMaxZoom: true,
+			showCoverageOnHover: false,
+			animate: true
+		}).addTo(map);
+	} else {
+		console.warn("MarkerClusterGroup not found in L, using standard LayerGroup");
+		AppState.markersLayer = import_leaflet_src.default.layerGroup().addTo(map);
+	}
 	AppState.lugaresLayer = import_leaflet_src.default.layerGroup().addTo(map);
+	window.addEventListener("resize", () => map.invalidateSize());
 	return map;
 }
-function createEventMarker(event, t, callbacks) {
+function createEventMarker(event, t) {
+	if (!event.lat || !event.lng) return null;
 	const color = colors[event.tipo] || "#6B7280";
 	const emoji = icons[event.tipo] || "📍";
 	const icon = import_leaflet_src.default.divIcon({
@@ -724,7 +756,7 @@ function createEventMarker(event, t, callbacks) {
                 ${emoji}
             </div>
         `,
-		className: "",
+		className: "marker-container",
 		iconSize: [40, 40],
 		iconAnchor: [20, 20],
 		popupAnchor: [0, -20]
@@ -736,14 +768,17 @@ function createEventMarker(event, t, callbacks) {
 	return marker;
 }
 function createPopupContent(event, t) {
-	const dateText = formatearFechaSafe(event.fecha, event.fecha_fin);
-	limpiarDescripcion(event.descripcion, 120);
+	const dateText = purify.sanitize(formatearFechaSafe(event.fecha, event.fecha_fin));
+	const safeDesc = purify.sanitize(limpiarDescripcion(event.descripcion, 120));
+	const safeName = purify.sanitize(event.nombre || "");
+	const safePlace = purify.sanitize(event.lugar || "");
 	const linkHTML = getLinkHTML(event, t);
 	return `
         <div class="popup-evento">
-            <h3>${event.nombre}</h3>
+            <h3>${safeName}</h3>
             <p><strong>📅</strong> ${dateText}</p>
-            <p><strong>📍</strong> ${event.lugar}</p>
+            <p><strong>📍</strong> ${safePlace}</p>
+            ${safeDesc ? `<p>${safeDesc}</p>` : ""}
             <div class="popup-actions">
                 ${linkHTML}
             </div>
@@ -759,20 +794,23 @@ function createPopupContent(event, t) {
     `;
 }
 function createLugarMarker(lugar) {
+	if (!lugar.lat || !lugar.lng) return null;
 	const color = lugaresColors[lugar.categoria] || "#6B7280";
 	const emoji = lugaresIcons[lugar.categoria] || "📍";
 	const icon = import_leaflet_src.default.divIcon({
 		html: `<div class="lugar-marker" style="background:${color};">${emoji}</div>`,
-		className: "",
+		className: "marker-container",
 		iconSize: [36, 36],
 		iconAnchor: [18, 18]
 	});
 	const marker = import_leaflet_src.default.marker([lugar.lat, lugar.lng], { icon });
 	marker.lugarId = lugar.id;
+	const safeNombre = purify.sanitize(lugar.nombre || "");
+	const safeLugar = purify.sanitize(lugar.lugar || "");
 	marker.bindPopup(`
         <div class="popup-lugar">
-            <h3>${lugar.nombre}</h3>
-            <p>📍 ${lugar.lugar}</p>
+            <h3>${safeNombre}</h3>
+            <p>📍 ${safeLugar}</p>
             <button class="popup-btn-extra" onclick="window.compartirLugar('${lugar.id}')">
                 <i class="fas fa-share-alt"></i> Compartir
             </button>
@@ -840,7 +878,7 @@ function renderFavoritesList(allEvents, t, verEnMapaCallback, comoLlegarCallback
 	container.innerHTML = allEvents.filter((e) => AppState.favorites.includes(e.id)).map((evento) => {
 		const emoji = icons[evento.tipo] || "📍";
 		const color = colors[evento.tipo] || "#6B7280";
-		const fecha = formatDate$1(evento.fecha);
+		const fecha = formatDate(evento.fecha);
 		const safeNombre = purify.sanitize(evento.nombre);
 		const safeLugar = purify.sanitize(evento.lugar);
 		return `
@@ -907,7 +945,7 @@ function generarUrlCompartir(item, type = "evento") {
 	return `${window.location.origin + window.location.pathname}?${type}=${item.id}`;
 }
 function generarTextoCompartir(evento, t) {
-	const fecha = formatDate$1(evento.fecha);
+	const fecha = formatDate(evento.fecha);
 	const precio = evento.precio === "gratis" ? t("badge.free") : evento.precio_desde || t("badge.paid");
 	return `${icons[evento.tipo] || "📍"} *${evento.nombre}*\n📅 ${fecha}\n📍 ${evento.lugar}\n💰 ${precio}`;
 }
@@ -922,7 +960,6 @@ function mostrarModalCompartir(item, t, type = "event") {
 	modal.id = "modal-compartir";
 	modal.className = "modal-compartir-overlay";
 	const safeNombre = purify.sanitize(item.nombre);
-	url.replace(/"/g, "&quot;");
 	modal.innerHTML = `
         <div class="modal-compartir">
             <div class="modal-compartir-header">
@@ -935,13 +972,15 @@ function mostrarModalCompartir(item, t, type = "event") {
             <div class="modal-compartir-acciones">
                 <a class="modal-compartir-btn whatsapp"
                    href="https://wa.me/?text=${encodeURIComponent(texto + "\n\n🗺️ Ver en EventosMadrid: " + url)}"
-                   target="_blank">
+                   target="_blank"
+                   rel="noopener noreferrer">
                     <i class="fab fa-whatsapp"></i>
                     <span>${t("event.share_whatsapp")}</span>
                 </a>
                 <a class="modal-compartir-btn twitter"
                    href="https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(url)}"
-                   target="_blank">
+                   target="_blank"
+                   rel="noopener noreferrer">
                     <i class="fab fa-x-twitter"></i>
                     <span>${t("event.share_twitter")}</span>
                 </a>
@@ -1001,7 +1040,7 @@ function applyFiltersImmediate(callbacks) {
 		if (types.length && !types.includes(e.tipo)) return false;
 		if (prices.length && !prices.includes(e.precio)) return false;
 		if (AppState.userLocation) {
-			if (calcularDistancia$1(AppState.userLocation.lat, AppState.userLocation.lng, e.lat, e.lng) > AppState.maxDistance) return false;
+			if (calcularDistancia(AppState.userLocation.lat, AppState.userLocation.lng, e.lat, e.lng) > AppState.maxDistance) return false;
 		}
 		if (search) {
 			const zona = e.zona || "Madrid";
@@ -1147,7 +1186,7 @@ function sortEvents(events) {
 			case "type": return a.tipo.localeCompare(b.tipo);
 			case "distance":
 				if (!AppState.userLocation) return 0;
-				return calcularDistancia$1(AppState.userLocation.lat, AppState.userLocation.lng, a.lat, a.lng) - calcularDistancia$1(AppState.userLocation.lat, AppState.userLocation.lng, b.lat, b.lng);
+				return calcularDistancia(AppState.userLocation.lat, AppState.userLocation.lng, a.lat, a.lng) - calcularDistancia(AppState.userLocation.lat, AppState.userLocation.lng, b.lat, b.lng);
 			default: return 0;
 		}
 	});
@@ -1222,9 +1261,9 @@ function renderLugaresList(lugares, t) {
             <div class="lugar-card">
                 <div class="lugar-icon" style="background:${lugaresColors[lugar.categoria] || "#6B7280"}">${lugaresIcons[lugar.categoria] || "📍"}</div>
                 <div class="event-info">
-                    <div class="event-title">${lugar.nombre}</div>
+                    <div class="event-title">${purify.sanitize(lugar.nombre || "")}</div>
                     <div class="event-meta">
-                        <span>📍 ${lugar.lugar}</span>
+                        <span>📍 ${purify.sanitize(lugar.lugar || "")}</span>
                     </div>
                 </div>
                 <div class="event-actions">
@@ -1356,6 +1395,9 @@ function formatDateShort(dateStr) {
 }
 //#endregion
 //#region js/main.js
+window.addEventListener("error", (e) => {
+	console.error("Captured Global Error:", e.message, "at", e.filename, ":", e.lineno);
+});
 var t = (key, vars) => i18n ? i18n.t(key, vars) : key;
 window.comoLlegar = (id) => {
 	const ev = AppState.getEventById(id);
@@ -1366,8 +1408,12 @@ window.verEnMapa = (id) => {
 	const ev = AppState.getEventById(id);
 	if (ev && AppState.map) {
 		AppState.map.setView([ev.lat, ev.lng], 15);
-		AppState.markersLayer.eachLayer((m) => {
-			if (m.eventoId === id) AppState.markersLayer.zoomToShowLayer(m, () => m.openPopup());
+		const layer = AppState.markersLayer;
+		if (layer.zoomToShowLayer) layer.eachLayer((m) => {
+			if (m.eventoId === id) layer.zoomToShowLayer(m, () => m.openPopup());
+		});
+		else layer.eachLayer((m) => {
+			if (m.eventoId === id) m.openPopup();
 		});
 	}
 };
@@ -1381,28 +1427,35 @@ window.verLugarEnMapa = (id) => {
 		});
 	}
 };
-window.compartirEvento = (id) => compartirEventoNativo(AppState.getEventById(id), t, mostrarToast$1);
+window.compartirEvento = (id) => compartirEventoNativo(AppState.getEventById(id), t, mostrarToast);
 window.compartirLugar = (id) => mostrarModalCompartir(AppState.getLugarById(id), t, "place");
 window.toggleFavorite = (id) => {
-	toggleFavorite(id, t, mostrarToast$1, () => {
+	toggleFavorite(id, t, mostrarToast, () => {
 		renderFavoritesList(AppState.allEvents, t, window.verEnMapa, window.comoLlegar, window.compartirEvento);
 		refreshViews();
 	});
 };
-window.clearFilters = () => clearFilters({
-	onEventsFiltered: refreshViews,
-	onLugaresFiltered: refreshViews
-});
+window.clearFilters = () => {
+	AppState.currentFilteredEvents = [];
+	AppState.currentFilteredLugares = [];
+	clearFilters({
+		onEventsFiltered: refreshViews,
+		onLugaresFiltered: refreshViews
+	});
+};
 async function initApp() {
-	initMap();
-	initThemeSystem();
-	initHeatmapMode(mostrarToast$1);
-	initRoutePlanner(mostrarToast$1, i18n, trapFocus, refreshViews, formatDate$1, calcularDistancia$1, formatearDistancia$1);
-	setupEventListeners();
+	console.log("🚀 App initializing...");
 	try {
+		initMap();
+		initThemeSystem(mostrarToast, () => initCharts(getVisibleEvents(), t));
+		initHeatmapMode(mostrarToast);
+		initRoutePlanner(mostrarToast, i18n, trapFocus, refreshViews, formatDate, calcularDistancia, formatearDistancia);
+		setupEventListeners();
 		await loadData();
+		registerServiceWorker();
+		console.log("✅ App initialized successfully");
 	} catch (err) {
-		console.error("Failed to load data:", err);
+		console.error("❌ Initialization error:", err);
 	} finally {
 		const loader = document.getElementById("loader");
 		if (loader) {
@@ -1410,40 +1463,60 @@ async function initApp() {
 			setTimeout(() => loader.style.display = "none", 500);
 		}
 	}
-	mostrarToast$1("🚀 " + t("common.ready"), "success");
 }
 async function loadData() {
 	try {
+		console.log("📡 Fetching data...");
 		const [evRes, lugRes] = await Promise.all([fetch("data/eventos.json"), fetch("data/lugares.json")]);
+		if (!evRes.ok || !lugRes.ok) throw new Error("Data fetch failed");
 		const events = await evRes.json();
 		const lugares = await lugRes.json();
+		console.log(`📦 Loaded ${events.length} events and ${lugares.length} places`);
 		const today = (/* @__PURE__ */ new Date()).setHours(0, 0, 0, 0);
-		AppState.allEvents = events.filter((e) => e.nombre && new Date(e.fecha_fin || e.fecha) >= today).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+		AppState.allEvents = events.filter((e) => {
+			if (!e.nombre) return false;
+			const eventDate = new Date(e.fecha_fin || e.fecha);
+			return isNaN(eventDate.getTime()) || eventDate >= today;
+		}).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 		AppState.allLugares = lugares;
+		console.log(`🎯 ${AppState.allEvents.length} events passed filter`);
 		refreshViews();
 		loadFavorites();
 		updateFavoritesCount();
+		mostrarToast("🚀 " + t("common.ready"), "success");
 	} catch (e) {
 		console.error("Data load error:", e);
-		mostrarToast$1(t("common.error_loading"), "error");
+		mostrarToast(t("common.error_loading"), "error");
 	}
 }
 function refreshViews() {
-	const evs = AppState.currentFilteredEvents.length ? AppState.currentFilteredEvents : AppState.allEvents;
-	const lugs = AppState.currentFilteredLugares.length ? AppState.currentFilteredLugares : AppState.allLugares;
+	const hasActiveFilters = hasActiveFiltersApplied();
+	const evs = hasActiveFilters ? AppState.currentFilteredEvents : AppState.allEvents;
+	const lugs = hasActiveFilters ? AppState.currentFilteredLugares : AppState.allLugares;
+	console.log(`🔄 Refreshing views: ${evs.length} events`);
 	if (AppState.markersLayer) {
 		AppState.markersLayer.clearLayers();
-		evs.forEach((e) => AppState.markersLayer.addLayer(createEventMarker(e, t)));
+		evs.forEach((e) => {
+			try {
+				const marker = createEventMarker(e, t);
+				if (marker) AppState.markersLayer.addLayer(marker);
+			} catch (err) {
+				console.error("Error adding marker:", err);
+			}
+		});
 	}
 	if (AppState.lugaresLayer) {
 		AppState.lugaresLayer.clearLayers();
-		if (AppState.mostrarLugares) lugs.forEach((l) => AppState.lugaresLayer.addLayer(createLugarMarker(l)));
+		if (AppState.mostrarLugares) lugs.forEach((l) => {
+			try {
+				AppState.lugaresLayer.addLayer(createLugarMarker(l));
+			} catch (err) {}
+		});
 	}
 	if (AppState.currentView === "list") renderListView(evs, t);
 	renderLugaresList(lugs, t);
 	const counter = document.getElementById("event-count");
 	if (counter) counter.textContent = evs.length;
-	if (document.getElementById("stats-panel").classList.contains("active")) initCharts(evs, t);
 	updateQuickFilterButtons();
 }
 function updateQuickFilterButtons() {
@@ -1458,6 +1531,7 @@ function updateQuickFilterButtons() {
 	if (qInfantil) qInfantil.classList.toggle("active", cbInfantil?.checked);
 }
 function switchView(view) {
+	console.log("Switching view:", view);
 	AppState.currentView = view;
 	document.body.className = `view-${view}`;
 	document.querySelectorAll(".view-container").forEach((c) => c.classList.toggle("active", c.id.startsWith(view)));
@@ -1487,22 +1561,10 @@ function setupEventListeners() {
 		const eventType = el.type === "checkbox" || el.tagName === "SELECT" ? "change" : "input";
 		el.addEventListener(eventType, () => applyFilters(filterCallbacks));
 	});
-	const precioMax = document.getElementById("filtro-precio-max");
-	if (precioMax) precioMax.addEventListener("input", (e) => {
-		const label = document.getElementById("precio-valor-label");
-		if (label) label.textContent = e.target.value >= 100 ? t("filters.price.any") : e.target.value + "€";
-	});
 	const sortSelect = document.getElementById("sort-by");
 	if (sortSelect) sortSelect.addEventListener("change", (e) => {
 		AppState.currentSort = e.target.value;
 		refreshViews();
-	});
-	document.querySelectorAll(".density-btn").forEach((btn) => {
-		btn.addEventListener("click", () => {
-			AppState.currentDensity = btn.dataset.density;
-			document.querySelectorAll(".density-btn").forEach((b) => b.classList.toggle("active", b === btn));
-			refreshViews();
-		});
 	});
 	document.querySelectorAll(".quick-filter").forEach((btn) => {
 		btn.addEventListener("click", () => {
@@ -1520,74 +1582,61 @@ function setupEventListeners() {
 			applyFilters(filterCallbacks);
 		});
 	});
-	const setupPanel = (toggleId, panelId, closeId, onOpen) => {
+	const setupPanel = (toggleId, panelId, closeId) => {
 		const toggle = document.getElementById(toggleId);
 		const panel = document.getElementById(panelId);
 		const close = document.getElementById(closeId);
-		if (toggle && panel) toggle.addEventListener("click", () => {
-			panel.classList.add("active");
-			if (onOpen) onOpen();
-		});
+		if (toggle && panel) toggle.addEventListener("click", () => panel.classList.add("active"));
 		if (close && panel) close.addEventListener("click", () => panel.classList.remove("active"));
 	};
 	setupPanel("fab-filters", "filters-panel", "close-panel");
 	setupPanel("favorites-toggle", "favorites-panel", "close-favorites");
-	setupPanel("stats-toggle", "stats-panel", "close-stats", () => {
-		const evs = AppState.currentFilteredEvents.length ? AppState.currentFilteredEvents : AppState.allEvents;
-		setTimeout(() => initCharts(evs, t), 300);
-	});
 	setupPanel("settings-toggle", "settings-panel", "close-settings");
 	setupPanel("bottom-nav-favorites", "favorites-panel", "close-favorites");
 	setupPanel("bottom-nav-settings", "settings-panel", "close-settings");
-	const langSelect = document.getElementById("lang-select");
-	if (langSelect) {
-		langSelect.value = i18n.currentLang;
-		langSelect.addEventListener("change", (e) => {
-			i18n.setLanguage(e.target.value);
-		});
-	}
-	const btnPlanRoute = document.getElementById("plan-favorite-route");
-	if (btnPlanRoute) btnPlanRoute.addEventListener("click", () => {
-		const favEvents = AppState.favorites.map((id) => AppState.getEventById(id)).filter(Boolean);
-		if (favEvents.length === 0) return mostrarToast$1(t("favorites.empty_route"), "warning");
-		document.getElementById("route-panel").classList.add("active");
-		AppState.selectedRouteEvents = [...favEvents];
-		window.dispatchEvent(new CustomEvent("updateRoute"));
+	setupPanel("stats-toggle", "stats-panel", "close-stats");
+	const statsToggle = document.getElementById("stats-toggle");
+	if (statsToggle) statsToggle.addEventListener("click", () => {
+		initCharts(getVisibleEvents(), t);
 	});
+	const langSelect = document.getElementById("lang-select");
+	if (langSelect) langSelect.addEventListener("change", (e) => i18n.setLanguage(e.target.value));
 	const btnClear = document.getElementById("btn-clear");
 	if (btnClear) btnClear.addEventListener("click", window.clearFilters);
-	const btnGeolocate = document.getElementById("btn-geolocate");
-	if (btnGeolocate) btnGeolocate.addEventListener("click", () => {
-		if (!navigator.geolocation) return mostrarToast$1("Geolocation not supported", "error");
-		btnGeolocate.classList.add("loading");
-		navigator.geolocation.getCurrentPosition((pos) => {
-			btnGeolocate.classList.remove("loading");
-			const { latitude, longitude } = pos.coords;
-			AppState.userLocation = {
-				lat: latitude,
-				lng: longitude
-			};
-			if (AppState.map) {
-				AppState.map.setView([latitude, longitude], 15);
-				if (AppState.userMarker) AppState.map.removeLayer(AppState.userMarker);
-				AppState.userMarker = import_leaflet_src.default.circleMarker([latitude, longitude], {
-					color: "#0A84FF",
-					fillOpacity: 1,
-					radius: 8,
-					weight: 3
-				}).addTo(AppState.map);
-			}
-			applyFilters(filterCallbacks);
-			mostrarToast$1("📍 " + t("common.location_ready"), "success");
-		}, () => {
-			btnGeolocate.classList.remove("loading");
-			mostrarToast$1("❌ " + t("common.location_error"), "error");
-		});
+}
+function getVisibleEvents() {
+	return hasActiveFiltersApplied() ? AppState.currentFilteredEvents : AppState.allEvents;
+}
+function hasActiveFiltersApplied() {
+	const search = document.getElementById("search")?.value?.trim() || "";
+	const date = document.getElementById("filtro-fecha")?.value || "todos";
+	const zona = document.getElementById("filtro-zona")?.value || "todas";
+	const precioMax = document.getElementById("filtro-precio-max")?.value || "100";
+	if (search !== "" || date !== "todos" || zona !== "todas" || precioMax !== "100") return true;
+	const typeFilters = [
+		"concierto",
+		"fiesta",
+		"mercado",
+		"cultural",
+		"gastronomia",
+		"deporte",
+		"infantil"
+	];
+	const priceFilters = ["gratis", "pago"];
+	const allTypesChecked = typeFilters.every((value) => document.querySelector(`.chip input[value="${value}"]`)?.checked);
+	const allPricesChecked = priceFilters.every((value) => document.querySelector(`.chip input[value="${value}"]`)?.checked);
+	return !(allTypesChecked && allPricesChecked);
+}
+function registerServiceWorker() {
+	if (!("serviceWorker" in navigator)) return;
+	if (!window.isSecureContext) return;
+	window.addEventListener("load", async () => {
+		try {
+			await navigator.serviceWorker.register("/sw.js");
+		} catch (err) {
+			console.warn("Service Worker registration failed:", err);
+		}
 	});
-	window.addEventListener("languageChanged", refreshViews);
 }
 document.addEventListener("DOMContentLoaded", initApp);
-if ("serviceWorker" in navigator && true) window.addEventListener("load", () => {
-	navigator.serviceWorker.register("./sw.js").catch((err) => console.log("SW error:", err));
-});
 //#endregion
