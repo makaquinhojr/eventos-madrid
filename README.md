@@ -138,6 +138,11 @@ Si quieres explorar un piloto, colaboracion o acuerdo de integracion:
 - **Base tecnica solida** para evolucionar a SaaS, licenciamiento o partnership institucional.
 - **Narrativa startup institucional**: innovacion de producto con aplicacion directa en sector publico.
 
+## 📖 Documentación Técnica
+Se ha elaborado un documento detallado que describe la arquitectura de 7 capas, el stack tecnológico y el flujo de datos del proyecto.
+
+👉 **[Consultar Documentación Técnica (PDF)](./documentation/EventosMadrid_Documentacion_Tecnica%20mayo%202026-1.pdf)**
+
 ## Autor
 
 **Diego SB**  
