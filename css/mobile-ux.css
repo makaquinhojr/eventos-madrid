@@ -1,14 +1,22 @@
 /* ========================================
-   MOBILE UX/UI ENHANCEMENTS
-   Capa final para unificar layout móvil
+   MOBILE UX/UI - FULL ACCESSIBLE OVERRIDE
    ======================================== */
 
 @media (max-width: 768px) {
     :root {
-        --mobile-top-bar-height: 48px;
-        --mobile-bottom-nav-height: 60px;
+        --mobile-top-bar-height: 50px;
+        --mobile-bottom-nav-height: 62px;
+        --mobile-gap: 12px;
+        --mobile-safe-bottom: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom));
+        --mobile-surface: color-mix(in srgb, var(--bg-elevated) 92%, black 8%);
+        --mobile-outline: color-mix(in srgb, var(--accent) 30%, transparent);
     }
 
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
+    /* Keep one navigation system in mobile */
     .view-toggle,
     .favorites-toggle,
     .settings-toggle,
@@ -25,12 +33,20 @@
     .top-bar {
         height: var(--mobile-top-bar-height) !important;
         grid-template-columns: auto 1fr auto !important;
-        padding: 0 12px !important;
         gap: 8px !important;
+        padding: 0 var(--mobile-gap) !important;
+        border-bottom: 1px solid var(--separator) !important;
+    }
+
+    .logo {
+        min-width: 0;
     }
 
     .logo-text {
         font-size: 15px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .top-bar-actions {
@@ -39,20 +55,25 @@
 
     .hoy-badge,
     .event-counter {
-        min-height: 30px;
+        min-height: 32px;
+        border-radius: 999px;
     }
 
     .bottom-nav {
         display: flex !important;
         height: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom)) !important;
         padding: 0 4px env(safe-area-inset-bottom) !important;
+        border-top: 1px solid var(--separator) !important;
+        background: color-mix(in srgb, var(--bg) 86%, var(--bg-elevated) 14%) !important;
     }
 
     .bottom-nav-item {
         min-width: 0 !important;
+        min-height: 44px !important;
         flex: 1 !important;
-        padding: 6px 4px !important;
-        gap: 2px !important;
+        padding: 8px 4px !important;
+        gap: 3px !important;
+        border-radius: 10px;
     }
 
     .bottom-nav-item i {
@@ -65,14 +86,17 @@
         white-space: nowrap;
     }
 
+    .bottom-nav-item.active {
+        background: var(--accent-subtle);
+    }
+
     #map,
     #list-view,
     #calendar-view {
         top: var(--mobile-top-bar-height) !important;
-        bottom: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom)) !important;
+        bottom: var(--mobile-safe-bottom) !important;
     }
 
-    /* Se muestran en mapa y se desplazan horizontalmente */
     .quick-filters {
         display: flex !important;
         top: var(--mobile-top-bar-height) !important;
@@ -81,9 +105,11 @@
         transform: none !important;
         max-width: 100% !important;
         border-radius: 0 !important;
-        padding: 8px 12px !important;
+        padding: 8px var(--mobile-gap) !important;
         gap: 8px !important;
         overflow-x: auto !important;
+        border-bottom: 1px solid var(--separator) !important;
+        background: color-mix(in srgb, var(--bg) 85%, var(--bg-elevated) 15%) !important;
         scrollbar-width: none;
     }
 
@@ -93,25 +119,29 @@
 
     .quick-filter {
         flex-shrink: 0;
+        min-height: 38px;
         padding: 8px 12px !important;
         font-size: 13px !important;
+        font-weight: 700 !important;
     }
 
     .active-filters {
-        top: calc(var(--mobile-top-bar-height) + 52px) !important;
-        left: 12px !important;
-        right: 12px !important;
+        top: calc(var(--mobile-top-bar-height) + 54px) !important;
+        left: var(--mobile-gap) !important;
+        right: var(--mobile-gap) !important;
         transform: none !important;
         max-width: none !important;
+        padding-top: 4px !important;
     }
 
     .list-container,
     .skeleton-list {
-        padding: 120px 12px 96px !important;
+        padding: 124px var(--mobile-gap) calc(var(--mobile-safe-bottom) + 20px) !important;
     }
 
     .event-group-header {
-        top: 112px !important;
+        top: 118px !important;
+        border: 1px solid var(--separator);
     }
 
     .list-header {
@@ -120,19 +150,31 @@
         gap: 10px !important;
     }
 
+    .list-header-left h2 {
+        font-size: 30px !important;
+        line-height: 1.15 !important;
+    }
+
     .list-header-right {
         width: 100%;
         justify-content: space-between;
+        gap: 8px;
     }
 
     .sort-label {
         display: none !important;
     }
 
+    .sort-select,
+    .density-btn {
+        min-height: 44px;
+    }
+
     .event-card {
         grid-template-columns: 1fr !important;
         padding: 14px !important;
         border-radius: 16px !important;
+        border: 1px solid var(--separator);
     }
 
     .event-icon {
@@ -147,6 +189,7 @@
     .event-title {
         max-width: calc(100% - 54px);
         font-size: 16px !important;
+        line-height: 1.35 !important;
     }
 
     .event-meta {
@@ -157,30 +200,33 @@
     .event-actions-row {
         width: 100%;
         flex-wrap: wrap;
+        gap: 8px !important;
     }
 
     .event-btn {
-        min-height: 38px;
+        min-height: 44px;
         padding: 10px 12px !important;
-        font-size: 12px !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
     }
 
     .event-btn-calendar,
     .event-btn-llegar,
     .event-btn-compartir,
     .btn-favorite {
-        width: 36px !important;
-        height: 36px !important;
-        flex: 0 0 36px !important;
+        width: 40px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        flex: 0 0 40px !important;
     }
 
     .calendar-header-fixed {
         top: var(--mobile-top-bar-height) !important;
-        padding: 8px 12px !important;
+        padding: 8px var(--mobile-gap) !important;
     }
 
     .calendar-container {
-        padding: 96px 12px 100px !important;
+        padding: 96px var(--mobile-gap) calc(var(--mobile-safe-bottom) + 20px) !important;
         min-height: auto !important;
     }
 
@@ -190,12 +236,18 @@
     }
 
     .calendar-day {
-        min-height: 64px !important;
+        min-height: 72px !important;
         padding: 6px !important;
+        border: 1px solid transparent;
+    }
+
+    .calendar-day:focus-visible {
+        border-color: var(--accent);
     }
 
     .calendar-day-number {
         font-size: 12px !important;
+        font-weight: 700 !important;
     }
 
     .panel-header {
@@ -218,22 +270,39 @@
     .panel-content {
         padding-left: 14px !important;
         padding-right: 14px !important;
+        padding-bottom: calc(var(--space-10) + env(safe-area-inset-bottom)) !important;
+    }
+
+    .search-box,
+    .filter-select,
+    .settings-select,
+    .btn-clear {
+        min-height: 44px;
+    }
+
+    .chip-content {
+        min-height: 38px;
+        display: inline-flex;
+        align-items: center;
     }
 
     .fab-filters,
     .btn-geolocate,
     .fab-scroll-top {
-        bottom: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom) + 12px) !important;
+        bottom: calc(var(--mobile-safe-bottom) + 10px) !important;
+        border: 1px solid var(--separator);
+        backdrop-filter: saturate(180%) blur(10px);
     }
 
     .fab-filters {
-        left: 12px !important;
+        left: var(--mobile-gap) !important;
+        min-height: 44px;
         padding: 10px 14px !important;
     }
 
     .btn-geolocate,
     .fab-scroll-top {
-        right: 12px !important;
+        right: var(--mobile-gap) !important;
     }
 
     .btn-geolocate {
@@ -242,46 +311,72 @@
     }
 
     .fab-scroll-top {
-        width: 40px !important;
-        height: 40px !important;
+        width: 42px !important;
+        height: 42px !important;
     }
 
     .geo-toast,
     .route-toast {
-        left: 12px !important;
-        right: 12px !important;
-        bottom: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom) + 68px) !important;
+        left: var(--mobile-gap) !important;
+        right: var(--mobile-gap) !important;
+        bottom: calc(var(--mobile-safe-bottom) + 66px) !important;
         max-width: none !important;
     }
 
-    /* Popups de mapa en formato hoja inferior */
+    /* Popups anclados al marcador, no bottom-sheet */
     .leaflet-popup {
-        position: fixed !important;
-        left: 0 !important;
-        right: 0 !important;
-        top: auto !important;
-        bottom: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom)) !important;
-        transform: none !important;
-        margin: 0 !important;
-        width: 100% !important;
-        inset-inline: 0 !important;
+        position: absolute !important;
+        width: auto !important;
+        max-width: calc(100vw - 24px) !important;
+        margin-bottom: 8px !important;
+        z-index: 900 !important;
     }
 
     .leaflet-popup-content-wrapper {
-        width: 100% !important;
-        max-width: none !important;
-        border-radius: 20px 20px 0 0 !important;
-        padding-bottom: 20px !important;
-        max-height: 70vh !important;
+        width: auto !important;
+        max-width: min(340px, calc(100vw - 24px)) !important;
+        border-radius: 14px !important;
+        border: 1px solid var(--separator) !important;
+        background: var(--mobile-surface) !important;
+        padding-bottom: 0 !important;
+        max-height: min(58vh, 460px) !important;
         overflow-y: auto !important;
     }
 
+    .leaflet-popup-content {
+        min-width: 0 !important;
+        width: auto !important;
+    }
+
     .leaflet-popup-tip-container {
-        display: none !important;
+        display: block !important;
+    }
+
+    .leaflet-popup-tip {
+        background: var(--mobile-surface) !important;
+        border: 1px solid var(--separator) !important;
+    }
+
+    /* Focus visible mobile a11y */
+    button:focus-visible,
+    a:focus-visible,
+    select:focus-visible,
+    input:focus-visible,
+    .bottom-nav-item:focus-visible,
+    .quick-filter:focus-visible,
+    .event-card:focus-within {
+        outline: 2px solid var(--accent) !important;
+        outline-offset: 2px !important;
+        box-shadow: 0 0 0 4px var(--mobile-outline) !important;
     }
 }
 
 @media (max-width: 420px) {
+    :root {
+        --mobile-gap: 10px;
+        --mobile-top-bar-height: 48px;
+    }
+
     .logo-text {
         font-size: 14px !important;
     }
@@ -303,11 +398,23 @@
 
     .list-container,
     .skeleton-list {
-        padding-left: 10px !important;
-        padding-right: 10px !important;
+        padding-left: var(--mobile-gap) !important;
+        padding-right: var(--mobile-gap) !important;
     }
 
     .event-card {
         padding: 12px !important;
+    }
+
+    .quick-filter {
+        font-size: 12px !important;
+    }
+}
+
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
     }
 }
