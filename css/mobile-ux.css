@@ -3,24 +3,9 @@
    ======================================== */
 
 @media (max-width: 768px) {
-    /* 1. BOTTOM NAVIGATION BAR (Floating Pill) */
+    /* 1. Keep primary navigation model from components.css */
     .view-toggle {
-        position: fixed !important;
-        bottom: 24px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 10000;
-        width: 85%;
-        max-width: 350px;
-        background: rgba(var(--bg-elevated-rgb, 20, 20, 20), 0.85) !important;
-        border: 1px solid rgba(150, 150, 150, 0.2);
-        backdrop-filter: blur(25px) saturate(180%);
-        -webkit-backdrop-filter: blur(25px) saturate(180%);
-        box-shadow: 0 12px 40px rgba(0,0,0,0.25);
-        border-radius: 40px;
-        padding: 6px !important;
-        display: flex;
-        justify-content: space-between;
+        display: none !important;
     }
     
     [data-theme='light'] .view-toggle {
@@ -48,22 +33,16 @@
         font-size: 20px !important;
     }
 
-    /* 2. HEADER REFINEMENT */
-    .top-bar {
-        padding: 12px 16px !important;
-        background: rgba(var(--bg-rgb, 255, 255, 255), 0.95);
-        backdrop-filter: blur(15px);
-    }
-    
-    .logo-text { font-size: 18px !important; }
-    
+    /* 2. Keep header compact to avoid overflow on small screens */
+    .logo-text { font-size: 16px !important; }
+
     .desktop-only { display: none !important; }
     
     .top-bar-actions { gap: 14px !important; }
 
-    /* 3. SCROLLABLE CHIPS (YouTube/Google Maps style) */
+    /* 3. Keep chips aligned with compact header/bottom nav */
     .quick-filters {
-        top: 56px !important;
+        top: 48px !important;
         padding: 10px 16px !important;
         background: transparent !important;
         backdrop-filter: none !important;
@@ -198,13 +177,13 @@
 
     /* 6. LIST & CALENDAR CONTAINER SPACING */
     .list-container {
-        padding-top: 120px !important;
-        padding-bottom: 120px !important; /* Avoid cutting off last items behind bottom bar */
+        padding-top: 68px !important;
+        padding-bottom: 80px !important;
         padding-left: 16px !important;
         padding-right: 16px !important;
     }
 
     .calendar-container {
-        padding-bottom: 120px !important;
+        padding-bottom: 80px !important;
     }
 }
