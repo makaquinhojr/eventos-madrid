@@ -1,190 +1,313 @@
 /* ========================================
-   MOBILE UX/UI ENHANCEMENTS (Apple HIG / Material 3)
+   MOBILE UX/UI ENHANCEMENTS
+   Capa final para unificar layout móvil
    ======================================== */
 
 @media (max-width: 768px) {
-    /* 1. Keep primary navigation model from components.css */
-    .view-toggle {
+    :root {
+        --mobile-top-bar-height: 48px;
+        --mobile-bottom-nav-height: 60px;
+    }
+
+    .view-toggle,
+    .favorites-toggle,
+    .settings-toggle,
+    .stats-toggle,
+    .btn-lugares,
+    .route-planner-btn {
         display: none !important;
     }
-    
-    [data-theme='light'] .view-toggle {
-        background: rgba(255, 255, 255, 0.9) !important;
-        box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+
+    .desktop-only {
+        display: none !important;
     }
 
-    .view-btn {
-        flex: 1;
-        flex-direction: column !important;
-        padding: 10px 4px !important;
-        gap: 6px !important;
-        border-radius: 30px !important;
-        font-size: 11px !important;
-        background: transparent !important; /* remove active background pill to avoid boxiness */
+    .top-bar {
+        height: var(--mobile-top-bar-height) !important;
+        grid-template-columns: auto 1fr auto !important;
+        padding: 0 12px !important;
+        gap: 8px !important;
     }
 
-    .view-btn.active {
-        color: var(--accent) !important;
-        box-shadow: none !important;
-        background: rgba(150, 150, 150, 0.1) !important;
+    .logo-text {
+        font-size: 15px !important;
     }
 
-    .view-btn i {
-        font-size: 20px !important;
+    .top-bar-actions {
+        gap: 8px !important;
     }
 
-    /* 2. Keep header compact to avoid overflow on small screens */
-    .logo-text { font-size: 16px !important; }
+    .hoy-badge,
+    .event-counter {
+        min-height: 30px;
+    }
 
-    .desktop-only { display: none !important; }
-    
-    .top-bar-actions { gap: 14px !important; }
+    .bottom-nav {
+        display: flex !important;
+        height: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom)) !important;
+        padding: 0 4px env(safe-area-inset-bottom) !important;
+    }
 
-    /* 3. Keep chips aligned with compact header/bottom nav */
+    .bottom-nav-item {
+        min-width: 0 !important;
+        flex: 1 !important;
+        padding: 6px 4px !important;
+        gap: 2px !important;
+    }
+
+    .bottom-nav-item i {
+        font-size: 18px !important;
+    }
+
+    .bottom-nav-item span {
+        font-size: 10px !important;
+        line-height: 1.1 !important;
+        white-space: nowrap;
+    }
+
+    #map,
+    #list-view,
+    #calendar-view {
+        top: var(--mobile-top-bar-height) !important;
+        bottom: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom)) !important;
+    }
+
+    /* Se muestran en mapa y se desplazan horizontalmente */
     .quick-filters {
-        top: 48px !important;
-        padding: 10px 16px !important;
-        background: transparent !important;
-        backdrop-filter: none !important;
+        display: flex !important;
+        top: var(--mobile-top-bar-height) !important;
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+        max-width: 100% !important;
+        border-radius: 0 !important;
+        padding: 8px 12px !important;
+        gap: 8px !important;
         overflow-x: auto !important;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        border-bottom: none !important;
+        scrollbar-width: none;
     }
-    
+
     .quick-filters::-webkit-scrollbar {
         display: none;
     }
 
     .quick-filter {
-        scroll-snap-align: start;
         flex-shrink: 0;
-        padding: 10px 18px !important;
-        font-size: 14px !important;
-        border-radius: 24px !important;
+        padding: 8px 12px !important;
+        font-size: 13px !important;
     }
 
-    /* 4. TRUE BOTTOM SHEET FOR MAP MARKERS (Leaflet Override) */
-    .leaflet-popup {
-        position: fixed !important;
-        bottom: calc(60px + env(safe-area-inset-bottom)) !important;
-        left: 0 !important;
-        right: 0 !important;
-        top: auto !important;
+    .active-filters {
+        top: calc(var(--mobile-top-bar-height) + 52px) !important;
+        left: 12px !important;
+        right: 12px !important;
         transform: none !important;
-        margin: 0 !important;
-        width: 100% !important;
-        z-index: 9999 !important;
-        inset-inline: 0 !important;
+        max-width: none !important;
     }
 
-    .leaflet-popup-content-wrapper {
-        border-radius: 28px 28px 0 0 !important;
-        box-shadow: 0 -15px 40px rgba(0,0,0,0.15) !important;
-        width: 100vw !important;
-        max-height: 85vh !important;
-        overflow-y: auto !important;
-        padding: 24px 20px 32px 20px !important;
-        background: var(--bg-elevated) !important;
-        animation: slideUpPopup 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    .list-container,
+    .skeleton-list {
+        padding: 120px 12px 96px !important;
     }
 
-    [data-theme='dark'] .leaflet-popup-content-wrapper {
-        background: #1e1e1e !important;
-        box-shadow: 0 -15px 50px rgba(0,0,0,0.5) !important;
+    .event-group-header {
+        top: 112px !important;
     }
 
-    .leaflet-popup-tip-container {
-        display: none !important; /* Hide triangle */
+    .list-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
     }
 
-    .leaflet-popup-close-button {
-        top: 16px !important;
-        right: 16px !important;
-        background: rgba(150, 150, 150, 0.2) !important;
-        border-radius: 50% !important;
-        width: 32px !important;
-        height: 32px !important;
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-        color: var(--text) !important;
-    }
-
-    /* Drag Handle visual for bottom sheet */
-    .leaflet-popup-content-wrapper::before {
-        content: '';
-        position: absolute;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 40px;
-        height: 5px;
-        background: rgba(150, 150, 150, 0.4);
-        border-radius: 10px;
-    }
-
-    @keyframes slideUpPopup {
-        from { transform: translateY(100%); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-
-    /* 5. EVENT CARDS MOBILE LAYOUT */
-    .event-card {
-        padding: 16px !important;
-        grid-template-columns: 1fr !important;
-        border-radius: 20px !important;
-    }
-    
-    .event-icon {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        width: 46px !important;
-        height: 46px !important;
-        font-size: 22px !important;
-        border-radius: 14px !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    
-    .event-title {
-        max-width: calc(100% - 60px);
-        font-size: 17px !important;
-    }
-    
-    .event-actions {
-        flex-direction: row !important;
-        flex-wrap: wrap;
-        gap: 8px !important;
-        margin-top: 12px;
-    }
-    
-    .event-actions-row {
+    .list-header-right {
         width: 100%;
         justify-content: space-between;
     }
 
-    .event-btn {
-        flex: 1 1 100% !important; /* Stack vertically if needed, but flex lets them grow */
-        padding: 12px !important;
-        font-size: 14px !important;
-        border-radius: 12px !important;
-    }
-    
-    .event-btn-calendar, .event-btn-llegar, .event-btn-compartir, .btn-favorite {
-        flex: 1 !important;
-        margin: 0 !important;
+    .sort-label {
+        display: none !important;
     }
 
-    /* 6. LIST & CALENDAR CONTAINER SPACING */
-    .list-container {
-        padding-top: 68px !important;
-        padding-bottom: 80px !important;
-        padding-left: 16px !important;
-        padding-right: 16px !important;
+    .event-card {
+        grid-template-columns: 1fr !important;
+        padding: 14px !important;
+        border-radius: 16px !important;
+    }
+
+    .event-icon {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 42px !important;
+        height: 42px !important;
+        font-size: 20px !important;
+    }
+
+    .event-title {
+        max-width: calc(100% - 54px);
+        font-size: 16px !important;
+    }
+
+    .event-meta {
+        gap: 8px !important;
+    }
+
+    .event-actions,
+    .event-actions-row {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .event-btn {
+        min-height: 38px;
+        padding: 10px 12px !important;
+        font-size: 12px !important;
+    }
+
+    .event-btn-calendar,
+    .event-btn-llegar,
+    .event-btn-compartir,
+    .btn-favorite {
+        width: 36px !important;
+        height: 36px !important;
+        flex: 0 0 36px !important;
+    }
+
+    .calendar-header-fixed {
+        top: var(--mobile-top-bar-height) !important;
+        padding: 8px 12px !important;
     }
 
     .calendar-container {
-        padding-bottom: 80px !important;
+        padding: 96px 12px 100px !important;
+        min-height: auto !important;
+    }
+
+    .calendar-grid,
+    .calendar-weekdays {
+        gap: 6px !important;
+    }
+
+    .calendar-day {
+        min-height: 64px !important;
+        padding: 6px !important;
+    }
+
+    .calendar-day-number {
+        font-size: 12px !important;
+    }
+
+    .panel-header {
+        padding: 16px !important;
+        min-height: 56px !important;
+    }
+
+    .panel-header h2 {
+        font-size: 22px !important;
+    }
+
+    .filters-panel,
+    .stats-panel,
+    .favorites-panel,
+    .settings-panel,
+    .route-panel {
+        max-width: 100% !important;
+    }
+
+    .panel-content {
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+    }
+
+    .fab-filters,
+    .btn-geolocate,
+    .fab-scroll-top {
+        bottom: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom) + 12px) !important;
+    }
+
+    .fab-filters {
+        left: 12px !important;
+        padding: 10px 14px !important;
+    }
+
+    .btn-geolocate,
+    .fab-scroll-top {
+        right: 12px !important;
+    }
+
+    .btn-geolocate {
+        width: 46px !important;
+        height: 46px !important;
+    }
+
+    .fab-scroll-top {
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    .geo-toast,
+    .route-toast {
+        left: 12px !important;
+        right: 12px !important;
+        bottom: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom) + 68px) !important;
+        max-width: none !important;
+    }
+
+    /* Popups de mapa en formato hoja inferior */
+    .leaflet-popup {
+        position: fixed !important;
+        left: 0 !important;
+        right: 0 !important;
+        top: auto !important;
+        bottom: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom)) !important;
+        transform: none !important;
+        margin: 0 !important;
+        width: 100% !important;
+        inset-inline: 0 !important;
+    }
+
+    .leaflet-popup-content-wrapper {
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 20px 20px 0 0 !important;
+        padding-bottom: 20px !important;
+        max-height: 70vh !important;
+        overflow-y: auto !important;
+    }
+
+    .leaflet-popup-tip-container {
+        display: none !important;
+    }
+}
+
+@media (max-width: 420px) {
+    .logo-text {
+        font-size: 14px !important;
+    }
+
+    .hoy-badge {
+        padding: 4px 8px !important;
+        font-size: 11px !important;
+    }
+
+    .event-counter {
+        min-width: 34px !important;
+        padding: 4px 8px !important;
+        font-size: 11px !important;
+    }
+
+    .bottom-nav-item span {
+        font-size: 9px !important;
+    }
+
+    .list-container,
+    .skeleton-list {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .event-card {
+        padding: 12px !important;
     }
 }
