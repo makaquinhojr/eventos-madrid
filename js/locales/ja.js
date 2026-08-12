@@ -264,7 +264,12 @@ export default {
         'common.loading': '読み込み中...',
         'common.error': 'エラー',
         'common.no_description': '説明なし',
-        'common.showing': '{total} 件中 {shown} 件を表示',
+                'common.close': '閉じる',
+'common.showing': '{total} 件中 {shown} 件を表示',
+'common.copy_error': '❌ コピーできませんでした',
+'toast.places_on': '🏛️ 場所を表示',
+'filters.distance_needs_location': '📍 先に位置情報を有効にしてください',
+'toast.places_off': '🏛️ 場所を非表示',
 
         // ===== CALENDARIO =====
         'calendar.today': '今日',

@@ -264,7 +264,12 @@ export default {
         'common.loading': '加载中...',
         'common.error': '错误',
         'common.no_description': '无描述',
-        'common.showing': '显示 {shown} / {total}',
+                'common.close': '关闭',
+'common.showing': '显示 {shown} / {total}',
+'toast.places_on': '🏛️ 场所可见',
+'filters.distance_needs_location': '📍 请先启用你的位置',
+'common.copy_error': '❌ 复制失败',
+'toast.places_off': '🏛️ 场所已隐藏',
 
         // ===== CALENDARIO =====
         'calendar.today': '今天',

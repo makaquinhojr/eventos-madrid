@@ -277,7 +277,12 @@ export default {
         'common.loading': '로딩 중...',
         'common.error': '오류',
         'common.no_description': '설명 없음',
-        'common.showing': '{total}개 중 {shown}개 표시',
+                'common.close': '닫기',
+'common.showing': '{total}개 중 {shown}개 표시',
+'common.copy_error': '❌ 복사 실패',
+'toast.places_on': '🏛️ 장소 표시됨',
+'filters.distance_needs_location': '📍 먼저 위치를 활성화하세요',
+'toast.places_off': '🏛️ 장소 숨김',
 
         // ===== CALENDARIO =====
         'calendar.today': '오늘',

@@ -264,7 +264,12 @@ export default {
         'common.loading': 'Chargement...',
         'common.error': 'Erreur',
         'common.no_description': 'Sans description',
-        'common.showing': 'Affichage de {shown} sur {total}',
+                'common.close': 'Fermer',
+'common.showing': 'Affichage de {shown} sur {total}',
+'toast.places_on': '🏛️ Lieux visibles',
+'common.copy_error': '❌ Impossible de copier',
+'toast.places_off': '🏛️ Lieux masqués',
+'filters.distance_needs_location': '📍 Activez votre position d’abord',
 
         // ===== CALENDARIO =====
         'calendar.today': 'Aujourd\'hui',

@@ -268,7 +268,12 @@ export default {
         'common.loading': 'جاري التحميل...',
         'common.error': 'خطأ',
         'common.no_description': 'بدون وصف',
-        'common.showing': 'عرض {shown} من {total}',
+                'common.close': 'إغلاق',
+'common.showing': 'عرض {shown} من {total}',
+'common.copy_error': '❌ تعذّر النسخ',
+'filters.distance_needs_location': '📍 فعّل موقعك أولاً',
+'toast.places_on': '🏛️ الأماكن مرئية',
+'toast.places_off': '🏛️ الأماكن مخفية',
 
         // ===== CALENDARIO =====
         'calendar.today': 'اليوم',

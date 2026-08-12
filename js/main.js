@@ -50,7 +50,7 @@ let routePolyline = null;
 let routeMarkers = [];
 
 // ===== ICONOS Y COLORES =====
-import DOMPurify from 'https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.es.mjs';
+import DOMPurify from 'dompurify';
 import { icons, colors, lugaresIcons, lugaresColors, ZONAS_COORDS } from './modules/constants.js';
 // ===== FUNCIÓN T (TRADUCCIÓN) =====
 function t(key) {
@@ -314,13 +314,13 @@ function compartirEvento(eventoId) {
     modal.className = 'modal-compartir-overlay';
     
     const safeNombre = DOMPurify.sanitize(evento.nombre);
-    const safeUrl = url.replace(/"/g, '&quot;'); // Simple escaping for URL in attribute
+    const safeUrl = safeAttr(url);
     
     modal.innerHTML = `
         <div class="modal-compartir">
             <div class="modal-compartir-header">
                 <span>${emoji} ${i18n.t('share.title_event')}</span>
-                <button class="modal-compartir-close" onclick="cerrarModalCompartir()" aria-label="Cerrar">
+                <button class="modal-compartir-close" onclick="cerrarModalCompartir()" aria-label="${i18n.t('common.close')}">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -373,7 +373,7 @@ async function copiarLinkEvento(url, btn) {
             btn.classList.remove('copiado');
         }, 2000);
     } catch {
-        mostrarToast('❌ No se pudo copiar', 'error');
+        mostrarToast(i18n.t('common.copy_error'), 'error');
     }
 }
 
@@ -385,6 +385,9 @@ function compartirLugar(lugarId) {
     const emoji = lugaresIcons[lugar.categoria] || '📍';
     const texto = `${emoji} *${lugar.nombre}*\n📍 ${lugar.lugar}\n🕐 ${lugar.horario || 'Ver horarios'}`;
 
+    const safeNombre = DOMPurify.sanitize(lugar.nombre);
+    const safeUrl = safeAttr(url);
+
     document.getElementById('modal-compartir')?.remove();
 
     const modal = document.createElement('div');
@@ -394,11 +397,11 @@ function compartirLugar(lugarId) {
         <div class="modal-compartir">
             <div class="modal-compartir-header">
                 <span>${emoji} ${i18n.t('share.title_place')}</span>
-                <button class="modal-compartir-close" onclick="cerrarModalCompartir()" aria-label="Cerrar">
+                <button class="modal-compartir-close" onclick="cerrarModalCompartir()" aria-label="${i18n.t('common.close')}">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="modal-compartir-nombre">${lugar.nombre}</div>
+            <div class="modal-compartir-nombre">${safeNombre}</div>
             <div class="modal-compartir-acciones">
                 <a class="modal-compartir-btn whatsapp"
                    href="https://wa.me/?text=${encodeURIComponent(texto + '\n\n🗺️ Ver en EventosMadrid: ' + url)}"
@@ -412,7 +415,7 @@ function compartirLugar(lugarId) {
                     <i class="fab fa-x-twitter"></i>
                     <span>${i18n.t('event.share_twitter')}</span>
                 </a>
-                <button class="modal-compartir-btn copiar" onclick="copiarLinkEvento('${url}', this)">
+                <button class="modal-compartir-btn copiar" onclick="copiarLinkEvento('${safeUrl}', this)">
                     <i class="fas fa-link"></i>
                     <span>${i18n.t('event.copy_link')}</span>
                 </button>
@@ -498,9 +501,30 @@ function esLinkUtil(url) {
     return !urlLower.includes('madrid.es') || url.length > 50;
 }
 
+// Escapa caracteres peligrosos para uso seguro dentro de atributos HTML.
+function safeAttr(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+// Normaliza una URL para href: solo admite protocolos http(s) y javascript-void
+// para evitar inyección de código vía atributos.
+function safeUrl(url) {
+    if (!url || typeof url !== 'string') return '#';
+    const trimmed = url.trim();
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    return '#';
+}
+
 function getLinkHTML(evento) {
+    const url = safeUrl(evento.url);
     if (esLinkUtil(evento.url)) {
-        return `<a href="${evento.url}" target="_blank" class="popup-link">${i18n.t('event.more_info')} →</a>`;
+        return `<a href="${safeAttr(url)}" target="_blank" class="popup-link">${i18n.t('event.more_info')} →</a>`;
     }
     const busqueda = encodeURIComponent(`${evento.nombre} Madrid`);
     return `<a href="https://www.google.com/search?q=${busqueda}" target="_blank" class="popup-link popup-link-google">🔍 ${i18n.t('event.search_google')}</a>`;
@@ -509,7 +533,8 @@ function getLinkHTML(evento) {
 function getBotonMasInfo(evento) {
     const busqueda = encodeURIComponent(`${evento.nombre} Madrid`);
     if (esLinkUtil(evento.url)) {
-        return `<a href="${evento.url}" target="_blank" class="event-btn event-btn-secondary">
+        const url = safeUrl(evento.url);
+        return `<a href="${safeAttr(url)}" target="_blank" class="event-btn event-btn-secondary">
                     <i class="fas fa-external-link-alt"></i> ${i18n.t('event.more_info')}
                 </a>`;
     }
@@ -884,14 +909,14 @@ function toggleLugares() {
             btn.classList.add('active');
             btn.setAttribute('aria-pressed', 'true');
         }
-        mostrarToast('🏛️ Lugares visibles');
+        mostrarToast(i18n.t('toast.places_on'));
     } else {
         lugaresLayer.clearLayers();
         if (btn) {
             btn.classList.remove('active');
             btn.setAttribute('aria-pressed', 'false');
         }
-        mostrarToast('🏛️ Lugares ocultos');
+        mostrarToast(i18n.t('toast.places_off'));
     }
 }
 
@@ -983,10 +1008,10 @@ function renderListView(events) {
         listContainer.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-search"></i>
-                <h3>No se encontraron eventos</h3>
-                <p>Prueba a cambiar los filtros</p>
+                <h3>${t('list.empty.title')}</h3>
+                <p>${t('list.empty.description')}</p>
                 <button class="event-btn event-btn-primary" onclick="clearFilters()" style="margin-top:24px;">
-                    <i class="fas fa-redo"></i> Limpiar filtros
+                    <i class="fas fa-redo"></i> ${t('filters.clear')}
                 </button>
             </div>
         `;
@@ -3582,7 +3607,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sortBy.addEventListener('change', e => {
             currentSort = e.target.value;
             if (currentSort === 'distance' && !userLocation) {
-                mostrarToast('📍 Activa tu ubicación primero', 'error');
+                mostrarToast(i18n.t('filters.distance_needs_location'), 'error');
                 e.target.value = 'date';
                 currentSort = 'date';
                 return;

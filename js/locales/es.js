@@ -308,5 +308,10 @@ export default {
         'common.loading': 'Cargando...',
         'common.error': 'Error',
         'common.no_description': 'Sin descripción',
-        'common.showing': 'Mostrando {shown} de {total}',
+                'common.close': 'Cerrar',
+'common.showing': 'Mostrando {shown} de {total}',
+'toast.places_on': '🏛️ Lugares visibles',
+'common.copy_error': '❌ No se pudo copiar',
+'toast.places_off': '🏛️ Lugares ocultos',
+'filters.distance_needs_location': '📍 Activa tu ubicación primero',
 };

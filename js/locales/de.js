@@ -264,7 +264,12 @@ export default {
         'common.loading': 'Laden...',
         'common.error': 'Fehler',
         'common.no_description': 'Keine Beschreibung',
-        'common.showing': '{shown} von {total} anzeigen',
+                'common.close': 'Schließen',
+'common.showing': '{shown} von {total} anzeigen',
+'common.copy_error': '❌ Kopieren fehlgeschlagen',
+'toast.places_off': '🏛️ Orte ausgeblendet',
+'toast.places_on': '🏛️ Orte sichtbar',
+'filters.distance_needs_location': '📍 Aktiviere zuerst deinen Standort',
 
         // ===== CALENDARIO =====
         'calendar.today': 'Heute',

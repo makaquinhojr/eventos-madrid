@@ -1,7 +1,7 @@
 {
   "name": "eventos-madrid",
   "version": "1.0.0",
-  "description": "<div align=\"center\">",
+  "description": "Plataforma web para descubrir eventos culturales y de ocio en la Comunidad de Madrid.",
   "main": "sw.js",
   "scripts": {
     "dev": "vite",
@@ -12,9 +12,9 @@
     "type": "git",
     "url": "git+https://github.com/makaquinhojr/eventos-madrid.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["eventos", "madrid", "cultura", "ocio", "mapa", "pwa"],
+  "author": "Diego SB <dlopeztostado09@gmail.com>",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/makaquinhojr/eventos-madrid/issues"
   },
