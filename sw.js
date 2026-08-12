@@ -1,5 +1,5 @@
 // sw.js completo y corregido
-const CACHE_VERSION = 'v6'; // ← súbelo manualmente solo cuando cambies
+const CACHE_VERSION = 'v7'; // ← súbelo manualmente solo cuando cambies
                              //    CSS/JS/HTML (archivos estáticos)
 
 const CACHE_NAME    = `eventos-madrid-${CACHE_VERSION}`;
@@ -15,8 +15,16 @@ const ARCHIVOS_ESTATICOS = [
     '/eventos-madrid/vendor/leaflet/MarkerCluster.css',
     '/eventos-madrid/vendor/leaflet/MarkerCluster.Default.css',
     '/eventos-madrid/vendor/leaflet/leaflet.markercluster.js',
+    '/eventos-madrid/vendor/leaflet/images/layers.png',
+    '/eventos-madrid/vendor/leaflet/images/layers-2x.png',
+    '/eventos-madrid/vendor/leaflet/images/marker-icon.png',
+    '/eventos-madrid/vendor/leaflet/images/marker-icon-2x.png',
+    '/eventos-madrid/vendor/leaflet/images/marker-shadow.png',
     '/eventos-madrid/vendor/chart/chart.umd.min.js',
-    '/eventos-madrid/vendor/fontawesome/all.min.css',
+    '/eventos-madrid/vendor/fontawesome/css/all.min.css',
+    '/eventos-madrid/vendor/fontawesome/webfonts/fa-solid-900.woff2',
+    '/eventos-madrid/vendor/fontawesome/webfonts/fa-regular-400.woff2',
+    '/eventos-madrid/vendor/fontawesome/webfonts/fa-brands-400.woff2',
     '/eventos-madrid/css/style.css',
     '/eventos-madrid/css/variables.css',
     '/eventos-madrid/css/layout.css',

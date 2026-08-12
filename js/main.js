@@ -642,12 +642,37 @@ function procesarUrlEvento() {
 }
 
 // ===== INICIALIZACIÓN DEL MAPA =====
-function initMap() {
-    map = L.map('map').setView([40.4168, -3.7038], 12);
+const TILE_PROVIDERS = [
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+];
+const TILE_ATTRIBUTION = '© OpenStreetMap &copy; contribuidores · © CARTO';
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
+function initMap() {
+    map = L.map('map', {
+        attributionControl: true,
+        zoomControl: true
+    }).setView([40.4168, -3.7038], 12);
+
+    // Añadir una fuente de tiles con reintentos: si la primera no está
+    // disponible, intenta la siguiente. Así el mapa nunca queda en blanco.
+    const tiles = L.tileLayer(TILE_PROVIDERS[0], {
+        attribution: TILE_ATTRIBUTION,
+        maxZoom: 19
     }).addTo(map);
+
+    let providerIndex = 0;
+    tiles.on('tileerror', function () {
+        // Intentar con el siguiente proveedor una sola vez
+        if (providerIndex + 1 < TILE_PROVIDERS.length) {
+            providerIndex++;
+            map.removeLayer(tiles);
+            L.tileLayer(TILE_PROVIDERS[providerIndex], {
+                attribution: TILE_ATTRIBUTION,
+                maxZoom: 19
+            }).addTo(map);
+        }
+    });
 
     markersLayer = L.markerClusterGroup({
         chunkedLoading: true,
@@ -661,6 +686,9 @@ function initMap() {
     }).addTo(map);
 
     lugaresLayer = L.layerGroup().addTo(map);
+
+    // Asegurar tamaño correcto cuando el mapa se muestra
+    setTimeout(() => map && map.invalidateSize(), 150);
 }
 
 // ===== CARGA DE EVENTOS =====

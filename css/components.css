@@ -444,6 +444,25 @@
 
     z-index: var(--z-base);
 
+    /* Fondo elegante mientras cargan/fallan las baldosas del mapa */
+    background:
+        radial-gradient(circle at 20% 30%, var(--bg-elevated-2, rgba(120,120,140,0.15)), transparent 60%),
+        radial-gradient(circle at 80% 70%, var(--accent-subtle, rgba(10,132,255,0.08)), transparent 55%),
+        var(--bg, #f0f1f3);
+
+}
+
+/* Rejilla sutil tipo mapa sobre el fondo del contenedor */
+#map::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(var(--separator, rgba(0,0,0,0.04)) 1px, transparent 1px),
+        linear-gradient(90deg, var(--separator, rgba(0,0,0,0.04)) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
 }
 
 
