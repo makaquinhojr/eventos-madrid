@@ -1,5 +1,5 @@
 // sw.js completo y corregido
-const CACHE_VERSION = 'v5'; // ← súbelo manualmente solo cuando cambies
+const CACHE_VERSION = 'v6'; // ← súbelo manualmente solo cuando cambies
                              //    CSS/JS/HTML (archivos estáticos)
 
 const CACHE_NAME    = `eventos-madrid-${CACHE_VERSION}`;
@@ -10,6 +10,13 @@ const ARCHIVOS_ESTATICOS = [
     '/eventos-madrid/',
     '/eventos-madrid/index.html',
     '/eventos-madrid/manifest.json',
+    '/eventos-madrid/vendor/leaflet/leaflet.css',
+    '/eventos-madrid/vendor/leaflet/leaflet.js',
+    '/eventos-madrid/vendor/leaflet/MarkerCluster.css',
+    '/eventos-madrid/vendor/leaflet/MarkerCluster.Default.css',
+    '/eventos-madrid/vendor/leaflet/leaflet.markercluster.js',
+    '/eventos-madrid/vendor/chart/chart.umd.min.js',
+    '/eventos-madrid/vendor/fontawesome/all.min.css',
     '/eventos-madrid/css/style.css',
     '/eventos-madrid/css/variables.css',
     '/eventos-madrid/css/layout.css',

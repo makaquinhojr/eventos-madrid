@@ -3487,21 +3487,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedReduceMotion = localStorage.getItem('reduceMotion') === 'true';
     document.documentElement.setAttribute('data-reduce-motion', savedReduceMotion);
 
-    initMap();
+    // Arranque resiliente: un fallo en cualquier init NO debe bloquear
+    // loadEvents(), que es lo que oculta el loader de carga.
+    try {
+        initMap();
+    } catch (e) {
+        console.error('⚠️ Error inicializando el mapa:', e);
+    }
+
+    // Carga de datos: si falla, el timeout de seguridad oculta el loader.
     loadEvents();
-    initGeolocate();
-    initSliderPrecio();
-    initDistanceFilter();
-    initCollapseGroups();
-    initLugaresSelectAll();
-    initLugaresListToggle();
-    initSettingsPanel();
-    initQuickFilters();
-    initViewDensity();
-    initInfiniteScroll();
-    initScrollToTop();
-    initSwipeGestures();
-    initPullToRefresh();
+
+    try { initGeolocate(); } catch (e) { console.error('⚠️ geolocate:', e); }
+    try { initSliderPrecio(); } catch (e) { console.error('⚠️ slider precio:', e); }
+    try { initDistanceFilter(); } catch (e) { console.error('⚠️ distancia:', e); }
+    try { initCollapseGroups(); } catch (e) { console.error('⚠️ collapse:', e); }
+    try { initLugaresSelectAll(); } catch (e) { console.error('⚠️ lugares select:', e); }
+    try { initLugaresListToggle(); } catch (e) { console.error('⚠️ lugares toggle:', e); }
+    try { initSettingsPanel(); } catch (e) { console.error('⚠️ settings:', e); }
+    try { initQuickFilters(); } catch (e) { console.error('⚠️ quickfilters:', e); }
+    try { initViewDensity(); } catch (e) { console.error('⚠️ density:', e); }
+    try { initInfiniteScroll(); } catch (e) { console.error('⚠️ infinite:', e); }
+    try { initScrollToTop(); } catch (e) { console.error('⚠️ scrolltop:', e); }
+    try { initSwipeGestures(); } catch (e) { console.error('⚠️ swipe:', e); }
+    try { initPullToRefresh(); } catch (e) { console.error('⚠️ pullrefresh:', e); }
 
     const fabFilters = document.getElementById('fab-filters');
     if (fabFilters) {
