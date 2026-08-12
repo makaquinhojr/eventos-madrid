@@ -444,25 +444,86 @@
 
     z-index: var(--z-base);
 
-    /* Fondo elegante mientras cargan/fallan las baldosas del mapa */
+    /* Fondo de mapa premium mientras cargan/fallan las baldosas externas.
+       Se muestra cuando las tiles no están disponibles, para que la vista
+       de mapa se vea intencionada y nunca con un mosaico gris de errores. */
     background:
-        radial-gradient(circle at 20% 30%, var(--bg-elevated-2, rgba(120,120,140,0.15)), transparent 60%),
-        radial-gradient(circle at 80% 70%, var(--accent-subtle, rgba(10,132,255,0.08)), transparent 55%),
-        var(--bg, #f0f1f3);
+        radial-gradient(circle at 15% 25%, rgba(10, 132, 255, 0.10), transparent 55%),
+        radial-gradient(circle at 85% 30%, rgba(191, 90, 242, 0.10), transparent 50%),
+        radial-gradient(circle at 75% 80%, rgba(48, 209, 88, 0.08), transparent 55%),
+        linear-gradient(160deg, #101114 0%, #181a20 55%, #0c0d12 100%);
 
 }
 
-/* Rejilla sutil tipo mapa sobre el fondo del contenedor */
+/* Rejilla cartográfica sutil (calles) sobre el fondo */
 #map::before {
     content: "";
     position: absolute;
     inset: 0;
     background-image:
-        linear-gradient(var(--separator, rgba(0,0,0,0.04)) 1px, transparent 1px),
-        linear-gradient(90deg, var(--separator, rgba(0,0,0,0.04)) 1px, transparent 1px);
-    background-size: 40px 40px;
+        linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    background-size: 44px 44px;
     pointer-events: none;
     z-index: 0;
+}
+
+/* Capa de "calles principales" más marcadas (detalle decorativo) */
+#map::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.06) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.06) 2px, transparent 2px);
+    background-size: 176px 176px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Variante clara del fondo de mapa */
+[data-theme="light"] #map {
+    background:
+        radial-gradient(circle at 15% 25%, rgba(0, 122, 255, 0.08), transparent 55%),
+        radial-gradient(circle at 85% 30%, rgba(191, 90, 242, 0.07), transparent 50%),
+        linear-gradient(160deg, #eef0f4 0%, #e4e8ef 55%, #dbe0ea 100%);
+}
+[data-theme="light"] #map::before {
+    background-image:
+        linear-gradient(rgba(60, 60, 67, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(60, 60, 67, 0.07) 1px, transparent 1px);
+}
+[data-theme="light"] #map::after {
+    background-image:
+        linear-gradient(rgba(60, 60, 67, 0.09) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(60, 60, 67, 0.09) 2px, transparent 2px);
+}
+
+/* Vineta sutil en los bordes del mapa */
+#map .leaflet-container { box-shadow: inset 0 0 80px rgba(0,0,0,0.10); }
+
+/* Los marcadores deben quedar por encima del fondo decorativo */
+#map .leaflet-map-pane { z-index: 10; position: relative; }
+
+/* Estado sin baldosas: marca de agua "Madrid" centrada (diseño premium) */
+#map.no-tiles .leaflet-container { background: transparent; }
+#map.no-tiles .leaflet-container::after {
+    content: "MADRID";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 64px;
+    font-weight: 800;
+    letter-spacing: 0.30em;
+    color: rgba(255, 255, 255, 0.05);
+    z-index: 1;
+    pointer-events: none;
+    font-family: -apple-system, "SF Pro Display", system-ui, sans-serif;
+    white-space: nowrap;
+}
+[data-theme="light"] #map.no-tiles .leaflet-container::after {
+    color: rgba(0, 0, 0, 0.05);
 }
 
 

@@ -654,25 +654,37 @@ function initMap() {
         zoomControl: true
     }).setView([40.4168, -3.7038], 12);
 
-    // Añadir una fuente de tiles con reintentos: si la primera no está
-    // disponible, intenta la siguiente. Así el mapa nunca queda en blanco.
-    const tiles = L.tileLayer(TILE_PROVIDERS[0], {
-        attribution: TILE_ATTRIBUTION,
-        maxZoom: 19
-    }).addTo(map);
+    // Capa de baldosas con degradación elegante: si los proveedores
+    // externos están bloqueados (p. ej. 403 en el preview), las baldosas
+    // se ocultan y se muestra el fondo de mapa diseñado + los marcadores,
+    // en lugar de un mosaico gris con errores.
+    const MAX_TILE_ERRORS = 6;
+    let tileErrors = 0;
+    let tileLayer = null;
 
-    let providerIndex = 0;
-    tiles.on('tileerror', function () {
-        // Intentar con el siguiente proveedor una sola vez
-        if (providerIndex + 1 < TILE_PROVIDERS.length) {
-            providerIndex++;
-            map.removeLayer(tiles);
-            L.tileLayer(TILE_PROVIDERS[providerIndex], {
-                attribution: TILE_ATTRIBUTION,
-                maxZoom: 19
-            }).addTo(map);
-        }
-    });
+    function cargarTiles(providerIndex) {
+        if (providerIndex >= TILE_PROVIDERS.length) return;
+        if (tileLayer) map.removeLayer(tileLayer);
+        tileLayer = L.tileLayer(TILE_PROVIDERS[providerIndex], {
+            attribution: TILE_ATTRIBUTION,
+            maxZoom: 19
+        }).addTo(map);
+
+        tileLayer.on('tileerror', function () {
+            tileErrors++;
+            if (tileErrors >= MAX_TILE_ERRORS) {
+                // Ningún proveedor disponible → fondo de mapa + marcadores
+                if (tileLayer) map.removeLayer(tileLayer);
+                tileLayer = null;
+                map.getContainer().classList.add('no-tiles');
+                console.warn('🗺️ Sin baldosas disponibles; mostrando marcadores sobre fondo propio');
+            } else if (tileErrors === MAX_TILE_ERRORS / 2) {
+                // Reintentar con el siguiente proveedor
+                cargarTiles(providerIndex + 1);
+            }
+        });
+    }
+    cargarTiles(0);
 
     markersLayer = L.markerClusterGroup({
         chunkedLoading: true,
