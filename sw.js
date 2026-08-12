@@ -1,5 +1,5 @@
 // sw.js completo y corregido
-const CACHE_VERSION = 'v3'; // ← súbelo manualmente solo cuando cambies
+const CACHE_VERSION = 'v4'; // ← súbelo manualmente solo cuando cambies
                              //    CSS/JS/HTML (archivos estáticos)
 
 const CACHE_NAME    = `eventos-madrid-${CACHE_VERSION}`;
@@ -9,9 +9,29 @@ const CACHE_STATIC  = `eventos-madrid-static-${CACHE_VERSION}`;
 const ARCHIVOS_ESTATICOS = [
     '/eventos-madrid/',
     '/eventos-madrid/index.html',
+    '/eventos-madrid/manifest.json',
     '/eventos-madrid/css/style.css',
+    '/eventos-madrid/css/variables.css',
+    '/eventos-madrid/css/layout.css',
+    '/eventos-madrid/css/components.css',
+    '/eventos-madrid/css/utilities.css',
+    '/eventos-madrid/css/premium.css',
+    '/eventos-madrid/css/mobile-ux.css',
     '/eventos-madrid/js/main.js',
     '/eventos-madrid/js/i18n.js',
+    '/eventos-madrid/js/modules/constants.js',
+    '/eventos-madrid/js/locales/es.js',
+    '/eventos-madrid/js/locales/en.js',
+    '/eventos-madrid/js/locales/fr.js',
+    '/eventos-madrid/js/locales/pt.js',
+    '/eventos-madrid/js/locales/de.js',
+    '/eventos-madrid/js/locales/it.js',
+    '/eventos-madrid/js/locales/zh.js',
+    '/eventos-madrid/js/locales/ja.js',
+    '/eventos-madrid/js/locales/ko.js',
+    '/eventos-madrid/js/locales/ar.js',
+    '/eventos-madrid/icons/icon-192.png',
+    '/eventos-madrid/icons/icon-512.png',
 ];
 
 // ===== DOMINIOS EXTERNOS (no cachear — CORS) =====
