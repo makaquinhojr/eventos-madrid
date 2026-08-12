@@ -1,5 +1,7 @@
 // Servidor estático para el preview de EventosMadrid.
-// Sirve el repositorio raíz tal cual (como GitHub Pages), bajo el prefijo /eventos-madrid/.
+// Sirve el repositorio raíz desde la raíz "/" (sin prefijo) para que el
+// service worker registrado bajo /eventos-madrid/ NO interfiera en el
+// preview. También se mantiene /eventos-madrid/ como alias.
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -26,23 +28,15 @@ const MIME = {
 
 const server = http.createServer((req, res) => {
   const raw = decodeURIComponent(req.url.split('?')[0]);
-
-  // Redirigir la raíz desnuda a la app bajo el prefijo
-  if (raw === '/' || raw === '/index.html') {
-    res.writeHead(302, { Location: PREFIX + (raw === '/index.html' ? '/index.html' : '/') });
-    res.end();
-    return;
-  }
-
   let urlPath = raw;
 
-  // Normalizar: quitar el prefijo base si está presente
+  // Alias: /eventos-madrid/... → servir desde la raíz del repo
   if (urlPath.startsWith(PREFIX)) {
     urlPath = urlPath.slice(PREFIX.length) || '/';
   }
 
-  // Sin sufijo → index.html
-  if (urlPath === '/') urlPath = '/index.html';
+  // Sin sufijo → index.html (la app vive en la raíz del repo)
+  if (urlPath === '/' || urlPath === '') urlPath = '/index.html';
 
   let filePath = path.join(ROOT, urlPath);
 
@@ -61,7 +55,11 @@ const server = http.createServer((req, res) => {
         res.writeHead(404); res.end('Not Found: ' + urlPath); return;
       }
       const ext = path.extname(filePath).toLowerCase();
-      res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+      res.writeHead(200, {
+        'Content-Type': MIME[ext] || 'application/octet-stream',
+        // No cachear en el preview para que cada recarga sea fresca
+        'Cache-Control': 'no-store'
+      });
       res.end(data);
     });
   });
@@ -69,5 +67,5 @@ const server = http.createServer((req, res) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`EventosMadrid static server en http://0.0.0.0:${PORT}${PREFIX}/`);
+  console.log(`EventosMadrid static server en http://0.0.0.0:${PORT}/`);
 });

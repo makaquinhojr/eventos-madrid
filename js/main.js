@@ -3681,10 +3681,29 @@ window.addEventListener('languageChanged', () => {
 });
 
 if ('serviceWorker' in navigator) {
+    // El service worker solo se registra en producción (GitHub Pages).
+    // En preview/desarrollo se desregistra y se limpian las caches para
+    // evitar que el navegador sirva versiones obsoletas de los assets.
+    const esProduccion =
+        location.hostname === 'makaquinhojr.github.io' ||
+        location.hostname.endsWith('.github.io');
+
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/eventos-madrid/sw.js')
-            .then(reg => console.log('✅ SW registrado:', reg.scope))
-            .catch(err => console.log('❌ SW error:', err));
+        if (esProduccion) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('✅ SW registrado:', reg.scope))
+                .catch(err => console.log('❌ SW error:', err));
+        } else {
+            if (navigator.serviceWorker.controller) {
+                console.log('🔧 Preview: desregistrando service worker');
+            }
+            navigator.serviceWorker.getRegistrations()
+                .then(regs => regs.forEach(r => r.unregister()));
+            if (window.caches) {
+                caches.keys()
+                    .then(keys => keys.forEach(k => caches.delete(k)));
+            }
+        }
     });
 }
 // ===== EXPORTACIONES GLOBALES PARA INLINE HANDLERS =====
