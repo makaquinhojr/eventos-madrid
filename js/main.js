@@ -50,7 +50,7 @@ let routePolyline = null;
 let routeMarkers = [];
 
 // ===== ICONOS Y COLORES =====
-import DOMPurify from 'https://cdn.jsdelivr.net/npm/dompurify@3.4.13/dist/purify.es.mjs';
+import DOMPurify from './vendor/dompurify.es.mjs';
 import { icons, colors, lugaresIcons, lugaresColors, ZONAS_COORDS } from './modules/constants.js';
 // ===== FUNCIÓN T (TRADUCCIÓN) =====
 function t(key) {

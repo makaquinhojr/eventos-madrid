@@ -1,5 +1,5 @@
 // sw.js completo y corregido
-const CACHE_VERSION = 'v4'; // ← súbelo manualmente solo cuando cambies
+const CACHE_VERSION = 'v5'; // ← súbelo manualmente solo cuando cambies
                              //    CSS/JS/HTML (archivos estáticos)
 
 const CACHE_NAME    = `eventos-madrid-${CACHE_VERSION}`;
@@ -19,6 +19,7 @@ const ARCHIVOS_ESTATICOS = [
     '/eventos-madrid/css/mobile-ux.css',
     '/eventos-madrid/js/main.js',
     '/eventos-madrid/js/i18n.js',
+    '/eventos-madrid/js/vendor/dompurify.es.mjs',
     '/eventos-madrid/js/modules/constants.js',
     '/eventos-madrid/js/locales/es.js',
     '/eventos-madrid/js/locales/en.js',
