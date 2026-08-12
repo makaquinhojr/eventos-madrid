@@ -172,6 +172,7 @@ export default {
         'toast.searches_on': '💾 Les recherches seront enregistrées',
         'toast.searches_off': '🗑️ Les recherches ne seront pas enregistrées',
         'toast.data_cleared': '🗑️ Données effacées',
+        'toast.load_error': '⚠️ Impossible de charger les événements',
         'toast.theme_activated': '✨ Thème "{theme}" activé',
         'toast.custom_color_on': '🎨 Couleur personnalisée activée',
         'toast.custom_color_off': '🎨 Thème par défaut restauré',

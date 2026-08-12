@@ -172,6 +172,7 @@ export default {
         'toast.searches_on': '💾 검색이 저장됩니다',
         'toast.searches_off': '🗑️ 검색이 저장되지 않습니다',
         'toast.data_cleared': '🗑️ 데이터 삭제됨',
+        'toast.load_error': '⚠️ 이벤트를 불러올 수 없습니다',
         'toast.theme_activated': '✨ "{theme}" 테마 활성화됨',
         'toast.custom_color_on': '🎨 커스텀 색상 활성화',
         'toast.custom_color_off': '🎨 기본 테마 복원됨',

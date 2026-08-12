@@ -176,6 +176,7 @@ export default {
         'toast.searches_on': '💾 سيتم حفظ عمليات البحث',
         'toast.searches_off': '🗑️ لن يتم حفظ عمليات البحث',
         'toast.data_cleared': '🗑️ تم مسح البيانات',
+        'toast.load_error': '⚠️ تعذّر تحميل الأحداث',
         'toast.theme_activated': '✨ تم تفعيل سمة "{theme}"',
         'toast.custom_color_on': '🎨 تم تفعيل اللون المخصص',
         'toast.custom_color_off': '🎨 تم استعادة السمة الافتراضية',

@@ -46,9 +46,11 @@
 <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
 
 <!-- ===== LOADER ===== -->
-<div class="loader-overlay" id="loader">
+<div class="loader-overlay" id="loader" role="status" aria-live="polite">
     <div class="loader-contenido">
-        <div class="loader-emoji">🎉</div>
+        <div class="loader-spinner" aria-hidden="true">
+            <div class="loader-spinner-ring"></div>
+        </div>
         <h2 class="loader-titulo" data-i18n="loader.title">EventosMadrid</h2>
         <p class="loader-subtitulo" data-i18n="loader.subtitle">Cargando eventos...</p>
         <div class="loader-barra">

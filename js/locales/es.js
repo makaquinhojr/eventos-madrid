@@ -209,6 +209,7 @@ export default {
         'toast.searches_on': '💾 Se guardarán tus búsquedas',
         'toast.searches_off': '🗑️ Las búsquedas no se guardarán',
         'toast.data_cleared': '🗑️ Datos limpiados',
+        'toast.load_error': '⚠️ No se pudieron cargar los eventos',
         'toast.theme_activated': '✨ Tema "{theme}" activado',
         'toast.custom_color_on': '🎨 Color personalizado activado',
         'toast.custom_color_off': '🎨 Tema por defecto restaurado',

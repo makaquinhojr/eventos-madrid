@@ -172,6 +172,7 @@ export default {
         'toast.searches_on': '💾 搜索将被保存',
         'toast.searches_off': '🗑️ 搜索不会被保存',
         'toast.data_cleared': '🗑️ 数据已清除',
+        'toast.load_error': '⚠️ 无法加载活动',
         'toast.theme_activated': '✨ 主题 "{theme}" 已激活',
         'toast.custom_color_on': '🎨 自定义颜色已激活',
         'toast.custom_color_off': '🎨 默认主题已恢复',

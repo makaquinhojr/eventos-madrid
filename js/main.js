@@ -50,7 +50,7 @@ let routePolyline = null;
 let routeMarkers = [];
 
 // ===== ICONOS Y COLORES =====
-import DOMPurify from 'dompurify';
+import DOMPurify from 'https://cdn.jsdelivr.net/npm/dompurify@3.4.13/dist/purify.es.mjs';
 import { icons, colors, lugaresIcons, lugaresColors, ZONAS_COORDS } from './modules/constants.js';
 // ===== FUNCIÓN T (TRADUCCIÓN) =====
 function t(key) {
@@ -664,12 +664,28 @@ function initMap() {
 }
 
 // ===== CARGA DE EVENTOS =====
+const LOAD_TIMEOUT_MS = 10000;
+let loaderHidden = false;
+
+// Oculta el loader si todavía está visible, evitando carga infinita.
+function forzarOcultarLoader() {
+    if (loaderHidden) return;
+    loaderHidden = true;
+    ocultarLoader(allEvents.length);
+}
+
 async function loadEvents() {
+    // Red de seguridad: nunca dejar el loader bloqueado para siempre.
+    const timeoutGuard = setTimeout(forzarOcultarLoader, LOAD_TIMEOUT_MS);
+
     try {
         const [eventosRes, lugaresRes] = await Promise.all([
             fetch('data/eventos.json'),
             fetch('data/lugares.json')
         ]);
+
+        if (!eventosRes.ok) throw new Error('HTTP ' + eventosRes.status + ' al cargar eventos');
+        if (!lugaresRes.ok) throw new Error('HTTP ' + lugaresRes.status + ' al cargar lugares');
 
         const events = await eventosRes.json();
         const lugares = await lugaresRes.json();
@@ -705,9 +721,14 @@ async function loadEvents() {
         performanceMetrics.renderTime = performance.now() - performanceMetrics.loadStart;
         console.log(`⚡ Performance: ${performanceMetrics.eventsLoaded} eventos cargados en ${Math.round(performanceMetrics.renderTime)}ms`);
 
+        clearTimeout(timeoutGuard);
+        forzarOcultarLoader();
+
     } catch (error) {
         console.error('❌ Error cargando datos:', error);
+        clearTimeout(timeoutGuard);
         ocultarLoader(0);
+        mostrarToast(i18n?.t('toast.load_error') || '⚠️ No se pudieron cargar los eventos', 'error');
     }
 }
 

@@ -172,6 +172,7 @@ export default {
         'toast.searches_on': '💾 検索が保存されます',
         'toast.searches_off': '🗑️ 検索は保存されません',
         'toast.data_cleared': '🗑️ データを消去しました',
+        'toast.load_error': '⚠️ イベントを読み込めませんでした',
         'toast.theme_activated': '✨ テーマ "{theme}" が有効になりました',
         'toast.custom_color_on': '🎨 カスタムカラーが有効になりました',
         'toast.custom_color_off': '🎨 デフォルトテーマが復元されました',

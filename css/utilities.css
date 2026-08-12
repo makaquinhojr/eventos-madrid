@@ -214,25 +214,43 @@
 
 
 
-.loader-emoji {
+.loader-spinner {
 
-    font-size: 64px;
+    width: 56px;
 
-    margin-bottom: var(--space-5);
+    height: 56px;
 
-    animation: bounce 1s var(--ease-in-out) infinite;
+    margin: 0 auto var(--space-5);
+
+    position: relative;
+
+}
+
+
+
+.loader-spinner-ring {
+
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: var(--radius-full);
+
+    border: 3px solid var(--bg-elevated-2);
+
+    border-top-color: var(--accent);
+
+    animation: spin 0.9s linear infinite;
 
 }
 
 
 
-@keyframes bounce {
+@keyframes spin { to { transform: rotate(360deg); } }
 
-    0%, 100% { transform: translateY(0); }
 
-    50% { transform: translateY(-20px); }
 
-}
+html[data-reduce-motion="true"] .loader-spinner-ring { animation-duration: 2.5s; }
 
 
 
